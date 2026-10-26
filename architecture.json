@@ -1,0 +1,811 @@
+{
+  "schemaVersion": 2,
+  "contractNote": "modules[].contract declares each module's inputs/outputs/invariants/probes (the blueprint node contract). dependsOn is the declared edge set; --probe-blueprint scans real cross-module references and fails on undeclared edges, regenerating docs/BLUEPRINT.md. Update contract and dependsOn in the same commit as the code change.",
+  "purpose": "Machine-readable navigation map for Franca developers and coding agents.",
+  "northStar": "Safe, understandable, recoverable game-language access for supported games.",
+  "navigation": {
+    "instructions": "AGENTS.md",
+    "boundaries": "docs/SYSTEM-MAP.md",
+    "currentStatus": "docs/DEVELOPMENT-PROGRESS.md",
+    "handoffAndTroubleshooting": "docs/HANDOFF.md",
+    "usage": "Match one feature, read its entryPoints, then expand to relatedPaths and callers only as needed. Paths are repository-relative; wildcards are globs.",
+    "documents": "docs/README.md",
+    "roadmap": "docs/ROADMAP.md",
+    "compatibility": "docs/COMPATIBILITY.md"
+  },
+  "modules": [
+    {
+      "id": "desktop",
+      "paths": [
+        "src/Franca/App.xaml",
+        "src/Franca/App.xaml.cs",
+        "src/Franca/MainWindow.xaml",
+        "src/Franca/MainWindow.xaml.cs",
+        "src/Franca/Views",
+        "src/Franca/ViewModels",
+        "src/Franca/Themes",
+        "src/Franca/Desktop"
+      ],
+      "owns": [
+        "user interaction",
+        "presentation state"
+      ],
+      "dependsOn": [
+        "application",
+        "game",
+        "installer",
+        "runtime",
+        "translation",
+        "shared",
+        "diagnostics"
+      ],
+      "contract": {
+        "inputs": [
+          "user actions on pages (library toggle, settings, endpoint management)",
+          "WPF timers and service events (relay counters, auto-pick results)"
+        ],
+        "outputs": [
+          "calls into application/query services",
+          "rendered status, overlay window, persisted UI preferences"
+        ],
+        "invariants": [
+          "views never parse INI, call HTTP, or write translation packs directly",
+          "window owns service instances, timers and subscriptions; all released on close"
+        ],
+        "probes": [
+          "--probe-navigation",
+          "--probe-startup",
+          "--probe-dialog",
+          "--probe-library"
+        ]
+      }
+    },
+    {
+      "id": "application",
+      "paths": [
+        "src/Franca/Services/GameTranslationService.cs",
+        "src/Franca/Services/KnownIssueRepairService.cs"
+      ],
+      "owns": [
+        "game enable/disable/repair orchestration",
+        "known issue repair workflows"
+      ],
+      "dependsOn": [
+        "game",
+        "installer",
+        "runtime",
+        "shared"
+      ],
+      "contract": {
+        "inputs": [
+          "enable/disable/repair requests from pages",
+          "game identity and target directory",
+          "debounced source/target-language configuration requests with a settings snapshot"
+        ],
+        "outputs": [
+          "orchestrated install/health-check/repair steps",
+          "runtime preparation before game launch",
+          "launch games via steam://rungameid/<appid>",
+          "diagnosable per-step results"
+        ],
+        "invariants": [
+          "installer never holds or starts the relay",
+          "enable/disable is reversible; writes to game directories keep recoverable backups",
+          "automatic language apply only touches stopped installed Unity games; preserves disabled state, skips running/unknown processes, and serializes with toggles/repairs"
+        ],
+        "probes": [
+          "--probe-toggle",
+          "--probe-health",
+          "--probe-architecture",
+          "--probe-language-apply"
+        ]
+      }
+    },
+    {
+      "id": "game",
+      "paths": [
+        "src/Franca/Models/GameInfo.cs",
+        "src/Franca/Services/SteamScanner.cs",
+        "src/Franca/Services/SteamAppInfoReader.cs",
+        "src/Franca/Services/EngineDetector.cs",
+        "src/Franca/Services/GameNameService.cs",
+        "src/Franca/Services/NameSegmenter.cs",
+        "src/Franca/Services/GameLibraryOrder.cs",
+        "src/Franca/Services/SteamIconService.cs"
+      ],
+      "owns": [
+        "game discovery",
+        "engine classification",
+        "library metadata and name resolution"
+      ],
+      "dependsOn": [
+        "translation",
+        "installer",
+        "shared"
+      ],
+      "contract": {
+        "inputs": [
+          "Steam library folders, appmanifest files and local appcache/appinfo.vdf v39-v41 metadata",
+          "game directory file signatures"
+        ],
+        "outputs": [
+          "installed game list with engine tags",
+          "translated/segmented game names",
+          "library ordering and icons"
+        ],
+        "invariants": [
+          "appmanifest supplies installed app ids; unmanifested directories with exe remain fallback rows without app ids; appinfo only classifies and never proves installation",
+          "known Steam game/demo/mod types override software name fallbacks; known software types and auxiliary-only EA anti-cheat directories are reversibly hidden; unknown types remain visible unless a known software signature matches",
+          "engine detection is local file signatures only, no network or model"
+        ],
+        "probes": [
+          "--probe-library",
+          "--probe-names <lang> <primaryEndpointId>"
+        ]
+      }
+    },
+    {
+      "id": "installer",
+      "paths": [
+        "src/Franca/Services/TranslationInstaller.cs",
+        "src/Franca/Services/TranslationHealthService.cs",
+        "src/Franca/Services/InstallationTransaction.cs",
+        "src/Franca/Services/TouhouStaticService.cs",
+        "src/Franca/Services/TouhouThcrapService.cs",
+        "src/Franca/Services/TouhouMenuImageService.cs",
+        "src/Franca/Services/TouhouMenuImageService.Specs.cs",
+        "src/Franca/Services/UePak",
+        "src/Franca/Services/UeStaticService.cs",
+        "src/Franca/Services/UeStaticService.Tables.cs",
+        "src/Franca/Services/StaticTextTranslationService.cs"
+      ],
+      "owns": [
+        "runtime installation",
+        "configuration health",
+        "repair",
+        "journalled installation and interrupted-install recovery",
+        "static archive patching for Touhou (ZUN engine) data packages",
+        "thcrap runtime translation patching for Touhou (ZUN engine) games",
+        "procedural localized menu sprite generation for Touhou th10/th11 (title.anm PNGs)",
+        "experimental UE v11 pak, locres and restricted cooked FText DataTable preparation outside game directories"
+      ],
+      "dependsOn": [
+        "game",
+        "translation",
+        "runtime",
+        "pack",
+        "shared"
+      ],
+      "contract": {
+        "inputs": [
+          "explicit relay address",
+          "target game directory",
+          "explicit UE source pak, selected locres or supported DataTable paths, settings snapshot and outside-game output/cache roots"
+        ],
+        "outputs": [
+          "BepInEx/XUnity files and AutoTranslatorConfig.ini",
+          "health reports and backups",
+          "ReloadTranslationsOnFileChange=True in template",
+          "UE prepared pak plus completion manifest outside game directories; not installed"
+        ],
+        "invariants": [
+          "never starts the relay; relay address is always passed in explicitly",
+          "backs up before every write; health check covers config, runtime files and reload flag",
+          "runtime packages are staged before mutation; pending transactions cannot be ready",
+          "rollback retains backups and refuses to overwrite external edits",
+          "Touhou static route stages unpack/translate/repack in a temp workspace; the game directory only sees verified archives plus .frorig/.frpatched reversible renames",
+          "Touhou thcrap route never modifies game data files; thtk unpack/dump is read-only and translations ship as jdiff patches under the thcrap working tree",
+          "thcrap working tree is copied from the bundled ThirdParty/thcrap on first use and works fully offline (no update servers)",
+          "exe swap is reversible (thNN.exe.frorig backup plus marker-checked stub) and refuses unrecognized game builds via base_tsa versions.js",
+          "jdiff box keys follow thcrap time_ind semantics: all boxes of a time are written together with line counts matching the original",
+          "UE preparation reads original archives only; rejects output/cache paths inside games and reparse-point output ancestors; completion manifest marks an immutable generation",
+          "UE translation uses instance-scoped packs and breakers, settings snapshot, 2500 input and 200 request limits; caches successful fragments and complete documents only; free-only by default",
+          "UE overlays are uncompressed after the target UE4.26 rejected compressed payloads; translation language and installed culture slot are explicit separate values"
+        ],
+        "probes": [
+          "--probe-health",
+          "--probe-toggle",
+          "--probe-installation",
+          "--probe-touhou-thcrap",
+          "--probe-ue-pak",
+          "--probe-ue-static"
+        ]
+      }
+    },
+    {
+      "id": "runtime",
+      "paths": [
+        "src/Franca/Services/RelayServer.cs",
+        "src/Franca/Services/GameRuntimeMonitor.cs",
+        "src/Franca/Services/KnownIssueCatalog.cs",
+        "src/Franca/Services/TranslationTextSegmenter.cs",
+        "src/Franca/Services/SegmentedTranslationService.cs",
+        "src/Franca/Services/GameTextSyncService.cs",
+        "src/Franca/Services/OverlayStatusModel.cs"
+      ],
+      "owns": [
+        "local translation relay",
+        "pool orchestration",
+        "failure-open behavior",
+        "paragraph and sentence segmentation",
+        "bounded fragment queue and document reconstruction",
+        "game text sync (Franca.txt full dump and buffered appends)",
+        "translation status overlay model (status lines from relay counters, lab/011)"
+      ],
+      "dependsOn": [
+        "game",
+        "translation",
+        "pack",
+        "shared"
+      ],
+      "contract": {
+        "inputs": [
+          "GET /translate/<appid>?text=...&from=...&to=...",
+          "UpgradeCompleted events from relay background upgrades",
+          "running game process signals"
+        ],
+        "outputs": [
+          "translated text or 503 (retry signal)",
+          "writes <game>/BepInEx/Translation/<lang>/Text/Franca.txt",
+          "creates a missing default _AutoGeneratedTranslations.txt before publishing Franca.txt; never replaces existing cache text",
+          "overlay status lines (mode, hit rates, in-flight/failures)",
+          "relay counters (DictHits/InFlight/Failures)"
+        ],
+        "invariants": [
+          "dictionary entries are never written to Franca.txt",
+          "incomplete segmented requests return 503; never a partial document",
+          "per-instance isolation; single request captures one settings snapshot",
+          "relay failures have error/retry paths; impact on game behavior requires integration testing"
+        ],
+        "probes": [
+          "--probe-relay",
+          "--probe-segmentation",
+          "--probe-dictionary",
+          "--probe-architecture"
+        ]
+      }
+    },
+    {
+      "id": "translation",
+      "paths": [
+        "src/Franca/Services/AppTranslator.cs",
+        "src/Franca/Services/Endpoint*.cs",
+        "src/Franca/Services/YoudaoWebTranslator.cs",
+        "src/Franca/Services/TranslationProviders.*.cs",
+        "src/Franca/Services/DictionaryService.cs",
+        "src/Franca/Services/DictionarySeeds.cs"
+      ],
+      "owns": [
+        "production translation protocols",
+        "endpoint configuration validation, model import prompts and credential removal",
+        "provider health checks",
+        "automatic endpoint selection",
+        "built-in dictionary lookup and seed entries"
+      ],
+      "dependsOn": [
+        "pack",
+        "shared"
+      ],
+      "contract": {
+        "inputs": [
+          "text + language pair + settings snapshot",
+          "endpoint definitions and keys"
+        ],
+        "outputs": [
+          "translated text per production protocol",
+          "endpoint health outcomes and automatic selection",
+          "dictionary hits (trim + case-insensitive)"
+        ],
+        "invariants": [
+          "speed tests reuse production protocols; EndpointTestService only wraps health checks",
+          "auto-switch hysteresis: new candidate at least 30% faster and switches at least 45s apart",
+          "dictionary auto-sedimentation only for source text up to 30 chars, never overwrites existing keys"
+        ],
+        "probes": [
+          "--probe-architecture",
+          "--probe-dictionary",
+          "--probe-free [lang]",
+          "--probe-translate <endpointId> <lang> <text>"
+        ]
+      }
+    },
+    {
+      "id": "pack",
+      "paths": [
+        "src/Franca/Services/PackStore.cs",
+        "src/Franca/Services/XxHash64.cs"
+      ],
+      "owns": [
+        "translation pack persistence"
+      ],
+      "dependsOn": [],
+      "contract": {
+        "inputs": [
+          "appId + language + source/translated pairs"
+        ],
+        "outputs": [
+          "JSONL pack files under packs/<appid>/<lang>/entries/<hh>.jsonl",
+          "cache hits for repeated source text"
+        ],
+        "invariants": [
+          "same text in different games stays isolated by appId",
+          "existing keys are never overwritten by sedimentation"
+        ],
+        "probes": [
+          "--probe-relay",
+          "--probe-architecture"
+        ]
+      }
+    },
+    {
+      "id": "shared",
+      "paths": [
+        "src/Franca/Services/AppSettings.cs",
+        "src/Franca/Services/AppLog.cs",
+        "src/Franca/Services/UiStrings.cs",
+        "src/Franca/Services/AttributionCatalog.cs",
+        "src/Franca/Services/EngineSupportCatalog.cs",
+        "src/Franca/Views/SettingsPage.xaml",
+        "src/Franca/Services/DnsWarmup.cs"
+      ],
+      "owns": [
+        "settings",
+        "logging",
+        "local text and attribution resources",
+        "engine support catalog",
+        "DNS warmup"
+      ],
+      "dependsOn": [
+        "translation",
+        "game"
+      ],
+      "contract": {
+        "inputs": [
+          "settings read/write from any module",
+          "log calls"
+        ],
+        "outputs": [
+          "deep-copied settings snapshots",
+          "log file lines",
+          "localized UI strings and attribution data",
+          "engine support list derived from engine installability"
+        ],
+        "invariants": [
+          "snapshots are deep copies; mutating a snapshot never affects live settings",
+          "logs never contain API keys or full game text"
+        ],
+        "probes": [
+          "--probe-architecture",
+          "--probe-startup"
+        ]
+      }
+    },
+    {
+      "id": "diagnostics",
+      "paths": [
+        "src/Franca/Diagnostics"
+      ],
+      "owns": [
+        "command-line probes and UI verification"
+      ],
+      "dependsOn": [
+        "application",
+        "desktop",
+        "game",
+        "installer",
+        "runtime",
+        "translation",
+        "pack",
+        "shared"
+      ],
+      "contract": {
+        "inputs": [
+          "--probe-* command-line arguments"
+        ],
+        "outputs": [
+          "RESULT<TAB>category<TAB>name<TAB>PASS|FAIL lines",
+          "process exit code; app shuts down without opening a window"
+        ],
+        "invariants": [
+          "synthetic fixtures, temporary directories and loopback HTTP only, unless a probe documents live-network side effects",
+          "probes never modify real games; probe success is not real-game acceptance"
+        ],
+        "probes": []
+      }
+    },
+    {
+      "id": "loader-experimental",
+      "paths": [
+        "src/Loader"
+      ],
+      "owns": [
+        "IL2CPP native bootstrap diagnostics",
+        "x64 WinHTTP proxy generation and isolated CoreCLR diagnostics"
+      ],
+      "dependsOn": [],
+      "contract": {
+        "inputs": [
+          "IL2CPP game process"
+        ],
+        "outputs": [
+          "bootstrap diagnostics log"
+        ],
+        "invariants": [
+          "build artifacts are never committed; experimental, not part of the desktop build"
+        ],
+        "probes": [
+          "pwsh -File src/Loader/test.ps1"
+        ]
+      }
+    }
+  ],
+  "features": [
+    {
+      "id": "ue-static-preparation",
+      "entryPoints": ["src/Franca/Services/UeStaticService.cs", "src/Franca/Services/StaticTextTranslationService.cs"],
+      "relatedPaths": ["src/Franca/Services/UePak", "src/Franca/Services/UeStaticService.Tables.cs", "src/Franca/Diagnostics/UePakProbe.cs", "src/Franca/Diagnostics/UeStaticProbe.cs", "src/Franca/Diagnostics/UeDataTableProbe.cs", "src/Franca/Diagnostics/ProbeRunner.Ue.cs", "src/Franca/Services/PackStore.cs", "src/Franca/Services/TranslationTextSegmenter.cs"],
+      "verification": ["--probe-ue-pak [artifactDirectory]", "--probe-ue-static", "--probe-architecture", "--probe-blueprint"],
+      "sideEffects": "Probes use temporary synthetic fixtures and injected providers only, no network/game writes. Optional pak probe artifactDirectory retains a synthetic archive for independent UnrealPak checking. --ue-inspect <pak> [targetCulture] reads real archives only. --ue-prepare <gameDir> <source.pak> <appId> <outputDir> <settings.json> <packsDir> <seconds> [--language=ja] [--slot=zh-Hans] <sourcePath>... reads an explicit source pak and contacts only enabled GoogleTranslateV2 (translate.googleapis.com) and BingTranslate (www.bing.com/cn.bing.com) through AppTranslator; writes packs and uncompressed prepared generations outside the game only. --ue-prepare-cached takes the same arguments but disables all providers and never contacts the network. English source, zh-CN default or ja translation with separate language caches; explicit existing target slot defaults to zh-Hans and is recorded in manifest. Preserve target-only native entries and report their count. --ue-table-inspect reads supported GameText/Database/*EN.uasset pairs. --ue-table-prepare and --ue-table-prepare-cached use the same arguments/options as locres preparation, translate supported cooked FText tables and preserve source-empty target rows. Unknown schemas are rejected; table probes use synthetic data only. No formal UI installation/launch; manually authorized live testing is recorded separately.",
+      "references": ["lab/014-ue-static-adapter.md", "tests/2026-10-25-ue-static.md", "tests/2026-10-26-octopath2.md", "docs/UE-ADAPTATION-ROADMAP.md"]
+    },
+    {
+      "id": "local-launcher-and-project-navigation",
+      "entryPoints": ["src/Launcher/Setup-Shortcut.ps1", "README.md"],
+      "relatedPaths": ["docs/README.md", "docs/site/index.html", "docs/site/engines.html", "docs/CHANGELOG.md", "docs/THIRD-PARTY-NOTICES.md", "src/Franca/Franca.csproj", "src/Franca/Assets/Brand/franca-taskbar.ico"],
+      "verification": ["dotnet build src/Franca/Franca.csproj -c Release", "powershell -NoProfile -ExecutionPolicy Bypass -File src/Launcher/Setup-Shortcut.ps1"],
+      "sideEffects": "Creates or updates the local root launch shortcut with absolute executable/icon paths; does not start Franca. A successful standard Windows Release build refreshes the shortcut automatically; custom output directories and design-time builds do not. The setup script can also regenerate it manually after relocating the checkout. Static documentation checks only require JSON, links and paths. Packaged notices retain their existing runtime filenames.",
+      "references": ["tests/2026-10-23-root-launcher.md"]
+    },
+    {
+      "id": "library-hide-non-game-software",
+      "entryPoints": ["src/Franca/Views/SettingsPage.xaml", "src/Franca/Views/SettingsPage.xaml.cs"],
+      "relatedPaths": ["src/Franca/MainWindow.xaml.cs", "src/Franca/Services/AppSettings.cs", "src/Franca/Services/GameLibraryOrder.cs", "src/Franca/Services/SteamScanner.cs", "src/Franca/Services/SteamAppInfoReader.cs", "src/Franca/Models/GameInfo.cs", "src/Franca/Services/UiStrings.cs", "src/Franca/Views/GamesPage.xaml.cs", "src/Franca/Diagnostics/LibraryProbe.cs"],
+      "verification": ["--probe-library"],
+      "sideEffects": "Setting defaults on, persists on click and immediately filters library counts and recent shortcut. Reads local Steam appinfo v39-v41 types; known game/demo/mod evidence overrides fallback names. Unmanifested directories use unambiguous exact install-dir metadata and auxiliary-only EA anti-cheat signatures, then known software name fallbacks. Unknown entries remain visible without such evidence. Does not remove scanned entries, write Steam/game directories or request network metadata. Probe uses transient settings, synthetic binary fixtures, local HTTP fixtures and read-only Steam scanning; shows a non-activating off-screen window with background services disabled to verify the loaded settings control and Click handler, and optionally saves screenshots.",
+      "references": ["tests/2026-10-23-software-filter.md"]
+    },
+    {
+      "id": "library-search-sort-icons",
+      "entryPoints": [
+        "src/Franca/Views/GamesPage.xaml",
+        "src/Franca/Views/GamesPage.xaml.cs"
+      ],
+      "relatedPaths": [
+        "src/Franca/Services/GameLibraryOrder.cs",
+        "src/Franca/Services/SteamIconService.cs",
+        "src/Franca/Services/SteamScanner.cs",
+        "src/Franca/Services/EngineDetector.cs",
+        "src/Franca/Models/GameInfo.cs",
+        "src/Franca/Services/AppSettings.cs",
+        "src/Franca/Diagnostics/LibraryProbe.cs",
+        "src/Franca/Diagnostics/ProbeRunner.Navigation.cs"
+      ],
+      "verification": [
+        "--probe-library",
+        "--probe-navigation [screenshotDirectory]"
+      ],
+      "sideEffects": "Reads local Steam registry/library; may render screenshots. Inspect probe setup before running.",
+      "references": [
+        "lab/009-library-discovery.md",
+        "tests/2026-10-23-unsupported-row.md",
+        "tests/test-plan.md"
+      ]
+    },
+    {
+      "id": "game-names-official-language-support",
+      "entryPoints": [
+        "src/Franca/Services/GameNameService.cs"
+      ],
+      "relatedPaths": [
+        "src/Franca/Services/NameSegmenter.cs",
+        "src/Franca/Services/AppSettings.cs",
+        "src/Franca/Services/GameLibraryOrder.cs",
+        "src/Franca/Services/UiStrings.cs",
+        "src/Franca/Views/SettingsPage.xaml",
+        "src/Franca/Views/SettingsPage.xaml.cs",
+        "src/Franca/Services/AppTranslator.cs",
+        "src/Franca/Models/GameInfo.cs",
+        "src/Franca/Views/GamesPage.xaml.cs",
+        "src/Franca/Diagnostics/LibraryProbe.cs",
+        "src/Franca/Diagnostics/ProbeRunner.Navigation.cs"
+      ],
+      "verification": [
+        "--probe-library",
+        "--probe-navigation [screenshotDirectory]",
+        "--probe-names <lang> <primaryEndpointId>"
+      ],
+      "sideEffects": "Names probe reads Steam library, accesses network and name cache; library probe supplies simulated language evidence for target and optional secondary language. Cached titles/evidence are displayed before network work. Manual official-support refresh queries Steam language evidence only, retains prior evidence on failure, and never translates titles. Secondary language only affects official-support display/order, never provider requests or game configuration.",
+      "references": [
+        "lab/009-library-discovery.md",
+        "docs/HANDOFF.md",
+        "tests/2026-10-25-library-refresh.md"
+      ]
+    },
+    {
+      "id": "install-toggle-config-health",
+      "entryPoints": [
+        "src/Franca/Services/GameTranslationService.cs",
+        "src/Franca/Services/TranslationInstaller.cs",
+        "src/Franca/Services/TranslationHealthService.cs"
+      ],
+      "relatedPaths": [
+        "src/Franca/Views/GamesPage.xaml.cs",
+        "src/Franca/Services/RelayServer.cs",
+        "src/Franca/Services/AppSettings.cs",
+        "src/Franca/Diagnostics/ProbeRunner.Installation.cs",
+        "src/Franca/Diagnostics/ArchitectureProbe.cs",
+        "src/Franca/Services/InstallationTransaction.cs",
+        "src/Franca/Diagnostics/InstallationProbe.cs",
+        "src/Franca/Services/TranslationHealthService.cs",
+        "src/Franca/Desktop/LanguageApplyController.cs",
+        "src/Franca/Views/LanguageApplyBar.xaml",
+        "src/Franca/Views/LanguageApplyBar.xaml.cs",
+        "src/Franca/MainWindow.xaml.cs",
+        "src/Franca/Views/SettingsPage.xaml",
+        "src/Franca/Diagnostics/LanguageApplyProbe.cs"
+      ],
+      "verification": [
+        "--probe-toggle",
+        "--probe-health",
+        "--probe-architecture",
+        "--probe-installation",
+        "--probe-language-apply",
+        "--probe-navigation [screenshotDirectory]"
+      ],
+      "sideEffects": "These probes use synthetic directories; real enable/disable/repair writes game files. Installation requires separate real-game acceptance. Installation probe uses temporary fixtures only, with disk/cancellation/validation/conflict injection; real install retains .franca/installations/<id>/manifest.json and overwritten-file backups. Pending transactions recover before readiness checks. Source/target language changes start a shared five-second countdown with pause/resume and apply-now controls. Completion repairs stopped installed Unity games with backups; does not enable disabled games or install runtimes. Running/unknown process states are skipped and reported. Language-apply probe uses temporary fixtures, process inspection, and a loopback relay only.",
+      "references": [
+        "tests/2026-10-22-sync.md",
+        "tests/test-plan.md",
+        "docs/HANDOFF.md",
+        "docs/INSTALLATION.md",
+        "tests/2026-10-23-language-apply.md",
+        "tests/2026-10-23-live-games.md"
+      ]
+    },
+    {
+      "id": "known-issues-process-monitor-repair",
+      "entryPoints": [
+        "src/Franca/Services/GameRuntimeMonitor.cs",
+        "src/Franca/Services/KnownIssueRepairService.cs"
+      ],
+      "relatedPaths": [
+        "src/Franca/Services/KnownIssueCatalog.cs",
+        "src/Franca/Views/KnownIssueDialog.xaml",
+        "src/Franca/Views/KnownIssueDialog.xaml.cs",
+        "src/Franca/MainWindow.xaml.cs",
+        "src/Franca/Diagnostics/ProbeRunner.KnownIssues.cs"
+      ],
+      "verification": [
+        "--probe-known-issues"
+      ],
+      "sideEffects": "Probe uses synthetic evidence; real repair can close and restart game/Steam processes. Probe success is not real repair acceptance.",
+      "references": [
+        "tests/test-plan.md",
+        "docs/HANDOFF.md"
+      ]
+    },
+    {
+      "id": "endpoint-protocols-selection-keys",
+      "entryPoints": [
+        "src/Franca/Views/EndpointsPage.xaml.cs",
+        "src/Franca/Services/AppTranslator.cs"
+      ],
+      "relatedPaths": [
+        "src/Franca/Views/EndpointsPage.xaml",
+        "src/Franca/Services/EndpointCatalog.cs",
+        "src/Franca/Services/EndpointConfigurationService.cs",
+        "src/Franca/Services/EndpointTestService.cs",
+        "src/Franca/Services/EndpointAutoService.cs",
+        "src/Franca/Services/YoudaoWebTranslator.cs",
+        "src/Franca/ViewModels/EndpointCard.cs",
+        "src/Franca/Views/CustomEndpointDialog.xaml.cs",
+        "src/Franca/Views/AgentEndpointDialog.xaml",
+        "src/Franca/Views/AgentEndpointDialog.xaml.cs",
+        "src/Franca/Diagnostics/EndpointConfigurationProbe.cs",
+        "src/Franca/Services/AppSettings.cs",
+        "src/Franca/MainWindow.xaml.cs",
+        "src/Franca/Services/TranslationProviders.*.cs",
+        "src/Franca/Services/EndpointStatus.cs",
+        "src/Franca/Desktop/EndpointAutoController.cs",
+        "src/Franca/Diagnostics/ProbeRunner.Translation.cs",
+        "src/Franca/Diagnostics/ArchitectureProbe.cs",
+        "src/Franca/Diagnostics/ProbeRunner.Dialogs.cs"
+      ],
+      "verification": [
+        "--probe-endpoint-config",
+        "--probe-navigation [screenshotDirectory]",
+        "--probe-deepseek",
+        "--probe-architecture",
+        "--probe-free [lang]",
+        "--probe-translate <endpointId> <lang> <text> [--source <lang>]"
+      ],
+      "sideEffects": "Architecture and endpoint-config probes use transient settings and loopback HTTP only. --probe-deepseek explicitly reads the saved local DeepSeek key and makes two short paid API calls (health + production translation), never logs credentials and does not change the active endpoint. Other translation probes contact live providers and may consume quota. Production protocols live in TranslationProviders.*.cs; EndpointTestService only wraps health checks.",
+      "references": [
+        "tests/test-plan.md",
+        "tests/2026-10-24-endpoint-primary.md"
+      ]
+    },
+    {
+      "id": "relay-provider-pool-pack-cache",
+      "entryPoints": [
+        "src/Franca/Services/RelayServer.cs",
+        "src/Franca/Services/PackStore.cs"
+      ],
+      "relatedPaths": [
+        "src/Franca/Services/XxHash64.cs",
+        "src/Franca/Services/AppTranslator.cs",
+        "src/Franca/Services/EndpointAutoService.cs",
+        "src/Franca/Services/AppSettings.cs",
+        "src/Franca/Services/DictionaryService.cs",
+        "src/Franca/Services/DictionarySeeds.cs",
+        "src/Franca/Services/GameTextSyncService.cs",
+        "src/Franca/Services/OverlayStatusModel.cs",
+        "src/Franca/MainWindow.xaml.cs",
+        "src/Franca/Diagnostics/ProbeRunner.Relay.cs",
+        "src/Franca/Diagnostics/ArchitectureProbe.cs",
+        "src/Franca/Diagnostics/DictionaryProbe.cs"
+      ],
+      "verification": [
+        "--probe-architecture",
+        "--probe-dictionary",
+        "--probe-relay"
+      ],
+      "sideEffects": "Architecture and dictionary probes use unique temporary packs/dictionaries/game directories and loopback mock providers only. Dictionary probe also covers the Slice-2 game-text sync: PrepareForGame full dump and buffered runtime appends to <game>/BepInEx/Translation/<lang>/Text/Franca.txt (dictionary entries are never written there), cold empty-pack reload ordering and preservation of existing runtime cache text. Sync creates a missing default _AutoGeneratedTranslations.txt before publishing Franca.txt; it never truncates an existing runtime cache. Custom output paths remain managed by XUnity. Legacy --probe-relay contacts live endpoints and deletes/recreates synthetic pack 999999 in the executable directory. Identified requests use /translate/<appid>; legacy /translate skips game-pack caching.",
+      "references": [
+        "lab/004-package-format-v1.md",
+        "lab/006-relay-and-pack-harvest.md",
+        "docs/OPTIMIZATIONS.md",
+        "tests/2026-10-24-unity-cleanup.md"
+      ]
+    },
+    {
+      "id": "startup-navigation-settings-localization",
+      "entryPoints": [
+        "src/Franca/MainWindow.xaml.cs",
+        "src/Franca/Views/SettingsPage.xaml.cs",
+        "src/Franca/Views/AcknowledgementsPage.xaml.cs"
+      ],
+      "relatedPaths": [
+        "src/Franca/MainWindow.xaml",
+        "src/Franca/App.xaml.cs",
+        "src/Franca/Services/AppSettings.cs",
+        "src/Franca/Services/UiStrings.cs",
+        "src/Franca/Services/AttributionCatalog.cs",
+        "src/Franca/Views/LicenseWindow.xaml.cs",
+        "src/Franca/Views/StatusPage.xaml",
+        "src/Franca/Views/StatusPage.xaml.cs",
+        "src/Franca/Views/EnginesPage.xaml",
+        "src/Franca/Views/EnginesPage.xaml.cs",
+        "src/Franca/Services/EngineSupportCatalog.cs",
+        "src/Franca/Themes/ThemeCatalog.cs",
+        "src/Franca/Themes/DarkTheme.xaml",
+        "src/Franca/Diagnostics/ProbeRunner.Navigation.cs",
+        "src/Franca/Diagnostics/ProbeRunner.cs",
+        "src/Franca/Desktop/EndpointAutoController.cs",
+        "src/Franca/Assets/Brand",
+        "src/Franca/Franca.csproj"
+      ],
+      "verification": [
+        "--probe-startup",
+        "--probe-navigation [screenshotDirectory]"
+      ],
+      "sideEffects": "Startup probe checks local resources, all 15 UI languages and six theme palettes (normal text contrast >= 4.5:1); navigation probe constructs real WPF pages with background services disabled, uses synthetic game rows and writes six-theme screenshots of status/settings/endpoints/library. No real endpoint requests or game writes.",
+      "references": [
+        "lab/008-licenses-and-acknowledgements.md",
+        "docs/UI-IMPROVEMENT-CHECKLIST.md",
+        "tests/test-plan.md"
+      ]
+    },
+    {
+      "id": "native-loader-experiment",
+      "entryPoints": [
+        "src/Loader/README.md",
+        "src/Loader/build.ps1",
+        "src/Loader/test.ps1"
+      ],
+      "relatedPaths": [
+        "src/Loader/loader.c",
+        "src/Loader/tests"
+      ],
+      "verification": [
+        "pwsh -File src/Loader/test.ps1"
+      ],
+      "sideEffects": "Builds native x64 proxy and managed/native fixtures using an existing MSVC/SDK/.NET9 toolchain. Probe uses unique temporary directories and local WinHTTP handles without SendRequest; no game writes or input injection. Native binaries and exports stay under ignored src/Loader/build. Actual Unity bootstrap timing and game translation remain separate acceptance gates.",
+      "references": [
+        "docs/DEVELOPMENT-PROGRESS.md",
+        "docs/THIRD-PARTY-NOTICES.md",
+        "tests/2026-10-23-loader.md",
+        "tests/2026-10-23-live-games.md"
+      ]
+    },
+    {
+      "id": "long-text-segmentation",
+      "entryPoints": [
+        "src/Franca/Services/TranslationTextSegmenter.cs",
+        "src/Franca/Services/SegmentedTranslationService.cs"
+      ],
+      "relatedPaths": [
+        "src/Franca/Services/RelayServer.cs",
+        "src/Franca/Services/TranslationInstaller.cs",
+        "src/Franca/Services/TranslationHealthService.cs",
+        "src/Franca/Diagnostics/SegmentationProbe.cs"
+      ],
+      "verification": [
+        "--probe-segmentation",
+        "--probe-health",
+        "--probe-architecture"
+      ],
+      "sideEffects": "Probes use temporary fixtures and loopback HTTP only. Real-game config repair backs up INI, accepts up to 2500 characters and retains paragraph whitespace; restart the game to apply. Provider requests are at most 200 characters; UI receives the reconstructed full document.",
+      "references": [
+        "tests/2026-10-22-long-text.md"
+      ]
+    },
+    {
+      "id": "blueprint-contract-graph",
+      "entryPoints": [
+        "src/Franca/Diagnostics/BlueprintProbe.cs"
+      ],
+      "relatedPaths": [
+        "architecture.json",
+        "docs/BLUEPRINT.md",
+        "docs/BLUEPRINT-FLOWS.md",
+        "src/Franca/Diagnostics/ProbeRunner.cs"
+      ],
+      "verification": [
+        "--probe-blueprint [repoRoot]"
+      ],
+      "sideEffects": "Reads source files and architecture.json; rewrites docs/BLUEPRINT.md only. No network, no game directories. Module contracts live in modules[].contract in this file; the probe fails on undeclared cross-module references.",
+      "references": [
+        "docs/SYSTEM-MAP.md"
+      ]
+    },
+    {
+      "id": "translation-status-overlay",
+      "entryPoints": [
+        "src/Franca/Views/OverlayWindow.xaml",
+        "src/Franca/Services/OverlayStatusModel.cs"
+      ],
+      "relatedPaths": [
+        "src/Franca/Views/OverlayWindow.xaml.cs",
+        "src/Franca/MainWindow.xaml.cs",
+        "src/Franca/Diagnostics/OverlayProbe.cs"
+      ],
+      "verification": [
+        "--probe-overlay <artifact-directory>",
+        "--probe-architecture"
+      ],
+      "sideEffects": "Overlay probe shows a real WPF window offscreen without activation, reads native styles and foreground handle, uses temporary packs and loopback mock translation only, writes a rendered PNG. It does not inject input or validate real-game overlay/keyboard/DPI behavior.",
+      "references": [
+        "lab/011-overlay-status.md",
+        "docs/ROADMAP.md"
+      ]
+    }
+  ],
+  "criticalFlows": [
+    "desktop.enable-game -> application.GameTranslationService -> installer.install-or-validate -> per-game relay URL in XUnity config -> runtime.relay -> pack.lookup-or-translation -> pack.store",
+    "desktop.repair-game -> application.GameTranslationService -> installer.health-check -> backup -> repair-config -> recheck -> separate real-game-validation",
+    "desktop.EndpointAutoController -> translation.EndpointAutoService -> verified selection -> published settings snapshot -> next relay request"
+  ],
+  "stateFiles": [
+    "franca-settings.json",
+    "packs/<appid>/<lang>/entries/<hh>.jsonl",
+    "dictionaries/<from>-<to>.json",
+    "<game>/BepInEx/Translation/<lang>/Text/Franca.txt",
+    "<game>/BepInEx/config/AutoTranslatorConfig.ini",
+    "<game>/BepInEx/LogOutput.log",
+    "<game>/BepInEx/franca-loader.log",
+    "<game>/.franca/installations/<id>/manifest.json",
+    "<game>/.franca/touhou-thcrap.json",
+    "<game>/thNN.exe.frorig + thNN.thcrapcmd",
+    "thcrap/config/franca.js",
+    "thcrap/repos/franca/<patchid>/"
+  ],
+  "acceptanceSource": "tests/test-plan.md",
+  "runtimeIdentity": {
+    "route": "/translate/<positive-appid>",
+    "legacyRoute": "/translate",
+    "legacyPolicy": "Translate without reading or writing game packs; never infer identity from ActiveGameAppId.",
+    "migration": "Existing INI files are preserved. Explicit game configuration repair writes the identified route; no batch game-directory rewrite.",
+    "settings": "Desktop publishes deep snapshots; each relay request captures one snapshot. The source and target query parameters apply to that request."
+  }
+}

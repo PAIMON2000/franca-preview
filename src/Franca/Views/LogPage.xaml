@@ -1,0 +1,29 @@
+<UserControl x:Class="Franca.Views.LogPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource PageBackgroundBrush}">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+            <Button x:Name="CopyButton" Content="复制" Click="OnCopyClick" Padding="10,2"/>
+            <Button x:Name="ClearButton" Content="清空" Click="OnClearClick" Padding="10,2" Margin="8,0,0,0"/>
+        </StackPanel>
+        <ListBox Grid.Row="1" x:Name="LogList" FontFamily="Consolas" FontSize="12">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="2,0"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <ContentPresenter/>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+        </ListBox>
+    </Grid>
+</UserControl>

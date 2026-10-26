@@ -1,0 +1,43 @@
+<UserControl x:Class="Franca.Views.EnginesPage"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="{DynamicResource PageBackgroundBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24">
+            <TextBlock x:Name="TitleLabel" FontWeight="SemiBold" FontSize="24" Margin="0,0,0,16"/>
+            <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1" Padding="20" CornerRadius="6" Margin="0,0,0,20">
+                <ItemsControl x:Name="EnginesList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="230"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="None"/>
+                                <Border x:Name="Badge" Grid.Column="1" CornerRadius="3" BorderThickness="1"
+                                        Padding="8,1" Margin="0,0,10,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding BadgeText}" FontSize="10"/>
+                                </Border>
+                                <TextBlock Grid.Column="2" Text="{Binding Note}" FontSize="11" TextWrapping="Wrap"
+                                           VerticalAlignment="Center" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsSupported}" Value="True">
+                                    <Setter TargetName="Badge" Property="BorderBrush" Value="{DynamicResource OkBrush}"/>
+                                    <Setter TargetName="Badge" Property="TextElement.Foreground" Value="{DynamicResource OkBrush}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSupported}" Value="False">
+                                    <Setter TargetName="Badge" Property="BorderBrush" Value="{DynamicResource TextSecondaryBrush}"/>
+                                    <Setter TargetName="Badge" Property="TextElement.Foreground" Value="{DynamicResource TextSecondaryBrush}"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

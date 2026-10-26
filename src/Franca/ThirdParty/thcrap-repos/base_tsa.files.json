@@ -1,0 +1,1285 @@
+﻿{
+    "id":  "nmlgc/base_tsa",
+    "title":  "Basic support for Team Shanghai Alice games (runtime download, not bundled)",
+    "upstream":  "https://github.com/thpatch/thcrap-tsa",
+    "commit":  "c803fdcba321c018ac9e8ee35ee147dff72dd45a",
+    "generatedAt":  "2026-10-26",
+    "servers":  [
+                    "https://mirrors.thpatch.net/nmlgc/base_tsa/",
+                    "https://raw.githubusercontent.com/thpatch/thcrap-tsa/c803fdcba321c018ac9e8ee35ee147dff72dd45a/base_tsa/"
+                ],
+    "files":  [
+                  {
+                      "path":  "alcostg.js",
+                      "size":  1010,
+                      "sha256":  "3bc52fdf3fe515de363a8264cb7c54dee1c5db876b2a6d1125e5c73dccbba47d"
+                  },
+                  {
+                      "path":  "alcostg.v1.00a.js",
+                      "size":  363,
+                      "sha256":  "d4f85279f242529f7dabc1f60b664450e910672b3f1ad090199454160361296f"
+                  },
+                  {
+                      "path":  "alcostg/dialog_203.js",
+                      "size":  141,
+                      "sha256":  "dfc451cc3b8d0f2622edcbbfecd4351d2098e1dacb1f25f62600021bcfa98404"
+                  },
+                  {
+                      "path":  "alcostg/stage07.ecl",
+                      "size":  41356,
+                      "sha256":  "c18c86d551f4e98d4f5fde97e3d974f5337786510f5671f30d4f2418feda89a0"
+                  },
+                  {
+                      "path":  "alcostg/stage08.ecl",
+                      "size":  52328,
+                      "sha256":  "b7d0d9fb38bdc3a6312b0ce4588ffc68c2dfe1dadd713c5f58a9580632f069e9"
+                  },
+                  {
+                      "path":  "alcostg/stage09.ecl",
+                      "size":  60040,
+                      "sha256":  "cfa7fdde0aed4472ba1f7cb30a30d6bcfc30fc66bf069bb1299fb9f5d18de5a9"
+                  },
+                  {
+                      "path":  "alcostg/text.anm",
+                      "size":  19276,
+                      "sha256":  "531cc6cf637f15e8df20db98843daae22b5237caaff0af0f536d81794202de62"
+                  },
+                  {
+                      "path":  "alcostg_custom/dialog_103.js",
+                      "size":  353,
+                      "sha256":  "fb69ceb3a989cff2db4daae015c3ac7a62ef9a5c60cb934ddc36386bea028ed2"
+                  },
+                  {
+                      "path":  "alcostg_custom/stringlocs.v1.00a.js",
+                      "size":  80,
+                      "sha256":  "4685bd155966b44f18eb2c99cbe7b42d44435a97b9b80192c11dee67a0df8f33"
+                  },
+                  {
+                      "path":  "formats.js",
+                      "size":  2571,
+                      "sha256":  "f899365091e302fe59763604efa363e7e8402691c72bb8a590b1b246c3a6325e"
+                  },
+                  {
+                      "path":  "global.js",
+                      "size":  4667,
+                      "sha256":  "8b915c924efc358a15bf2ff0c85bf876faf967f83e28501227379de27fbcb981"
+                  },
+                  {
+                      "path":  "patch.js",
+                      "size":  427,
+                      "sha256":  "2f7f71b722c723be764d79fb5167cb30b708f9af35007f35feb8c604a1ec3fd4",
+                      "mirrorSha256":  "19827ffbf0af05f027179c47829ae1d827898dd271305744a8fbc49d6b75bd92",
+                      "mirrorSize":  419
+                  },
+                  {
+                      "path":  "stringdefs.js",
+                      "size":  2119,
+                      "sha256":  "4e475513542afd5cbba14a18ca6e620673368ce3b35186a8bcaaf4903e13e84b"
+                  },
+                  {
+                      "path":  "th06.js",
+                      "size":  11466,
+                      "sha256":  "8be1be7c3792a6611e06a7a23021bde33f7d000c736073e4bd7d0f3f28be3420"
+                  },
+                  {
+                      "path":  "th06.v0.08.js",
+                      "size":  747,
+                      "sha256":  "f7f2257c0a2facf365180129700036aa96e56d68fc494451a9ef05d023967ebb"
+                  },
+                  {
+                      "path":  "th06.v0.13.js",
+                      "size":  1095,
+                      "sha256":  "f66fa53964878d3315458597651e52c0b51f7c40881e03c69cbd89ac7c493cdc"
+                  },
+                  {
+                      "path":  "th06.v1.02h.js",
+                      "size":  5747,
+                      "sha256":  "7bb621f9d3d787a07035e4e383c6dd5d6ed4e6fed700ae915989787c48565f76"
+                  },
+                  {
+                      "path":  "th06/front.anm",
+                      "size":  2372,
+                      "sha256":  "f6ab0825cbc7fa68e2dd73457edf8979285d061c059cfa807eca4255c06725eb"
+                  },
+                  {
+                      "path":  "th06/music01.anm",
+                      "size":  464,
+                      "sha256":  "ea0393645c1b854ed81a5eab7b597217fec6912782b630f76f5c9ad626fa95ee"
+                  },
+                  {
+                      "path":  "th06/music02.anm",
+                      "size":  464,
+                      "sha256":  "ea0393645c1b854ed81a5eab7b597217fec6912782b630f76f5c9ad626fa95ee"
+                  },
+                  {
+                      "path":  "th06/replay00.anm",
+                      "size":  3580,
+                      "sha256":  "c1e4484efb8fec1dd288592509cbdd8279e337ac545c446362f7822710641e86"
+                  },
+                  {
+                      "path":  "th06/result01.anm",
+                      "size":  1104,
+                      "sha256":  "4fcbc14007ce4bd5dd56503305333de00dd68f60294b1f2bdf1ac4adbfbb9f88"
+                  },
+                  {
+                      "path":  "th06/stringlocs.v1.02h.js",
+                      "size":  4317,
+                      "sha256":  "8df7bfeda6fa2da292e4268f9474d91a8d4e813e91f84d2619429104bc50726d"
+                  },
+                  {
+                      "path":  "th06/text.anm",
+                      "size":  2552,
+                      "sha256":  "da88021250445b9815cc3cd157d74e7fec1031c5d837747be7f375fa04ce7856"
+                  },
+                  {
+                      "path":  "th06/title01.anm",
+                      "size":  4628,
+                      "sha256":  "cb133ae72fd28e885736f14f86110f2c3891eda9d33591b86527829e889982c6"
+                  },
+                  {
+                      "path":  "th06/title01s.anm",
+                      "size":  776,
+                      "sha256":  "be945d37f9518ce1627a292a66dbcdfdd7923ef83213782f5a17a501bf662629"
+                  },
+                  {
+                      "path":  "th06/title04.anm",
+                      "size":  6448,
+                      "sha256":  "9dbae07f0558d45ad928dddfccc5a94af241eb40fef4746369631fc0a7514930"
+                  },
+                  {
+                      "path":  "th06/title04s.anm",
+                      "size":  584,
+                      "sha256":  "2bc8045f5589df2f8461bd758b5d334578aac3b2448ceaa8ba6eb847db219f58"
+                  },
+                  {
+                      "path":  "th06_custom.js",
+                      "size":  373,
+                      "sha256":  "72efd65f57cd33e76dec61a2ace5d17a504d68d6012127a4ff051f916c0e59a4"
+                  },
+                  {
+                      "path":  "th06_custom.v0.13.js",
+                      "size":  72,
+                      "sha256":  "253d5f032eca1bc718690de28a55e2e46d315aa700d6e4aba9a2705d6bb02280"
+                  },
+                  {
+                      "path":  "th06_custom.v1.02h.js",
+                      "size":  72,
+                      "sha256":  "561d86398b22bb88d2c4575cffabaffc8127ff86199b1aa0e1cd46fca96656fd"
+                  },
+                  {
+                      "path":  "th06_custom/dialog_103.js",
+                      "size":  662,
+                      "sha256":  "aeee4ecb0f61d20848c2e9bddb7ff9b8beccd17073036f178bca7a9efd5482f4"
+                  },
+                  {
+                      "path":  "th06_custom/stringlocs.v0.13.js",
+                      "size":  175,
+                      "sha256":  "96cbe9a020d34c257b38d705da471b07a19e52af6f43a92ba33f8c97ad2e7960"
+                  },
+                  {
+                      "path":  "th06_custom/stringlocs.v1.00.js",
+                      "size":  80,
+                      "sha256":  "86efbd1ad611c01861ab0790ca8430d4c4044eefd9651d7fa010adccb813253c"
+                  },
+                  {
+                      "path":  "th06_custom/stringlocs.v1.02h.js",
+                      "size":  216,
+                      "sha256":  "3d9179913fc172f484e120f1e5b5b867f83fadd0db5607666507c66692dcaa9a"
+                  },
+                  {
+                      "path":  "th07.js",
+                      "size":  4312,
+                      "sha256":  "8675243007b0b1b2bbda288bbb236d710b658a099214968ad8a1cf0052d0e2af"
+                  },
+                  {
+                      "path":  "th07.v1.00b.js",
+                      "size":  3313,
+                      "sha256":  "cfa2faaa184198ba44a476b4b05906cfcccb19e7abe634177168ec82956e6814"
+                  },
+                  {
+                      "path":  "th07/stringlocs.v1.00b.js",
+                      "size":  6061,
+                      "sha256":  "a80c284cab5fe3b294218f7978efc115d06aca6b8a4a686974db2030ca67600c"
+                  },
+                  {
+                      "path":  "th07/text.anm",
+                      "size":  5756,
+                      "sha256":  "5746a23d0db544247867499c13916c73644c0a40177919ba0ec091bb9c1747d7"
+                  },
+                  {
+                      "path":  "th07_custom/dialog_103.js",
+                      "size":  711,
+                      "sha256":  "03d27b8fad7753d7b4a8138cd25827de1be612d2639c12278250914bc4fe17df"
+                  },
+                  {
+                      "path":  "th07_custom/stringlocs.v1.00.js",
+                      "size":  80,
+                      "sha256":  "1fa2ce45e5cb92474ab223271aacc15e09fe4a8f679aa2e7ebe9e82bdcaf9e7b"
+                  },
+                  {
+                      "path":  "th07_custom/stringlocs.v1.00b.js",
+                      "size":  121,
+                      "sha256":  "d6e9a0b92706c6df12a8709dd5c731570d18c608b499850fdb015f32c46314c8"
+                  },
+                  {
+                      "path":  "th08.js",
+                      "size":  5755,
+                      "sha256":  "741cd2fcf6463032eec107867062f3fc7cc16fe3ca64db695465031a5c148cec"
+                  },
+                  {
+                      "path":  "th08.v1.00d.js",
+                      "size":  3743,
+                      "sha256":  "8004b88efd03991dc27fb9cd97132e2d9bda6ce15751446f697d7252b3163403"
+                  },
+                  {
+                      "path":  "th08/stringlocs.v1.00d.js",
+                      "size":  8197,
+                      "sha256":  "aa44dd214b9c9c9e670c96ad65aca96120b1adce8f169946dea4e0a46698efc3"
+                  },
+                  {
+                      "path":  "th08/text.anm",
+                      "size":  7048,
+                      "sha256":  "cf1a6a6d9ab7fade4d1b413db6ae1aa2870393bc2f57da6733bf8ad25991e5d1"
+                  },
+                  {
+                      "path":  "th08/text.v0.03.anm",
+                      "size":  6544,
+                      "sha256":  "8407bbb5c74bedaec3ebc13132f49ec608fb8b0466fc9e8d746141ab2ddc74a8"
+                  },
+                  {
+                      "path":  "th08_custom/dialog_103.js",
+                      "size":  711,
+                      "sha256":  "0ddfa3dfa6485c5ec2d542dfde17454ac1bd5e1331b68d7f38398775a4c18294"
+                  },
+                  {
+                      "path":  "th08_custom/stringlocs.v1.00.js",
+                      "size":  121,
+                      "sha256":  "d6e9a0b92706c6df12a8709dd5c731570d18c608b499850fdb015f32c46314c8"
+                  },
+                  {
+                      "path":  "th09.js",
+                      "size":  4140,
+                      "sha256":  "572a3f8689bcb2e1eea19aef16b91ea6fd457d2d4992283c54b939ec73021109"
+                  },
+                  {
+                      "path":  "th09.v0.02a.js",
+                      "size":  416,
+                      "sha256":  "a456ace1f68f57b3e553868efcd6f2b44488255d814dda2617582e3f72d05462"
+                  },
+                  {
+                      "path":  "th09.v1.00a.js",
+                      "size":  3337,
+                      "sha256":  "906d2c5a8429d6a189a7e4fc5ace2db46b76a9ea3bd6c3f1cbd7bf94f3f594fd"
+                  },
+                  {
+                      "path":  "th09.v1.50a.js",
+                      "size":  2773,
+                      "sha256":  "d41b811cf50d6f99071d04a71d2112026f7a08e5a20b6ad4e3ff164c911d5d04"
+                  },
+                  {
+                      "path":  "th09/stringlocs.v1.00a.js",
+                      "size":  1165,
+                      "sha256":  "9d5b7e6bf2094f835fa7a04a946f2e194cfa0fb8d7ca43a76d797a152b2a3a09"
+                  },
+                  {
+                      "path":  "th09/stringlocs.v1.50a.js",
+                      "size":  3760,
+                      "sha256":  "049c912e011fa4e6c0b6cd55cee5c8925eaeb92f1e1fee606e9ca20dac8272c8"
+                  },
+                  {
+                      "path":  "th09_custom/dialog_103.js",
+                      "size":  836,
+                      "sha256":  "c62240b68a5784e3410d2c465d8185171c9f7e97bb7bccf92a71419dbe0d2940"
+                  },
+                  {
+                      "path":  "th09_custom/stringlocs.v1.00.js",
+                      "size":  121,
+                      "sha256":  "4bc137de38583d2f6c383d693fa5c520bb6a30a53d918d503860bd422aea07a7"
+                  },
+                  {
+                      "path":  "th095.js",
+                      "size":  2776,
+                      "sha256":  "0a8ede02a6175936b191fa4c4cefb94351599235b577d45ea200cfd37847baf2"
+                  },
+                  {
+                      "path":  "th095.v1.02a.js",
+                      "size":  2352,
+                      "sha256":  "a1915a4571b950f7256b85e2e81150f42da6ce71e630a7bb920f1efed2a18da5"
+                  },
+                  {
+                      "path":  "th095/stringlocs.v1.02a.js",
+                      "size":  2057,
+                      "sha256":  "f8c0cbf27471e75df988f527318b811a145a4b1ed773c4da43abdcaee0ffdcdf"
+                  },
+                  {
+                      "path":  "th095/text.anm",
+                      "size":  7608,
+                      "sha256":  "b2e5ff53096d8ea084b5e06250023b91562a254ef092f6803e5fe09a4d627e2d"
+                  },
+                  {
+                      "path":  "th095_custom/dialog_103.js",
+                      "size":  410,
+                      "sha256":  "52d1a76892e587c38f90d36c8ca3b90d8fe7d8c5b33e2fc6e6db1de71ef3ad76"
+                  },
+                  {
+                      "path":  "th095_custom/stringlocs.v1.00a.js",
+                      "size":  121,
+                      "sha256":  "4bc137de38583d2f6c383d693fa5c520bb6a30a53d918d503860bd422aea07a7"
+                  },
+                  {
+                      "path":  "th10.js",
+                      "size":  2232,
+                      "sha256":  "7514c5cc0f02c6d34ef87503ad185dbd2463f068dbeb837e614bfdb6c151f4de"
+                  },
+                  {
+                      "path":  "th10.v0.02a.js",
+                      "size":  1062,
+                      "sha256":  "9b87adb2fbef29de54f195da822fbbbad0168e5de773a4a6d500e04953c37d7b"
+                  },
+                  {
+                      "path":  "th10.v1.00a.js",
+                      "size":  3886,
+                      "sha256":  "fbb71e0fe624f55ae3b317d9819d076274dc9e986c68ead8c2ef07f1c6114d3b"
+                  },
+                  {
+                      "path":  "th10/dialog_203.js",
+                      "size":  138,
+                      "sha256":  "4e853ec3f7d426ef6daefd003c7d50c89bb01d2a5a93e6f0e063d186506eed4a"
+                  },
+                  {
+                      "path":  "th10/sig.anm.jdiff",
+                      "size":  36,
+                      "sha256":  "4d1088e89c01ba2ec9260faf516c95c4877491165bfa562abe87a07a4547a2fb"
+                  },
+                  {
+                      "path":  "th10/stringlocs.v0.02a.js",
+                      "size":  627,
+                      "sha256":  "4f033f11dc1edea2846a72a69f6896a4d9e87c483c9844055934148b28995f47"
+                  },
+                  {
+                      "path":  "th10/stringlocs.v1.00a.js",
+                      "size":  708,
+                      "sha256":  "3f9837529f7c9bdad95ef92354a74e6d93834c423a0d7e954c523f3b5aaeb6ca"
+                  },
+                  {
+                      "path":  "th10/text.anm",
+                      "size":  19276,
+                      "sha256":  "0823db9fb7eb0d83dad3d721d9b15f26bdfc8466a453184dca7102b7d47a2fa8"
+                  },
+                  {
+                      "path":  "th10_custom/dialog_103.js",
+                      "size":  391,
+                      "sha256":  "27f68666e1a04b735bc5a3964cd95fd589a76e602972100896cf4d1c5b0ce9a4"
+                  },
+                  {
+                      "path":  "th10_custom/stringlocs.v1.00a.js",
+                      "size":  80,
+                      "sha256":  "4685bd155966b44f18eb2c99cbe7b42d44435a97b9b80192c11dee67a0df8f33"
+                  },
+                  {
+                      "path":  "th11.js",
+                      "size":  2634,
+                      "sha256":  "f4aa524805ec1016357dfed3e38fce4ae6adfb06eec49e7fb0291856491fd788"
+                  },
+                  {
+                      "path":  "th11.v0.02a.js",
+                      "size":  592,
+                      "sha256":  "7f4c207d9e8a3920438e47a9fa1da12f950aee135f5cc55ba2a814ae702055e8"
+                  },
+                  {
+                      "path":  "th11.v1.00a.js",
+                      "size":  3156,
+                      "sha256":  "f0541f5ce457c2e52999ef217fecab261e2346eb98db3250cb42c4e6b737e51e"
+                  },
+                  {
+                      "path":  "th11/dialog_203.js",
+                      "size":  236,
+                      "sha256":  "e94f977a152bf5a4b16d57a5e7889443097a08fe0215e648fbe5aab90be383f9"
+                  },
+                  {
+                      "path":  "th11/stringlocs.v0.02a.js",
+                      "size":  385,
+                      "sha256":  "a9478036c008d8d3c681bea6b72596fd69544eb2c324400d7e7162e5cb6de49d"
+                  },
+                  {
+                      "path":  "th11/stringlocs.v1.00a.js",
+                      "size":  496,
+                      "sha256":  "b98f4dba8d2cf88e4edfbb0450ed8ff6a6c3e6955539c75bb031a6e5abb19f15"
+                  },
+                  {
+                      "path":  "th11/text.anm",
+                      "size":  22540,
+                      "sha256":  "a187571f6a86b3025bae069b9fb80a02daae782c9252c78c5d9478f593760e1b"
+                  },
+                  {
+                      "path":  "th11_custom/dialog_103.js",
+                      "size":  687,
+                      "sha256":  "5e920f0f17ca8a3f5f79960bd17b6b1d85a4d00258d518089131ed0a931c8ec2"
+                  },
+                  {
+                      "path":  "th11_custom/stringlocs.v1.00a.js",
+                      "size":  80,
+                      "sha256":  "db4c354337943f07bdbe16e3f085e53a4d53b7376af3e50dec9fb2abdf6a8b5f"
+                  },
+                  {
+                      "path":  "th12.js",
+                      "size":  2158,
+                      "sha256":  "402ae96ccf7c115346b19799a76c7b456dc8c38a1968c60a79aa0de7bb4ddbfd"
+                  },
+                  {
+                      "path":  "th12.v1.00b.js",
+                      "size":  2738,
+                      "sha256":  "9e56281cd71e7c8dec3d45e96e689c5f6b5187499fd18553eac9af1bf4b39097"
+                  },
+                  {
+                      "path":  "th12/dialog_203.js",
+                      "size":  236,
+                      "sha256":  "34e1b312564df925ebd115f98f80797e3bc3ae5ee6d147a81042cc7fdef90213"
+                  },
+                  {
+                      "path":  "th12/stringlocs.v0.02a.js",
+                      "size":  328,
+                      "sha256":  "525ee87ed3b4103c34c3322a0bb268124cb647eb80209c51f510c162022a29e5"
+                  },
+                  {
+                      "path":  "th12/stringlocs.v1.00b.js",
+                      "size":  640,
+                      "sha256":  "fb0e71a70dea7958a08677c98f8444347fe1bed6ec3e3eec2c645cc693fb63f8"
+                  },
+                  {
+                      "path":  "th12/text.anm",
+                      "size":  22472,
+                      "sha256":  "b2974044b0f181ffc6abc2838b61eea3427b9919f683c2ac8deefafbc73a54f4"
+                  },
+                  {
+                      "path":  "th12_custom/dialog_103.js",
+                      "size":  687,
+                      "sha256":  "abb2db43da9248fba9b2b2da3ae3c2b04dbda2e666d99c714fc8b20120305de9"
+                  },
+                  {
+                      "path":  "th12_custom/stringlocs.v1.00a.js",
+                      "size":  80,
+                      "sha256":  "db4c354337943f07bdbe16e3f085e53a4d53b7376af3e50dec9fb2abdf6a8b5f"
+                  },
+                  {
+                      "path":  "th125.js",
+                      "size":  3156,
+                      "sha256":  "b0499331a9a1a48f91e831734ff2ea41a8f9c459bef2f7ac64aefd1e3f021f6a"
+                  },
+                  {
+                      "path":  "th125.v1.00a.js",
+                      "size":  3712,
+                      "sha256":  "05929b974b3b0939bbee9b8285ab22dce69852ffd85e6af6e7bf080866c22a8b"
+                  },
+                  {
+                      "path":  "th125/dialog_203.js",
+                      "size":  237,
+                      "sha256":  "069c17031932f2feca7675d6889679e690b468c0c7b9498fcb74c62476f86750"
+                  },
+                  {
+                      "path":  "th125/stringlocs.v1.00a.js",
+                      "size":  349,
+                      "sha256":  "cbe3cd5c98906b68b76c3dbf52b9dace1a54c3f4223cc8cbdc67287288ef30b1"
+                  },
+                  {
+                      "path":  "th125/text.anm",
+                      "size":  23364,
+                      "sha256":  "80ed6dbfaef10cb9acb0b81722638b6ea791d2e19a2dfe6b7660f10fb4c30c7e"
+                  },
+                  {
+                      "path":  "th125/title.anm.jdiff",
+                      "size":  48,
+                      "sha256":  "265927bebabbac82db34c627c43288aec98b76ac53aac29b9afeb9364f238cd7"
+                  },
+                  {
+                      "path":  "th125_custom/dialog_103.js",
+                      "size":  688,
+                      "sha256":  "94be3e9484a2665773acad6fe74dc2fa75e4171694cb6b972c812a6024ef1f89"
+                  },
+                  {
+                      "path":  "th125_custom/stringlocs.v1.00a.js",
+                      "size":  80,
+                      "sha256":  "a29b611d6e5901c74351c0b0bb92d1bb28d282ed1228eafaa113b59786b70320"
+                  },
+                  {
+                      "path":  "th128.js",
+                      "size":  1977,
+                      "sha256":  "56d51ed9f3d2883e5b1fcf9e87b4cd028bbc561f7be77a0613945f1d33cfe8ea"
+                  },
+                  {
+                      "path":  "th128.v1.00a.js",
+                      "size":  2606,
+                      "sha256":  "0557dae29a0db0a5745018eaa66bc2684f7f2eea3d95f1acfdb227ca5e7b4b28"
+                  },
+                  {
+                      "path":  "th128/dialog_203.js",
+                      "size":  237,
+                      "sha256":  "7b6ded97aeca83f2c39d32442752636870d73f5798b54205f7583ca733804d5b"
+                  },
+                  {
+                      "path":  "th128/stringlocs.v1.00a.js",
+                      "size":  389,
+                      "sha256":  "180667ab432ec73862749c3e1b227d4a0622f331a2944a388bc49dbba0484c43"
+                  },
+                  {
+                      "path":  "th128/text.anm",
+                      "size":  23588,
+                      "sha256":  "572f03e3632c1319ec92565ed809a3b7aea69312f4a8c045916282c3a5fabdd4"
+                  },
+                  {
+                      "path":  "th128_custom/dialog_103.js",
+                      "size":  688,
+                      "sha256":  "6201710e530b37563946d899105321e392a35fcb43a0ad183a556b6069d47e79"
+                  },
+                  {
+                      "path":  "th128_custom/stringlocs.v1.00a.js",
+                      "size":  80,
+                      "sha256":  "03364246e5ff9a0c470a2369285bfe03d09c18d0511aa4c820daefa2e5dc6f14"
+                  },
+                  {
+                      "path":  "th13.js",
+                      "size":  2978,
+                      "sha256":  "648d1c92eb5cf099e828713c0f49f33b878ea1790af97fa215483e3e2be9d4e2"
+                  },
+                  {
+                      "path":  "th13.v0.01a.js",
+                      "size":  165,
+                      "sha256":  "24cbc94231d14c2ea005261fe667e2f2a02e92810c8ef5f47646a766370e165d"
+                  },
+                  {
+                      "path":  "th13.v1.00a.js",
+                      "size":  394,
+                      "sha256":  "4cc6d7fc505cb94a9c2adf5fc05bbb1722dd0a9386288ebe73161edc2fefbcd6"
+                  },
+                  {
+                      "path":  "th13.v1.00b.js",
+                      "size":  394,
+                      "sha256":  "6f1164a71dbcad3f3473a72a51cc3799cb261288a8a7774079336b0ee6c5d165"
+                  },
+                  {
+                      "path":  "th13.v1.00c.js",
+                      "size":  4631,
+                      "sha256":  "7a2137d70789c90f2d594763d3a37247e4cc64c47792268bd879b047d0a19c94"
+                  },
+                  {
+                      "path":  "th13/dialog_203.js",
+                      "size":  236,
+                      "sha256":  "4d6a1c4a00e926b76d09da93f46110f39fd87b31b8a72ebaa39cddfcbe5014e4"
+                  },
+                  {
+                      "path":  "th13/front.anm.jdiff",
+                      "size":  42,
+                      "sha256":  "4579d3f0c95ac17a2fa3d93260c7f0a77e5a6baa12ff944ce128cf03627d0aa4"
+                  },
+                  {
+                      "path":  "th13/stringlocs.v0.01a.js",
+                      "size":  328,
+                      "sha256":  "cbbbb71a8b3849475b27dc09b7c35b827f5cbd117783d3f6c38c9ca3bc2ed71d"
+                  },
+                  {
+                      "path":  "th13/stringlocs.v1.00c.js",
+                      "size":  560,
+                      "sha256":  "dee7eba5f8bf88819eb62573ba88530b3066ee637de943ac89a67ba1bcd401e4"
+                  },
+                  {
+                      "path":  "th13/text.anm",
+                      "size":  22992,
+                      "sha256":  "160472a208df1130daf5c22a317104c56a37acee491cd8fdd5dd2ae48b330379"
+                  },
+                  {
+                      "path":  "th13_custom/dialog_103.js",
+                      "size":  687,
+                      "sha256":  "eea5c6affda575d0384a0caf3d7a5c81652b54665d4d80ec501736064ec2aabf"
+                  },
+                  {
+                      "path":  "th13_custom/stringlocs.v1.00a.js",
+                      "size":  80,
+                      "sha256":  "03364246e5ff9a0c470a2369285bfe03d09c18d0511aa4c820daefa2e5dc6f14"
+                  },
+                  {
+                      "path":  "th14.js",
+                      "size":  2144,
+                      "sha256":  "493fd7d3f72daa01d2c0c7b51bbd9438d25d8028a9df2e8ec5868225d36bb8a9"
+                  },
+                  {
+                      "path":  "th14.v0.01a.js",
+                      "size":  943,
+                      "sha256":  "b2ef3c56dde92d01569f144d7a65acf56970bf68c3483ca578695a0ad18a9683"
+                  },
+                  {
+                      "path":  "th14.v0.01b.js",
+                      "size":  1445,
+                      "sha256":  "ff5f7490f69cfa89fa0f9262123ebd99f3a3f25f898693d06f5e2e8414d213c2"
+                  },
+                  {
+                      "path":  "th14.v0.01bp.js",
+                      "size":  1662,
+                      "sha256":  "a2ed8ff43e6bda4c00105b9492f6656e5d2c88f589a9c9659fa2311bd1b69854"
+                  },
+                  {
+                      "path":  "th14.v1.00a.js",
+                      "size":  1109,
+                      "sha256":  "f6eb018d5d828c5475d74f34e800679be7b3359fe0e650fc8649790b1321f8f6"
+                  },
+                  {
+                      "path":  "th14.v1.00b.js",
+                      "size":  3491,
+                      "sha256":  "607d5b1f513dd8f174df8e3cee20aa54ebd71eed69df33e517e4370b226e973b"
+                  },
+                  {
+                      "path":  "th14.v1.00bp.js",
+                      "size":  1662,
+                      "sha256":  "458ea98bf76aeb997cab21f424c5af05aa9134b8cc27bd566cbadeca4489c7b6"
+                  },
+                  {
+                      "path":  "th14/ascii/ascii_960.png",
+                      "size":  7108,
+                      "sha256":  "e637cc015024737ae337d14557466d641a536a02abb755ed6eac7d0f88392bd6"
+                  },
+                  {
+                      "path":  "th14/dialog_203.js",
+                      "size":  211,
+                      "sha256":  "c8c0419822b92e5ed7ee51e52426947f5055bd3a9038441adacc8516c7f8376d"
+                  },
+                  {
+                      "path":  "th14/front.anm.jdiff",
+                      "size":  42,
+                      "sha256":  "4579d3f0c95ac17a2fa3d93260c7f0a77e5a6baa12ff944ce128cf03627d0aa4"
+                  },
+                  {
+                      "path":  "th14/stringlocs.v0.01b.js",
+                      "size":  335,
+                      "sha256":  "cd9bbe432638e4c9be8d840a8f7b888da8ef06e50a91e269c60f59b930da7935"
+                  },
+                  {
+                      "path":  "th14/stringlocs.v0.01bp.js",
+                      "size":  328,
+                      "sha256":  "2ae4116b3d720e46a3035254acbc6668c20497b0d6f701436d945ff69cd5ada0"
+                  },
+                  {
+                      "path":  "th14/stringlocs.v1.00a.js",
+                      "size":  941,
+                      "sha256":  "5d7567a6ad7944a96902cf1dfcbfd36220ae15ba8bf4b49ab8ad75af1feb910f"
+                  },
+                  {
+                      "path":  "th14/stringlocs.v1.00b.js",
+                      "size":  1454,
+                      "sha256":  "3da3c0c758ae09ce15e0a5de73444c60198ff7e9aa9aaa301629402640af909c"
+                  },
+                  {
+                      "path":  "th14/stringlocs.v1.00bp.js",
+                      "size":  934,
+                      "sha256":  "c90bbeccb247729fd030316da937293402db17101b0e2050c997e0c67264a3ae"
+                  },
+                  {
+                      "path":  "th14/text.v0.01b.anm",
+                      "size":  22544,
+                      "sha256":  "50ff4e7a9e083c3686efb7bed636ddecaf570bbf65e107aa6d5f0b500dc2f610"
+                  },
+                  {
+                      "path":  "th14/text.v1.00a.anm",
+                      "size":  22604,
+                      "sha256":  "37ff6662c49a433ebb925b008f1833542e16b670fda10f479dc4873769f159f5"
+                  },
+                  {
+                      "path":  "th14/text.v1.00b.anm",
+                      "size":  22844,
+                      "sha256":  "26cd73b9bda7e28a2fb43c4d8ebf84d0f78c11f429ad19c1fa8bdd88bd9f6c6c"
+                  },
+                  {
+                      "path":  "th14_custom/dialog_103.js",
+                      "size":  662,
+                      "sha256":  "c6acd9e19f640fc197c6ac91cd0dfbaebd995ee52d53c834dff4755d80c047b2"
+                  },
+                  {
+                      "path":  "th14_custom/dialog_103.v1.00bp.bin",
+                      "size":  2712,
+                      "sha256":  "2339d48325fb7cffad1a76b12139f92732bb6d6962ccb6a680380e91f8b52e2f"
+                  },
+                  {
+                      "path":  "th14_custom/stringlocs.v1.00b.js",
+                      "size":  84,
+                      "sha256":  "27cb4968d81f342844b690d5041b202b9eda6ec47c9609d09871772a35afcc82"
+                  },
+                  {
+                      "path":  "th14_custom/stringlocs.v1.00bp.js",
+                      "size":  84,
+                      "sha256":  "d82f41d69a188af0bec6b3570a683c5b79f6d2acdcc3226c3e4181c9cea92e8f"
+                  },
+                  {
+                      "path":  "th143.js",
+                      "size":  3162,
+                      "sha256":  "bdcec15b41692ed9f0d255406f0f796face7557c1fda062988423fb49a583e71"
+                  },
+                  {
+                      "path":  "th143.v1.00a.js",
+                      "size":  3547,
+                      "sha256":  "e475cd0b87c8d53f7e58538f8544766b5d5b3ec960cef2d576bcaae3ac2afd03"
+                  },
+                  {
+                      "path":  "th143/ascii/ascii_960.png",
+                      "size":  7600,
+                      "sha256":  "db9da8a6c8e79d4cf53b6a75809c92b6cf44d8bfaed2107f33ac152dbe07f6cb"
+                  },
+                  {
+                      "path":  "th143/dialog_203.js",
+                      "size":  212,
+                      "sha256":  "cf54ef62e7cac3d2abc7cdcad0e32b1c02ff9f3d570dd09a4d215096477ff1d3"
+                  },
+                  {
+                      "path":  "th143/front.anm.jdiff",
+                      "size":  263,
+                      "sha256":  "2154773776b6b1360a830e0f50915901bca58c2befadcd706b18116bb15c4b23"
+                  },
+                  {
+                      "path":  "th143/stringlocs.v1.00a.js",
+                      "size":  375,
+                      "sha256":  "2bfaace6e84e9fd1c5461116ec63eca4626ce57f3ca4b988b4c739ba35a5d987"
+                  },
+                  {
+                      "path":  "th143/text.anm",
+                      "size":  23992,
+                      "sha256":  "e6d0766d394f8e2c6fb0eb97802f315d293e7df7203f2daef0d538090dcf1e3a"
+                  },
+                  {
+                      "path":  "th143_custom/dialog_103.js",
+                      "size":  663,
+                      "sha256":  "e9a38fa538a757d479248520bb6f75ed2cf411cde0e2d262ecd81b24a83538d4"
+                  },
+                  {
+                      "path":  "th143_custom/stringlocs.v1.00a.js",
+                      "size":  80,
+                      "sha256":  "d2b2d94f98a62769b395149d54cb59302dc44fe53701e7d761234c47f9928e6d"
+                  },
+                  {
+                      "path":  "th15.js",
+                      "size":  2020,
+                      "sha256":  "2e010537bbdb480ea708d13310eb04506ed81ff9fa6503be54bfca84cac4135c"
+                  },
+                  {
+                      "path":  "th15.v0.01a.js",
+                      "size":  1554,
+                      "sha256":  "cb5492c1f68b3d060c198abb0ff66acea5307a221702980bc5451dd7d5003c0e"
+                  },
+                  {
+                      "path":  "th15.v0.01b.js",
+                      "size":  1617,
+                      "sha256":  "f200be5412381d52604646c83b9067f3f93d5d87fc36069821847dd0c8f7c47a"
+                  },
+                  {
+                      "path":  "th15.v1.00a.js",
+                      "size":  1450,
+                      "sha256":  "fdf830ee2344b1a454d2bf15fb911ca20624185f6c3e1fb141ff3cb3c0929270"
+                  },
+                  {
+                      "path":  "th15.v1.00b.js",
+                      "size":  3274,
+                      "sha256":  "43b46e75a56f65affeca13bcb7dd727d281e550c0b028d48920541a32953b7b1"
+                  },
+                  {
+                      "path":  "th15/ascii/ascii_960.png",
+                      "size":  7108,
+                      "sha256":  "e637cc015024737ae337d14557466d641a536a02abb755ed6eac7d0f88392bd6"
+                  },
+                  {
+                      "path":  "th15/dialog_203.js",
+                      "size":  211,
+                      "sha256":  "d4a918515a247fcdc03d7fe9b1318158627c6cddc8ff50fc187ecee0abb4323d"
+                  },
+                  {
+                      "path":  "th15/dialog_204.js",
+                      "size":  211,
+                      "sha256":  "d4a918515a247fcdc03d7fe9b1318158627c6cddc8ff50fc187ecee0abb4323d"
+                  },
+                  {
+                      "path":  "th15/front.anm.jdiff",
+                      "size":  42,
+                      "sha256":  "4579d3f0c95ac17a2fa3d93260c7f0a77e5a6baa12ff944ce128cf03627d0aa4"
+                  },
+                  {
+                      "path":  "th15/stringlocs.js",
+                      "size":  1674,
+                      "sha256":  "c5ff868c434c74cab8033f024ef6f9d173a3e346d93da56d94888d18ba00f423"
+                  },
+                  {
+                      "path":  "th15/stringlocs.v0.01a.js",
+                      "size":  328,
+                      "sha256":  "85b2dc3c5adf864b9c6d42778310382265dc04d5eee6e9034b1a49ea626e4468"
+                  },
+                  {
+                      "path":  "th15/stringlocs.v0.01b.js",
+                      "size":  328,
+                      "sha256":  "62c03a4c25bebf5a6aa6074c151a89bbb6d8a05ae905873cc98d68f4ff85ca05"
+                  },
+                  {
+                      "path":  "th15/text.v1.00a.anm",
+                      "size":  22844,
+                      "sha256":  "551bca1e2a9fa0b13ad8f67d77e3e1e559a9aebc00daa384855519e27b159ca5"
+                  },
+                  {
+                      "path":  "th15/text.v1.00b.anm",
+                      "size":  22844,
+                      "sha256":  "551bca1e2a9fa0b13ad8f67d77e3e1e559a9aebc00daa384855519e27b159ca5"
+                  },
+                  {
+                      "path":  "th15_custom/dialog_103.bin",
+                      "size":  2708,
+                      "sha256":  "d63d5132706578bb106655fbc939b914d92b62b4c29395dc197d32f6e5bdadba"
+                  },
+                  {
+                      "path":  "th15_custom/dialog_103.js",
+                      "size":  662,
+                      "sha256":  "882d8975cd607236eb73865dd6278f764fda132cbe5d4f8f31d26648e41e3e48"
+                  },
+                  {
+                      "path":  "th15_custom/dialog_3.js",
+                      "size":  662,
+                      "sha256":  "882d8975cd607236eb73865dd6278f764fda132cbe5d4f8f31d26648e41e3e48"
+                  },
+                  {
+                      "path":  "th15_custom/stringlocs.v1.00a.js",
+                      "size":  79,
+                      "sha256":  "00d696f0000005da729f9b337c07e6d83c099279dfbed22afd5999102d39ad18"
+                  },
+                  {
+                      "path":  "th16.js",
+                      "size":  1623,
+                      "sha256":  "fa84998a8dc41e1ddfff595a4057b4700334446f6995ab054ceee99c03618add"
+                  },
+                  {
+                      "path":  "th16.v0.01a.js",
+                      "size":  1641,
+                      "sha256":  "d86035de31149b76fc6c1e2121f3eb39762a76c1cb1356dcd9c19cdabcab656e"
+                  },
+                  {
+                      "path":  "th16.v1.00a.js",
+                      "size":  3688,
+                      "sha256":  "95b8d931beaa94fb2a57620b4ce6438486cfb5d2cbe677a7468448ef37f65d31"
+                  },
+                  {
+                      "path":  "th16/ascii/ascii_960.png",
+                      "size":  7108,
+                      "sha256":  "e637cc015024737ae337d14557466d641a536a02abb755ed6eac7d0f88392bd6"
+                  },
+                  {
+                      "path":  "th16/dialog_203.js",
+                      "size":  211,
+                      "sha256":  "1c472617d31f88987d94bc064c762216a587ac8b09f6f2cfd60b14e4ff4daf63"
+                  },
+                  {
+                      "path":  "th16/dialog_204.js",
+                      "size":  211,
+                      "sha256":  "1c472617d31f88987d94bc064c762216a587ac8b09f6f2cfd60b14e4ff4daf63"
+                  },
+                  {
+                      "path":  "th16/front.anm.jdiff",
+                      "size":  42,
+                      "sha256":  "4579d3f0c95ac17a2fa3d93260c7f0a77e5a6baa12ff944ce128cf03627d0aa4"
+                  },
+                  {
+                      "path":  "th16/stringlocs.v0.01a.js",
+                      "size":  992,
+                      "sha256":  "d8b10622df51768e9fd5e41daed84430293fa2e9cc874c2c090af8791e5ddef1"
+                  },
+                  {
+                      "path":  "th16/stringlocs.v1.00a.js",
+                      "size":  2828,
+                      "sha256":  "e6aabbb7f1e1dc1ef5f959f53647502ee276d96fb1060de8da77e0e6eed3a9e5"
+                  },
+                  {
+                      "path":  "th16/text.anm.jdiff",
+                      "size":  46,
+                      "sha256":  "3c84261df35061f8449cb43705922ad0dd9055c643bf9af50da8114b252d9ef3"
+                  },
+                  {
+                      "path":  "th16_custom.v0.01a.js",
+                      "size":  155,
+                      "sha256":  "4c9e589447ba8c7d9cedcfde047c746f7e0edc9b580ef730ff9b89c298134d58"
+                  },
+                  {
+                      "path":  "th16_custom/dialog_103.bin",
+                      "size":  2708,
+                      "sha256":  "33c8dbce5ca64ef1c947e029839b6aaedeb855326950fa3d78dc6bc2af98a75e"
+                  },
+                  {
+                      "path":  "th16_custom/dialog_103.js",
+                      "size":  662,
+                      "sha256":  "76147b9a55cb76ebc2ac4582f85aa480319925285383b2644c83118b9245dc09"
+                  },
+                  {
+                      "path":  "th16_custom/dialog_3.js",
+                      "size":  662,
+                      "sha256":  "76147b9a55cb76ebc2ac4582f85aa480319925285383b2644c83118b9245dc09"
+                  },
+                  {
+                      "path":  "th16_custom/stringlocs.v0.01a.js",
+                      "size":  80,
+                      "sha256":  "4b99a9a6ae1dc7179b63297827b2da17407761354ac9b459c3c54b1c5dd71c2f"
+                  },
+                  {
+                      "path":  "th16_custom/stringlocs.v1.00a.js",
+                      "size":  79,
+                      "sha256":  "83c2bb4a0cae46497187306fbb2a2634ab7b7a047e063ebc5b4dd99822beee96"
+                  },
+                  {
+                      "path":  "th165.js",
+                      "size":  3027,
+                      "sha256":  "3af138dad02dffaf58c01195a634f3a920d76e90905b067f67a4d5dd175af076"
+                  },
+                  {
+                      "path":  "th165.v1.00a.js",
+                      "size":  2885,
+                      "sha256":  "fe5f000b1e214764c0d86b725cd5ca9beae0fd80fa7c3d01282206021c320d87"
+                  },
+                  {
+                      "path":  "th165/ascii/ascii_960.png",
+                      "size":  7108,
+                      "sha256":  "e637cc015024737ae337d14557466d641a536a02abb755ed6eac7d0f88392bd6"
+                  },
+                  {
+                      "path":  "th165/dialog_203.js",
+                      "size":  212,
+                      "sha256":  "2b60c4f2c29cff9ba347adca53bad8d154db58a9450eba1cc988c632b75af6e5"
+                  },
+                  {
+                      "path":  "th165/dialog_204.js",
+                      "size":  212,
+                      "sha256":  "2b60c4f2c29cff9ba347adca53bad8d154db58a9450eba1cc988c632b75af6e5"
+                  },
+                  {
+                      "path":  "th165/front.anm.jdiff",
+                      "size":  42,
+                      "sha256":  "4579d3f0c95ac17a2fa3d93260c7f0a77e5a6baa12ff944ce128cf03627d0aa4"
+                  },
+                  {
+                      "path":  "th165/spells.js",
+                      "size":  47,
+                      "sha256":  "bd72ead1ee79d8532a77f7f3dbe04457b60b3a69b8a85ad05386e2180b1edfe1"
+                  },
+                  {
+                      "path":  "th165/stringlocs.v1.00a.js",
+                      "size":  1627,
+                      "sha256":  "62bacad1a013d70ba944272e3f52be535df3a8b886d264a9cd253eaaac12841d"
+                  },
+                  {
+                      "path":  "th165/text.anm",
+                      "size":  26212,
+                      "sha256":  "d013867989790855746ea80f46ca5392317d1b2a14739e7f652d2b838710d8f3"
+                  },
+                  {
+                      "path":  "th165_custom/dialog_103.bin",
+                      "size":  2712,
+                      "sha256":  "7d671881e29a1f647c427851744864758b78402ef43e8f5093f3c0a272b22328"
+                  },
+                  {
+                      "path":  "th165_custom/dialog_103.js",
+                      "size":  663,
+                      "sha256":  "c823b4c6a60421ea5aac5dd0e379b44d2a6a47a43c3bebdcb912be2cb646d84e"
+                  },
+                  {
+                      "path":  "th165_custom/dialog_3.js",
+                      "size":  663,
+                      "sha256":  "c823b4c6a60421ea5aac5dd0e379b44d2a6a47a43c3bebdcb912be2cb646d84e"
+                  },
+                  {
+                      "path":  "th165_custom/stringlocs.v1.00a.js",
+                      "size":  79,
+                      "sha256":  "83c2bb4a0cae46497187306fbb2a2634ab7b7a047e063ebc5b4dd99822beee96"
+                  },
+                  {
+                      "path":  "th17.js",
+                      "size":  2443,
+                      "sha256":  "09284042fe2efa26ff793527e4c31267840c0e6a931e7926dd00dbbb5069fa94"
+                  },
+                  {
+                      "path":  "th17.v0.01a.js",
+                      "size":  3487,
+                      "sha256":  "fd9c55f534644c6b8c891514fcb33f54194e308be32722e742dd6161a0258cbd"
+                  },
+                  {
+                      "path":  "th17.v1.00b.js",
+                      "size":  4251,
+                      "sha256":  "53f572957b4808abc2d0142680171eabb056432468fa911fa2e7e2a8154425c7"
+                  },
+                  {
+                      "path":  "th17/ascii/ascii_960.png",
+                      "size":  7108,
+                      "sha256":  "e637cc015024737ae337d14557466d641a536a02abb755ed6eac7d0f88392bd6"
+                  },
+                  {
+                      "path":  "th17/dialog_203.js",
+                      "size":  211,
+                      "sha256":  "59c0dfebcb6c143e2e7f5e64e028fc38579a727d00dbf74ea1a1dcc5c872c8ef"
+                  },
+                  {
+                      "path":  "th17/dialog_204.js",
+                      "size":  211,
+                      "sha256":  "59c0dfebcb6c143e2e7f5e64e028fc38579a727d00dbf74ea1a1dcc5c872c8ef"
+                  },
+                  {
+                      "path":  "th17/front.anm.jdiff",
+                      "size":  42,
+                      "sha256":  "4579d3f0c95ac17a2fa3d93260c7f0a77e5a6baa12ff944ce128cf03627d0aa4"
+                  },
+                  {
+                      "path":  "th17/fronttr.anm.jdiff",
+                      "size":  42,
+                      "sha256":  "4579d3f0c95ac17a2fa3d93260c7f0a77e5a6baa12ff944ce128cf03627d0aa4"
+                  },
+                  {
+                      "path":  "th17/st03bs.v0.01a.ecl",
+                      "size":  25984,
+                      "sha256":  "7e5d5d2d8056fbaefe3d92ecb9baf523ac5200fc00b561f9f79b7b4a3aebe946"
+                  },
+                  {
+                      "path":  "th17/stringlocs.v0.01a.js",
+                      "size":  798,
+                      "sha256":  "c053c7bdd013d792a867874f3f1faa46af27727485d033f8ed201d2ce1446a5a"
+                  },
+                  {
+                      "path":  "th17/stringlocs.v1.00b.js",
+                      "size":  1014,
+                      "sha256":  "4d018dd2b296364903b77f51df1c50a591bbf702ce6571c7471e432eae6c9c8a"
+                  },
+                  {
+                      "path":  "th17/text.anm.jdiff",
+                      "size":  46,
+                      "sha256":  "3c84261df35061f8449cb43705922ad0dd9055c643bf9af50da8114b252d9ef3"
+                  },
+                  {
+                      "path":  "th17_custom/dialog_103.bin",
+                      "size":  2708,
+                      "sha256":  "6b870bbe1b62e0f93981d8286bba6747811d4a940bfd3b954c4f83d302e9aa88"
+                  },
+                  {
+                      "path":  "th17_custom/dialog_103.js",
+                      "size":  662,
+                      "sha256":  "2b9455a5e01691ffd06491a9b60a42dfe9267048e955437af4e28af448be2458"
+                  },
+                  {
+                      "path":  "th17_custom/dialog_3.js",
+                      "size":  662,
+                      "sha256":  "2b9455a5e01691ffd06491a9b60a42dfe9267048e955437af4e28af448be2458"
+                  },
+                  {
+                      "path":  "th17_custom/stringlocs.v0.01a.js",
+                      "size":  80,
+                      "sha256":  "9ab984be3d12d555b2869dd005e2964e88b1ff0c1a9470eebf4f3146a5ba021f"
+                  },
+                  {
+                      "path":  "th17_custom/stringlocs.v1.00a.js",
+                      "size":  80,
+                      "sha256":  "9ab984be3d12d555b2869dd005e2964e88b1ff0c1a9470eebf4f3146a5ba021f"
+                  },
+                  {
+                      "path":  "th18.js",
+                      "size":  3198,
+                      "sha256":  "7df17d05fedcd7ebf9d7fef60d59356749654ad7a12f945a98a80862d34d96e7"
+                  },
+                  {
+                      "path":  "th18.v0.01b.js",
+                      "size":  2791,
+                      "sha256":  "2c3190e36739970ae540fa9d2a9e61e89bea844abb063cae186797afd132263f"
+                  },
+                  {
+                      "path":  "th18.v0.02a.js",
+                      "size":  2818,
+                      "sha256":  "d64e83f37f77c34e2eb4a52b88f1c45b09a0e56809610847e2f4784884d7a772"
+                  },
+                  {
+                      "path":  "th18.v1.00a.js",
+                      "size":  4887,
+                      "sha256":  "9b6b7352ab7fa806cb5c7fa10fb1e6c7260f1126e19a99426f27863a53a8a5b3"
+                  },
+                  {
+                      "path":  "th18/stringlocs.v0.01b.js",
+                      "size":  972,
+                      "sha256":  "0c09f084b6961ac5422c730dcfaea3490c0f7f55b7c6329e7a0e62086f7b9f63"
+                  },
+                  {
+                      "path":  "th18/stringlocs.v0.02a.js",
+                      "size":  2193,
+                      "sha256":  "8252f633a6cf8c34761507162e5d6720e6c21c7d5284fd6311b05ff4655dfc59"
+                  },
+                  {
+                      "path":  "th18/stringlocs.v1.00a.js",
+                      "size":  2511,
+                      "sha256":  "2550ad95fc59178b439825161b120a21ec2c64b5f2d06add67c100ecd2c6d703"
+                  },
+                  {
+                      "path":  "th18/text.anm.jdiff",
+                      "size":  46,
+                      "sha256":  "3c84261df35061f8449cb43705922ad0dd9055c643bf9af50da8114b252d9ef3"
+                  },
+                  {
+                      "path":  "th185.js",
+                      "size":  3097,
+                      "sha256":  "fa91093f54f018d762e9e9de7e95945ccb4cec7d79eb493ddc2dfa69778b83b9"
+                  },
+                  {
+                      "path":  "th185.v1.00a.js",
+                      "size":  4401,
+                      "sha256":  "0e8d219c889a55083d56f3d544e1da154be21bc73a7a16c9f91ac3612ba22092"
+                  },
+                  {
+                      "path":  "th185/front.anm.jdiff",
+                      "size":  42,
+                      "sha256":  "4579d3f0c95ac17a2fa3d93260c7f0a77e5a6baa12ff944ce128cf03627d0aa4"
+                  },
+                  {
+                      "path":  "th185/stringlocs.v1.00a.js",
+                      "size":  2838,
+                      "sha256":  "bbfdf7b614bbf1e50f1aa9dc9f8ab45cb74fb9112b3be92b365075d7b6877aa6"
+                  },
+                  {
+                      "path":  "th19.js",
+                      "size":  1795,
+                      "sha256":  "b4a77c15c23be5684dd55d69d74ec20707bd2d8f15aa44d5c01de2c2309a84fd"
+                  },
+                  {
+                      "path":  "th19.v0.01a.js",
+                      "size":  3227,
+                      "sha256":  "8c8f5557aaf6331771702fb97e963ab07585f331bc5871b8839b04ae048e5489"
+                  },
+                  {
+                      "path":  "th19.v0.02a.js",
+                      "size":  3016,
+                      "sha256":  "60ce51a922ea60ba36faa523f863ed8fb864e15db35e38d6832091fc8303ad79"
+                  },
+                  {
+                      "path":  "th19.v1.00a.js",
+                      "size":  5676,
+                      "sha256":  "7bc2d63be3fc4420890bc94d5c34299f9069a1a99a4349a6d52c2293b8bbfda0"
+                  },
+                  {
+                      "path":  "th19.v1.10c.js",
+                      "size":  5645,
+                      "sha256":  "4a76f70bfafa895cb86f38f9debcf058ef54dceb0101640256e6538f23131c9a"
+                  },
+                  {
+                      "path":  "th19/dialog_203.js",
+                      "size":  418,
+                      "sha256":  "ed4dd6a80a972ff8d9328ceed0f661f3e4b3d4f6f62c5d61572a558eb03d6b09"
+                  },
+                  {
+                      "path":  "th19/dialog_204.js",
+                      "size":  418,
+                      "sha256":  "ed4dd6a80a972ff8d9328ceed0f661f3e4b3d4f6f62c5d61572a558eb03d6b09"
+                  },
+                  {
+                      "path":  "th19/dictdefs.js",
+                      "size":  2040,
+                      "sha256":  "49e33b5e24dbbc56f8568fef9b04f9226bd6e2da62f9129f5226d6ce2f49554b"
+                  },
+                  {
+                      "path":  "th19/stringlocs.v0.01a.js",
+                      "size":  488,
+                      "sha256":  "d11df521f3c482c965094a29970c62b64a2da67156e2f18281cf3bb525dfe623"
+                  },
+                  {
+                      "path":  "th19/stringlocs.v1.00a.js",
+                      "size":  8512,
+                      "sha256":  "318445bf71f4e4bc4c54f7f8097d791817c77c26642f18c9af122cb8884ff1f5"
+                  },
+                  {
+                      "path":  "th19/stringlocs.v1.10c.js",
+                      "size":  7166,
+                      "sha256":  "ca6ae996a0f48d94eca272766a5c1d95529f6be8ca3f124262da23ea37641fa4"
+                  },
+                  {
+                      "path":  "th19_custom.v0.01a.js",
+                      "size":  163,
+                      "sha256":  "37203de94875160bde1b09f8783008245d36c69c36b189d5fa232d027fa1dbf8"
+                  },
+                  {
+                      "path":  "th19_custom/dialog_103.bin",
+                      "size":  3140,
+                      "sha256":  "273778653c0534172bfb327a4772eae79089d8a92b5c7c2e55b3763f70112f57"
+                  },
+                  {
+                      "path":  "th19_custom/dialog_103.js",
+                      "size":  847,
+                      "sha256":  "4f77352e18259efca9a84bcfa879ac153a02d13e9bf155b91bce45bb63dc5c72"
+                  },
+                  {
+                      "path":  "th19_custom/dialog_3.js",
+                      "size":  847,
+                      "sha256":  "4f77352e18259efca9a84bcfa879ac153a02d13e9bf155b91bce45bb63dc5c72"
+                  },
+                  {
+                      "path":  "th19_custom/stringlocs.v0.01a.js",
+                      "size":  79,
+                      "sha256":  "9ec836fc1dd5e97a346dcba6dfee0c49812f882e2ee909e97efa4e4f477787d9"
+                  },
+                  {
+                      "path":  "th20.js",
+                      "size":  1894,
+                      "sha256":  "cb37b2a9a1495d7e6423d798dd263b1b5a0b0c366deaddbc08649f97ee5fd491"
+                  },
+                  {
+                      "path":  "th20.v0.01a.js",
+                      "size":  7518,
+                      "sha256":  "5203867ff59709716be30d8f08039807cf24c646d771b529285304b8daf5048d"
+                  },
+                  {
+                      "path":  "th20.v1.00a.js",
+                      "size":  9346,
+                      "sha256":  "7311c857bfd69bba0b4bd3515e8c5441670b56eac6dc125519d7b336dc741ba1"
+                  },
+                  {
+                      "path":  "th20/dialog_203.js",
+                      "size":  418,
+                      "sha256":  "12083f920daf05de756c461c708d6c98563e2aa8f7b6bbc674d86d9930dd0560"
+                  },
+                  {
+                      "path":  "th20/dialog_204.js",
+                      "size":  496,
+                      "sha256":  "fa98b6c8ca55f359c75e37dd3464c85d055eb872d2a8853a3e69cf4d1d7da4df"
+                  },
+                  {
+                      "path":  "th20/stringlocs.v0.01a.js",
+                      "size":  3952,
+                      "sha256":  "9c61f04b5b5babf1893ad4906fa4f1aad6f23e0e38d841773c600851d358f7d4"
+                  },
+                  {
+                      "path":  "th20/stringlocs.v1.00a.js",
+                      "size":  4520,
+                      "sha256":  "0687156b3f06bb99bed5d070b6ad22bc5501c03894fe0a2f014a51bf814e89d2"
+                  },
+                  {
+                      "path":  "th20_custom/dialog_103.bin",
+                      "size":  2676,
+                      "sha256":  "f439a87cae51be37c482ebbb97b26b3eec6e8285b010513d6eacdcfa813d5cf3"
+                  },
+                  {
+                      "path":  "th20_custom/dialog_103.js",
+                      "size":  847,
+                      "sha256":  "95c7535b43f5a58d91757f041a1357873fb1efaff7458f4b3b7ab6ef317ab74e"
+                  },
+                  {
+                      "path":  "th20_custom/dialog_3.js",
+                      "size":  847,
+                      "sha256":  "95c7535b43f5a58d91757f041a1357873fb1efaff7458f4b3b7ab6ef317ab74e"
+                  },
+                  {
+                      "path":  "th20_custom/stringlocs.v0.01a.js",
+                      "size":  80,
+                      "sha256":  "4d329fc78c56b85afecfb1b3c83327e76e65fb7aecb7f1f4914de537d29f7268"
+                  },
+                  {
+                      "path":  "th20_custom/stringlocs.v1.00a.js",
+                      "size":  82,
+                      "sha256":  "174b102207d68533b0a6c43e6c0df2066966781f8c96bd09dce3c95db93383f3"
+                  },
+                  {
+                      "path":  "themes.js",
+                      "size":  754,
+                      "sha256":  "03ffaae8594fce904e35c1049c197411145e37a0f44a64456b36cba8d3af9ab4"
+                  },
+                  {
+                      "path":  "versions.js",
+                      "size":  28480,
+                      "sha256":  "9ac6c0247b9c53129429f9522f66e035a7880d15082f8d519990ac7ed82c14e1"
+                  }
+              ]
+}

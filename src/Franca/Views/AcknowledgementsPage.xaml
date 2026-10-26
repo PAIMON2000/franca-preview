@@ -1,0 +1,110 @@
+<UserControl x:Class="Franca.Views.AcknowledgementsPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        TextElement.Foreground="{DynamicResource TextPrimaryBrush}"
+        FontFamily="Segoe UI, Microsoft YaHei UI">
+    <UserControl.Resources>
+        <Style x:Key="CardTextStyle" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="NoWrap"/>
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+        <Style x:Key="AttributionLinkStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <Grid Margin="24,18,24,16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="TitleText" Style="{StaticResource CardTextStyle}"
+                   FontSize="24" FontWeight="SemiBold"/>
+        <TextBlock x:Name="SubtitleText" Grid.Row="1" Style="{StaticResource CardTextStyle}"
+                   Margin="0,3,0,10" FontSize="11"
+                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+
+        <ItemsControl x:Name="AttributionItems" Grid.Row="2" Margin="-4,0,-4,0">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="4"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Margin="4,3" Padding="10,5" MinHeight="72"
+                            Background="{DynamicResource CardBackgroundBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1" CornerRadius="5">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="{Binding Name}" Style="{StaticResource CardTextStyle}"
+                                       FontSize="12" FontWeight="SemiBold" FlowDirection="LeftToRight"/>
+                            <TextBlock Grid.Row="1" Text="{Binding Role}" Style="{StaticResource CardTextStyle}"
+                                       Margin="0,1,0,0" FontSize="10"
+                                       Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            <TextBlock Grid.Row="2" Text="{Binding License}" ToolTip="{Binding License}" Style="{StaticResource CardTextStyle}"
+                                       Margin="0,1,0,0" FontSize="9" FlowDirection="LeftToRight"
+                                       Foreground="{DynamicResource AccentBrush}"/>
+                            <Button Grid.Row="3" Style="{StaticResource AttributionLinkStyle}"
+                                    Margin="0,2,0,0" VerticalAlignment="Bottom"
+                                    Tag="{Binding Url}" ToolTip="{Binding Url}"
+                                    Click="OnAttributionClick">
+                                <TextBlock Style="{StaticResource CardTextStyle}"
+                                           Text="{Binding ThanksText, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                            </Button>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Grid Grid.Row="3" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel VerticalAlignment="Center" Margin="0,0,12,0">
+                <TextBlock x:Name="ProjectLicenseText" FontSize="11" FontWeight="SemiBold"/>
+                <TextBlock x:Name="LicenseScopeText" FontSize="10" TextWrapping="Wrap"
+                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+                <TextBlock x:Name="UpstreamRiskText" FontSize="10" TextWrapping="Wrap" Margin="0,3,0,0"
+                           Foreground="{DynamicResource TextSecondaryBrush}"/>
+            </StackPanel>
+            <Button x:Name="NoticesButton" Grid.Column="1" Click="OnNoticesClick"
+                    Margin="0,0,12,0" Padding="12,6" VerticalAlignment="Center"/>
+            <TextBlock x:Name="CountdownText" Grid.Column="2" Margin="6,0,0,0"
+                       VerticalAlignment="Center" FontSize="12" FontWeight="SemiBold"
+                       Visibility="Collapsed"/>
+        </Grid>
+    </Grid>
+    </ScrollViewer>
+</UserControl>

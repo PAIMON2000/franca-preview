@@ -1,0 +1,21 @@
+<Window x:Class="Franca.Views.OverlayWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        Topmost="True" ShowActivated="False" ShowInTaskbar="False" ResizeMode="NoResize"
+        SizeToContent="WidthAndHeight" WindowStartupLocation="Manual"
+        Title="Franca Overlay">
+    <Border CornerRadius="8" Background="#E61a1f27" BorderBrush="#FF3a4757"
+            BorderThickness="1" Padding="10,2,10,8">
+        <StackPanel>
+            <!-- 拖动抓手：穿透态下鼠标移入抓手时临时恢复命中以便拖动，移出重新穿透 -->
+            <Border x:Name="Grip" Height="14" Cursor="SizeAll">
+                <TextBlock Text="⠿" Foreground="#FF969cae" FontSize="10"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <TextBlock x:Name="ModeLine" Foreground="#FFe2e8ee" FontSize="12" FontWeight="Bold"/>
+            <TextBlock x:Name="StatsLine" Foreground="#FF969cae" FontSize="11"/>
+            <TextBlock x:Name="FlightLine" Foreground="#FF969cae" FontSize="11"/>
+        </StackPanel>
+    </Border>
+</Window>

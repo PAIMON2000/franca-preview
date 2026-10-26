@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Franca — 兼容范围与依赖</title><link rel="stylesheet" href="../site.css"></head>
+<body><main>
+<nav aria-label="文档导航"><a href="index.html">项目说明</a><a href="engines.html" aria-current="page">兼容范围与依赖</a><a href="../COMPATIBILITY.md">游戏验收矩阵</a><a href="../THIRD-PARTY-NOTICES.md">第三方声明</a></nav>
+<header><h1>兼容范围与依赖</h1><p class="muted">说明更新：2026-10-26 · 以具体游戏和版本的测试记录为依据</p></header>
+<div class="status">识别引擎、安装文件、显示译文和完整游戏验收是不同结果。当前没有“所有 Unity 游戏可用”或其他引擎即将支持的结论。</div>
+<section><h2>引擎路径的实际状态</h2><div class="table-wrap"><table>
+<thead><tr><th scope="col">引擎／组件</th><th scope="col">当前实现</th><th scope="col">限制</th></tr></thead><tbody>
+<tr><th scope="row">Unity IL2CPP</th><td>现有安装器使用上游 Doorstop、BepInEx、XUnity.AutoTranslator 和相关互操作组件。Suzerain 有主菜单/选项页及序章正文中文画面证据；BALL x PIT 完成干净基线安装、英语 → 印尼语菜单与重启缓存闭环。</td><td>不能由这些记录推断其他游戏、完整剧情或更新版本兼容；未验长时间游玩。</td></tr>
+<tr><th scope="row">Unity Mono</th><td>有 BepInEx 5 与 XUnity 安装路径；Potion Craft 完成基线安装、英语 → 印尼语主菜单、缓存复用与停用恢复。</td><td>未进入存档游玩，长时间稳定性待验。Stardew Valley 为 MonoGame，不能作为该路径的证明。</td></tr>
+<tr><th scope="row">东方 Project（thcrap 运行时路线）</th><td>th10/th11 交换 exe 存根并生成 jdiff 补丁，不修改游戏数据包。th11 局内对话、结局、音乐室评论、主菜单与全部下级界面精灵图经用户真机确认；th10 对话与界面确认。</td><td>补丁数据首次启用时从上游镜像下载（约 1 MB）；符卡名因发行版加密跳过；th06 PKGL 不支持；其余正作未逐款验收。见<a href="../COMPATIBILITY.md">逐游戏证据</a>。</td></tr>
+<tr><th scope="row">Unreal（实验适配）</th><td>实验性静态资源翻译，尚未开放一键启用。已实测《逸剑风云决》的菜单/设置及《歧路旅人2》的少量菜单验证；八方完整译文包尚未完成。</td><td>限已验证的未加密 pak v11、locres 和数据表结构；图片菜单需单独适配。其他游戏需逐款验证。UE5 尚未验证；IoStore、加密资源和运行时热更新未接入。见<a href="../COMPATIBILITY.md">逐游戏证据</a>和<a href="../UE-ADAPTATION-ROADMAP.md">后续路线图</a>。</td></tr>
+<tr><th scope="row">Ren'Py、RPG Maker、Godot、GameMaker、MonoGame、Source 2、RE Engine、Clausewitz</th><td>检测器包含相应文件特征。</td><td>没有正式翻译适配器；展示标签不等于翻译支持，未安排支持日期。</td></tr>
+<tr><th scope="row">自研或未知</th><td>展示未匹配明确签名的结果。</td><td>没有 OCR 或自动适配的替代路径。</td></tr>
+<tr><th scope="row">自研原生 Loader</th><td>独立的 x64 代理与 CoreCLR 引导实验，有构建和隔离验证。</td><td>真实 Unity 初始化时序未验证，桌面安装器不自动部署。</td></tr>
+</tbody></table></div></section>
+<section><h2>实际使用的主要组件</h2><ul>
+<li><strong>.NET / WPF</strong>：Windows 桌面应用。</li>
+<li><strong>BepInEx、XUnity.AutoTranslator、Il2CppInterop、Harmony</strong>：Unity 加载、文本处理和相关运行时依赖；具体包随安装路径变化。</li>
+<li><strong>thcrap 运行时（Unlicense）与 Noto Sans SC 字体（OFL）</strong>：东方 Project 路线的注入与字形渲染；补丁数据不随仓库分发，首次启用时按清单从上游镜像下载。</li>
+<li><strong>thtk（BSD）</strong>：东方数据包只读解包/提取工具链；二进制随附并保留原始许可。</li>
+<li><strong>UnityDoorstop</strong>：上游加载路径，以及自研 Loader 引导序列的来源。改编代码保留对应许可。</li>
+</ul><p>RapidOCR、PaddleOCR、manga-ocr 及其他引擎工具仅列为历史技术调研，未接入当前产品。鸣谢不代表已集成、能够调用或获得第三方背书。</p></section>
+<section><h2>来源与分发说明</h2><p>确切依赖、参考关系与许可见<a href="../OSS-INVENTORY.md">依赖和参考清单</a>、<a href="../THIRD-PARTY-NOTICES.md">第三方声明</a>及 <a href="../../LICENSES/">LICENSES</a>。这些文件用于记录来源，不是对完整分发合规已经审核通过的证明。</p><p>本项目已有上游改编代码，不能描述为“从不修改上游”。新增或修改组件时保留其原始声明，按具体版本记录来源。游戏内容、模型权重和翻译数据不由 Franca 的代码许可证统一授权。</p></section>
+<section><h2>验收入口</h2><p>查看<a href="../COMPATIBILITY.md">逐游戏兼容性矩阵</a>和<a href="../../tests/README.md">日期测试记录</a>；当前工作见<a href="../DEVELOPMENT-PROGRESS.md">开发进度</a>。先补齐窗口化游戏闭环，再根据结果决定后续适配范围。</p></section>
+<footer>Franca · 未发布功能不设支持顺序、完成日期或兼容性保证。</footer>
+</main></body></html>

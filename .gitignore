@@ -1,0 +1,36 @@
+# 实验下载的第三方组件，不进仓库
+tools/
+*.zip
+
+# .NET 构建输出
+bin/
+obj/
+
+# FrancaLoader 的本机构建输出；只保留可重复构建的源与脚本
+src/Loader/build/
+# 本机配置、凭证、解析缓存与运行日志（也保护从仓库根目录启动的副本）
+franca-settings.json
+franca-names-*.json
+franca-*.log
+/packs/
+/library-probe/
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# 本机测试截图与原始日志；仓库只保存验证方法和摘要
+/tests/artifacts/
+
+# 本机快捷方式（含绝对路径，构建时自动生成）
+Franca.lnk
+
+# WPF 临时工程与 IDE 文件
+*_wpftmp.csproj
+.vs/
+*.user
+*.suo
+
+# thcrap 运行时（Unlicense，可再分发）随源码入库，保证干净 clone 可直接构建
+!src/Franca/ThirdParty/thcrap/bin/
+!src/Franca/ThirdParty/thcrap/bin/**

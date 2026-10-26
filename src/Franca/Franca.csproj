@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Franca</RootNamespace>
+    <AssemblyName>Franca</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets/Brand/franca-taskbar.ico</ApplicationIcon>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets/Brand/franca-pixel.png"/>
+    <Resource Include="Assets/Brand/franca-taskbar.ico"/>
+    <Content Include="../../LICENSE;../../docs/THIRD-PARTY-NOTICES.md">
+      <Link>%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="../../LICENSES/*.txt">
+      <Link>LICENSES/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="ThirdParty/thtk/*">
+      <Link>ThirdParty/thtk/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="ThirdParty/thcrap/**/*">
+      <Link>ThirdParty/thcrap/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="ThirdParty/thcrap-repos/*.json">
+      <Link>ThirdParty/thcrap-repos/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="ThirdParty/thcrap-stub/franca-thcrap-stub.exe">
+      <Link>ThirdParty/thcrap-stub/%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Shift-JIS 读写：thtk 解出的 th10/th11 对话文本为 cp932 -->
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.0"/>
+  </ItemGroup>
+
+  <Target Name="RefreshLocalShortcut" AfterTargets="Build"
+          Condition="'$(OS)' == 'Windows_NT' and '$(Configuration)' == 'Release' and '$(DesignTimeBuild)' != 'true' and '$(TargetDir)' == '$(MSBuildProjectDirectory)\bin\Release\$(TargetFramework)\'">
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\..\Launcher\Setup-Shortcut.ps1&quot;" />
+  </Target>
+</Project>

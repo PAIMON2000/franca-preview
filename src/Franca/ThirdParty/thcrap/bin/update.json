@@ -1,0 +1,145 @@
+[
+	{
+		"detect": {
+			"exist": "thcrap.dll",
+			"dont_exist": [
+				"config",
+				"logs"
+			]
+		},
+		"delete": [
+			"act_nut_lib.dll",
+			"bmpfont_create_gdi.dll",
+			"bmpfont_create_gdiplus.dll",
+			"COPYING",
+			"jansson.dll",
+			"libpng16.dll",
+			"msvcp120.dll",
+			"msvcr120.dll",
+			"README.md",
+			"scripts\\release_sign.py",
+			"scripts\\repo_update.py",
+			"scripts\\utils.py",
+			"scripts\\__pycache__\\utils.cpython-34.pyc",
+			"scripts\\__pycache__\\utils.cpython-35.pyc",
+			"scripts\\__pycache__\\utils.cpython-36.pyc",
+			"scripts\\__pycache__",
+			"scripts",
+			"steam_api.dll",
+			"thcrap.dll",
+			"thcrap_i18n.dll",
+			"thcrap_tasofro.dll",
+			"thcrap_tsa.dll",
+			"thcrap_update.dll",
+			"UNLICENSE.txt",
+			"version-resolve-installed.dat",
+			"win32_utf8.dll",
+			"win32_utf8_dynamic_x86.dll",
+			"zlib1.dll",
+			"zlib-ng.dll",
+			"zlibwapi.dll"
+		],
+		"move": {
+			"32th":              "repos/",
+			"Bravi":             "repos/",
+			"Clover-Music":      "repos/",
+			"Daikarasu":         "repos/",
+			"dass7":             "repos/",
+			"DTM":               "repos/",
+			"gamer251":          "repos/",
+			"Gensokyo.EXE":      "repos/",
+			"ghildrean":         "repos/",
+			"GhostPhanom":       "repos/",
+			"MasterGameFTW3561": "repos/",
+			"MoriyaFaith":       "repos/",
+			"nazeo":             "repos/",
+			"nmlgc":             "repos/",
+			"Nutzer":            "repos/",
+			"PKWeegee":          "repos/",
+			"pgj1997":           "repos/",
+			"PookChang'e":       "repos/",
+			"Priw8":             "repos/",
+			"rosenrose":         "repos/",
+			"SMB3Memes":         "repos/",
+			"Splashman":         "repos/",
+			"Tear":              "repos/",
+			"thpatch":           "repos/",
+			"Toaster":           "repos/",
+			"UnKnwn":            "repos/",
+			"VasteelXolotl":     "repos/",
+			"WindowDump":        "repos/",
+			"wobuffet3":         "repos/",
+			"games.js":          "config/",
+			"config.js":         "config/",
+			"*.js":              "config/",
+			"thcrap_log.txt":    "logs/",
+			"thcrap_log.1.txt":  "logs/"
+		},
+		"update_repo_paths": {
+			"cfg_files": "config/*.js",
+			"old_path": "/",
+			"new_path": "repos/"
+		}
+	},
+	{
+		"detect": {
+			"exist": [
+				"config",
+				"logs",
+				"repos",
+				"version-resolve-installed.dat"
+			]
+		},
+		"delete": [
+			"act_nut_lib.dll",
+			"bmpfont_create_gdi.dll",
+			"bmpfont_create_gdiplus.dll",
+			"COPYING",
+			"jansson.dll",
+			"libpng16.dll",
+			"msvcp120.dll",
+			"msvcr120.dll",
+			"README.md",
+			"scripts\\release_sign.py",
+			"scripts\\repo_update.py",
+			"scripts\\utils.py",
+			"scripts\\__pycache__\\utils.cpython-34.pyc",
+			"scripts\\__pycache__\\utils.cpython-35.pyc",
+			"scripts\\__pycache__\\utils.cpython-36.pyc",
+			"scripts\\__pycache__",
+			"scripts",
+			"steam_api.dll",
+			"thcrap.dll",
+			"thcrap_i18n.dll",
+			"thcrap_tasofro.dll",
+			"thcrap_tsa.dll",
+			"thcrap_update.dll",
+			"UNLICENSE.txt",
+			"version-resolve-installed.dat",
+			"win32_utf8.dll",
+			"win32_utf8_dynamic_x86.dll",
+			"zlib1.dll",
+			"zlib-ng.dll",
+			"zlibwapi.dll",
+
+			"thpatch\\repo.js",
+			"thpatch"
+		],
+		"fix_repo_paths_post_restructuring": {
+			"cfg_files": "config/*.js",
+			"broken_prefix": "repos/"
+		}
+	},
+	{
+		"detect": {
+			"exist": "thcrap_configure.exe"
+		},
+		"delete": "thcrap_configure.exe"
+    },
+	{
+		"detect": {
+			"exist": "bin\\libcrypto-1_1.dll"
+		},
+		"delete": "bin\\libcrypto-1_1.dll"
+    }
+]
