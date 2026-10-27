@@ -5,6 +5,7 @@ tools/
 # .NET 构建输出
 bin/
 obj/
+/dist/
 
 # FrancaLoader 的本机构建输出；只保留可重复构建的源与脚本
 src/Loader/build/

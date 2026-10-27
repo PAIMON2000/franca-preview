@@ -11,10 +11,15 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets/Brand/franca-taskbar.ico</ApplicationIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>0.1.0</Version>
+    <Version>0.1.20261027</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.1027.0</FileVersion>
+    <InformationalVersion>Franca0.1-1027</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyMetadata Include="ReleaseVersion" Value="$(Version)" />
     <Resource Include="Assets/Brand/franca-pixel.png"/>
     <Resource Include="Assets/Brand/franca-taskbar.ico"/>
     <Content Include="../../LICENSE;../../docs/THIRD-PARTY-NOTICES.md">
@@ -47,6 +52,22 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
+  </ItemGroup>
+  <!-- Standalone downloads embed the same shipped content, never local settings or caches. -->
+  <ItemGroup Condition="'$(FrancaStandalone)' == 'true'">
+    <EmbeddedResource Include="../../LICENSE;../../docs/THIRD-PARTY-NOTICES.md"
+                      LogicalName="Franca.Distribution/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../LICENSES/*.txt"
+                      LogicalName="Franca.Distribution/LICENSES/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="ThirdParty/thtk/*"
+                      LogicalName="Franca.Distribution/ThirdParty/thtk/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="ThirdParty/thcrap/**/*"
+                      LogicalName="Franca.Distribution/ThirdParty/thcrap/%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="ThirdParty/thcrap-repos/*.json"
+                      LogicalName="Franca.Distribution/ThirdParty/thcrap-repos/%(Filename)%(Extension)" />
+    <EmbeddedResource Include="ThirdParty/thcrap-stub/franca-thcrap-stub.exe"
+                      LogicalName="Franca.Distribution/ThirdParty/thcrap-stub/%(Filename)%(Extension)" />
+    <Content Update="@(Content)" CopyToPublishDirectory="Never" />
   </ItemGroup>
   <ItemGroup>
     <!-- Shift-JIS 读写：thtk 解出的 th10/th11 对话文本为 cp932 -->

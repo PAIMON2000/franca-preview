@@ -13,6 +13,14 @@ internal static partial class ProbeRunner
 
     public static async Task<bool> TryRunAsync(App app, string[] args)
     {
+        if (args.Length > 0 && args[0] == "--probe-release-update")
+        {
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            await ReleaseUpdateProbe.RunAsync();
+            app.Shutdown();
+            return true;
+        }
         if (args.Length > 0 && args[0] is "--ue-inspect" or "--ue-prepare" or "--ue-prepare-cached" or "--probe-ue-static"
             or "--ue-table-inspect" or "--ue-table-prepare" or "--ue-table-prepare-cached")
         {

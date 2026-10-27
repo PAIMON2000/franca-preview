@@ -22,6 +22,8 @@ public partial class MainWindow : Window
     private readonly OverlayStatusModel _overlayStatus;
     private OverlayWindow? _overlayWindow;
     private bool _closed;
+    private readonly CancellationTokenSource _releaseCheckCancellation = new();
+    private AvailableRelease? _availableRelease;
 
     private void OnLogLineAdded(string line) => StatusLatestLog.Text = line;
 
@@ -96,6 +98,8 @@ public partial class MainWindow : Window
         Closed += (_, _) =>
         {
             _closed = true;
+            _releaseCheckCancellation.Cancel();
+            _releaseCheckCancellation.Dispose();
             LanguageApply.Dispose();
             _gamesPage.StopBackgroundWork();
             _acknowledgementsPage.CancelStartupCountdown();
@@ -149,6 +153,7 @@ public partial class MainWindow : Window
 
         Loaded += async (_, _) =>
         {
+            _ = CheckForReleaseAsync();
             DnsWarmup.KickOff();
             await _gamesPage.StartupAsync();
             if (_closed) return;
@@ -350,11 +355,45 @@ public partial class MainWindow : Window
 
     private void ApplyUiLanguage()
     {
-        Title = UiStrings.Get("app.title");
+        Title = UiStrings.Get("app.title") + " · " + ReleaseUpdateService.DisplayVersion;
+        BrandLabel.ToolTip = ReleaseUpdateService.DisplayVersion;
+        RefreshUpdateBanner();
         _acknowledgementsPage.ApplyUiLanguage();
         foreach (var item in _navItems)
             item.RefreshLabel();
         RefreshStatusBar();
+    }
+
+    private async Task CheckForReleaseAsync()
+    {
+        var release = await new ReleaseUpdateService().CheckAsync(_releaseCheckCancellation.Token);
+        if (_closed || release is null) return;
+        ShowAvailableRelease(release);
+    }
+
+    internal void ShowAvailableRelease(AvailableRelease release)
+    {
+        _availableRelease = release;
+        RefreshUpdateBanner();
+    }
+
+    private void RefreshUpdateBanner()
+    {
+        if (_availableRelease is null) return;
+        UpdateMessage.Text = UiStrings.Format("update.available", _availableRelease.Name);
+        UpdateDownloadButton.Content = UiStrings.Get("update.download");
+        UpdateBanner.Visibility = Visibility.Visible;
+    }
+
+    private void OnUpdateDownloadClick(object sender, RoutedEventArgs e)
+    {
+        if (_availableRelease is null) return;
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(_availableRelease.Page.AbsoluteUri)
+                { UseShellExecute = true });
+        }
+        catch (Exception ex) { AppLog.Write("Could not open release page: " + ex.GetType().Name); }
     }
 
     // ---- 底部状态条 ----

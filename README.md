@@ -6,6 +6,20 @@ Windows game-translation desktop prototype (.NET 9 / WPF), free and open source.
 
 源码仓库：<https://github.com/hongweihu184/franca-preview>（问题与建议请开 Issue）。
 
+## 下载即用（Windows 64 位）
+
+**[点击下载 Franca0.1-1027.exe](https://github.com/hongweihu184/franca-preview/releases/download/v0.1.20261027/Franca0.1-1027.exe)** · [最新版本与更新说明](https://github.com/hongweihu184/franca-preview/releases/latest)
+
+不需要会用 GitHub，也不需要安装 .NET 或编译源码：
+
+1. 点击上面的下载链接，把 EXE 放进一个单独的、可写的文件夹（例如 `D:\Franca`）。
+2. 双击 EXE 启动。首次运行会在同一文件夹释放 `ThirdParty`、许可证等必要文件，请保留这些文件。
+3. 每次启动后会在后台检查本仓库的正式发布版本；有新版时，点击窗口中的「下载新版」打开发布页。离线或检查失败不影响使用。
+
+更新时先关闭 Franca 和使用翻译运行时的游戏，把新版 EXE 放回原文件夹；保留 `franca-settings.json`、`thcrap` 等已有文件，更新后从新版 EXE 启动。不要删除或移动旧文件夹后再迁移：已启用的东方游戏可能仍引用其中的运行时路径。程序不会自动下载或覆盖更新。
+
+此版本为未签名的桌面原型，仅提供 Windows x64 包；其他架构未经验证。GitHub 下载失败可稍后重试。[发布页](https://github.com/hongweihu184/franca-preview/releases/tag/v0.1.20261027)同时提供 SHA-256 校验文件。兼容范围仍以下方逐游戏证据为准。
+
 ## 实际状态
 
 - Suzerain 既有环境有主菜单、选项页及序章正文中文画面证据；不代表干净安装、完整剧情或更新兼容性验收通过。
@@ -19,7 +33,7 @@ Windows game-translation desktop prototype (.NET 9 / WPF), free and open source.
 
 ## 运行与使用条件
 
-需要 .NET 9 SDK 构建；程序为框架依赖发布，运行需要 .NET 9 Desktop Runtime。
+普通用户请使用上方自带运行环境的 EXE。以下步骤供源码开发者使用，需要 .NET 9 SDK；标准构建输出运行时需要 .NET 9 Desktop Runtime。
 
 ```powershell
 dotnet build src/Franca/Franca.csproj -c Release
@@ -31,7 +45,9 @@ dotnet build src/Franca/Franca.csproj -c Release
 powershell -NoProfile -ExecutionPolicy Bypass -File src/Launcher/Setup-Shortcut.ps1
 ```
 
-安装及修复会改动选定游戏目录，应先保留备份。游戏侧支持停用、配置修复和卸载（卸载整体还原到未安装基线）；程序本身从源码构建运行，暂不提供安装包和一键卸载。测试用例的副作用按 [功能索引](architecture.json) 说明，真实游戏测试保持窗口化。
+安装及修复会改动选定游戏目录，应先保留备份。游戏侧支持停用、配置修复和卸载（卸载整体还原到未安装基线）；桌面程序提供免安装 EXE，暂不提供安装器和一键卸载。删除程序文件夹前请先停用/卸载依赖该目录的游戏翻译。测试用例的副作用按 [功能索引](architecture.json) 说明，真实游戏测试保持窗口化。
+
+维护者可用 `pwsh -File src/Launcher/Publish-Release.ps1` 重建自带 .NET 的单 EXE，输出位于 `dist/Franca0.1-1027/`。后续发布需同步修改项目中的 `Version`（对应 GitHub 标签 `v<Version>`）、`InformationalVersion`（下载文件名）及 `FileVersion`，再上传 EXE 和校验文件到 GitHub Releases；只有带 Franca EXE 的正式 Release 才会触发新版提示。
 
 东方路线首次启用时需要联网从上游镜像下载补丁数据（约 1 MB，逐个校验哈希）；下载失败会明确报错中止，不影响其他引擎。
 

@@ -38,6 +38,8 @@ public static class UiStrings
     {
         ["en"] = new()
         {
+            ["update.available"] = "New version available: {0}",
+            ["update.download"] = "Download update",
             ["language.apply.idle"] = "Change a language to apply installed game configurations after 5 seconds.",
             ["language.apply.countdown"] = "Applying in {0}s",
             ["language.apply.paused"] = "Paused · {0}s remaining",
@@ -443,6 +445,8 @@ public static class UiStrings
         },
         ["zh-CN"] = new()
         {
+            ["update.available"] = "发现新版本：{0}",
+            ["update.download"] = "下载新版",
             ["language.apply.idle"] = "修改语言后，5 秒自动应用到已安装的游戏配置。",
             ["language.apply.countdown"] = "{0} 秒后自动应用",
             ["language.apply.paused"] = "已暂停 · 剩余 {0} 秒",
@@ -848,6 +852,8 @@ public static class UiStrings
         },
         ["zh-TW"] = new()
         {
+            ["update.available"] = "發現新版本：{0}",
+            ["update.download"] = "下載新版",
             ["language.apply.idle"] = "修改語言後，5 秒自動套用到已安裝的遊戲設定。",
             ["language.apply.countdown"] = "{0} 秒後自動套用",
             ["language.apply.paused"] = "已暫停 · 剩餘 {0} 秒",
@@ -1253,6 +1259,8 @@ public static class UiStrings
         },
         ["ja"] = new()
         {
+            ["update.available"] = "新しいバージョン：{0}",
+            ["update.download"] = "新版をダウンロード",
             ["language.apply.idle"] = "言語を変更すると、5 秒後に導入済みゲームの設定へ適用します。",
             ["language.apply.countdown"] = "{0} 秒後に適用",
             ["language.apply.paused"] = "一時停止 · 残り {0} 秒",
@@ -1658,6 +1666,8 @@ public static class UiStrings
         },
         ["ko"] = new()
         {
+            ["update.available"] = "새 버전: {0}",
+            ["update.download"] = "업데이트 다운로드",
             ["language.apply.idle"] = "언어를 변경하면 5초 후 설치된 게임 설정에 적용합니다.",
             ["language.apply.countdown"] = "{0}초 후 적용",
             ["language.apply.paused"] = "일시 정지 · {0}초 남음",
@@ -2063,6 +2073,8 @@ public static class UiStrings
         },
         ["pt-BR"] = new()
         {
+            ["update.available"] = "Nova versão disponível: {0}",
+            ["update.download"] = "Baixar atualização",
             ["language.apply.idle"] = "Altere o idioma para aplicar às configurações dos jogos instalados após 5 segundos.",
             ["language.apply.countdown"] = "Aplicando em {0}s",
             ["language.apply.paused"] = "Pausado · {0}s restantes",
@@ -2468,6 +2480,8 @@ public static class UiStrings
         },
         ["es"] = new()
         {
+            ["update.available"] = "Nueva versión disponible: {0}",
+            ["update.download"] = "Descargar actualización",
             ["language.apply.idle"] = "Cambia un idioma para aplicar la configuración de los juegos instalados tras 5 segundos.",
             ["language.apply.countdown"] = "Se aplicará en {0}s",
             ["language.apply.paused"] = "En pausa · quedan {0}s",
@@ -2873,6 +2887,8 @@ public static class UiStrings
         },
         ["id"] = new()
         {
+            ["update.available"] = "Versi baru tersedia: {0}",
+            ["update.download"] = "Unduh pembaruan",
             ["language.apply.idle"] = "Ubah bahasa untuk menerapkan konfigurasi game terpasang setelah 5 detik.",
             ["language.apply.countdown"] = "Diterapkan dalam {0} dtk",
             ["language.apply.paused"] = "Dijeda · tersisa {0} dtk",
@@ -3278,6 +3294,8 @@ public static class UiStrings
         },
         ["vi"] = new()
         {
+            ["update.available"] = "Có phiên bản mới: {0}",
+            ["update.download"] = "Tải bản cập nhật",
             ["language.apply.idle"] = "Đổi ngôn ngữ để áp dụng cấu hình cho trò chơi đã cài sau 5 giây.",
             ["language.apply.countdown"] = "Áp dụng sau {0} giây",
             ["language.apply.paused"] = "Tạm dừng · còn {0} giây",
@@ -3683,6 +3701,8 @@ public static class UiStrings
         },
         ["th"] = new()
         {
+            ["update.available"] = "มีเวอร์ชันใหม่: {0}",
+            ["update.download"] = "ดาวน์โหลดอัปเดต",
             ["language.apply.idle"] = "เปลี่ยนภาษาเพื่อใช้การตั้งค่ากับเกมที่ติดตั้งหลังจาก 5 วินาที",
             ["language.apply.countdown"] = "จะใช้ใน {0} วินาที",
             ["language.apply.paused"] = "หยุดชั่วคราว · เหลือ {0} วินาที",
@@ -4088,6 +4108,8 @@ public static class UiStrings
         },
         ["tr"] = new()
         {
+            ["update.available"] = "Yeni sürüm mevcut: {0}",
+            ["update.download"] = "Güncellemeyi indir",
             ["language.apply.idle"] = "Dili değiştirince kurulu oyun ayarları 5 saniye sonra uygulanır.",
             ["language.apply.countdown"] = "{0} sn sonra uygulanacak",
             ["language.apply.paused"] = "Duraklatıldı · {0} sn kaldı",
@@ -4493,6 +4515,8 @@ public static class UiStrings
         },
         ["ru"] = new()
         {
+            ["update.available"] = "Доступна новая версия: {0}",
+            ["update.download"] = "Скачать обновление",
             ["language.apply.idle"] = "После смены языка настройки установленных игр применятся через 5 секунд.",
             ["language.apply.countdown"] = "Применение через {0} с",
             ["language.apply.paused"] = "Пауза · осталось {0} с",
@@ -4898,6 +4922,8 @@ public static class UiStrings
         },
         ["ar"] = new()
         {
+            ["update.available"] = "يتوفر إصدار جديد: {0}",
+            ["update.download"] = "تنزيل التحديث",
             ["language.apply.idle"] = "غيّر اللغة لتطبيق إعدادات الألعاب المثبتة بعد 5 ثوانٍ.",
             ["language.apply.countdown"] = "التطبيق خلال {0} ث",
             ["language.apply.paused"] = "متوقف مؤقتًا · متبقي {0} ث",
@@ -5303,6 +5329,8 @@ public static class UiStrings
         },
         ["fr"] = new()
         {
+            ["update.available"] = "Nouvelle version disponible : {0}",
+            ["update.download"] = "Télécharger la mise à jour",
             ["language.apply.idle"] = "Changez de langue pour appliquer les réglages des jeux installés après 5 secondes.",
             ["language.apply.countdown"] = "Application dans {0}s",
             ["language.apply.paused"] = "En pause · reste {0}s",
@@ -5708,6 +5736,8 @@ public static class UiStrings
         },
         ["de"] = new()
         {
+            ["update.available"] = "Neue Version verfügbar: {0}",
+            ["update.download"] = "Update herunterladen",
             ["language.apply.idle"] = "Sprachänderungen werden nach 5 Sekunden auf installierte Spiele angewendet.",
             ["language.apply.countdown"] = "Anwendung in {0}s",
             ["language.apply.paused"] = "Pausiert · noch {0}s",

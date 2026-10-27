@@ -106,7 +106,16 @@
             </Border>
 
             <!-- 页签内容区 -->
-            <ContentControl Grid.Column="1" x:Name="PageHost"/>
+            <DockPanel Grid.Column="1">
+                <Border x:Name="UpdateBanner" DockPanel.Dock="Top" Visibility="Collapsed"
+                        Background="{DynamicResource NavBackgroundBrush}" Padding="12,8">
+                    <DockPanel>
+                        <Button x:Name="UpdateDownloadButton" DockPanel.Dock="Right" Click="OnUpdateDownloadClick" Padding="12,5"/>
+                        <TextBlock x:Name="UpdateMessage" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,12,0"/>
+                    </DockPanel>
+                </Border>
+                <ContentControl x:Name="PageHost"/>
+            </DockPanel>
         </Grid>
 
         <!-- 底部状态条 -->

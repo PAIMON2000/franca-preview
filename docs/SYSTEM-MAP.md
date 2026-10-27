@@ -6,6 +6,8 @@
 
 本机启动入口为根目录「Franca」快捷方式，由 `src/Launcher/Setup-Shortcut.ps1` 生成，指向标准 Release 输出，使用现有品牌图标。仓库网页在 `docs/site/`，更新日志与第三方声明归入 `docs/`；构建仍将声明以 `THIRD-PARTY-NOTICES.md` 原文件名复制到程序目录，许可证窗口的读取契约不变。
 
+发布入口为 `Publish-Release.ps1` 与 Standalone profile：自包含 win-x64 单 EXE，仅嵌入项目声明的发行资源。App 启动先通过 Application 的 `ReleaseAssetsService` 校验/释放资源到 EXE 所在目录（普通构建无嵌入资源，因此无操作）；不打包本机凭证、缓存或生成补丁。窗口 Loaded 后异步调用 `ReleaseUpdateService` 查询固定仓库的最新正式 Release，窗口关闭取消查询；服务负责请求、版本与来源验证，页面仅显示下载提示并按用户点击打开 GitHub 发布页，不自动下载/安装、不写游戏目录。版本比较使用程序集 ReleaseVersion metadata，显示名称使用 InformationalVersion。
+
 ```text
 游戏库开关（Desktop）
   -> GameTranslationService（Application）
@@ -22,7 +24,7 @@
 | 模块 | 当前代码 | 责任 | 不负责 |
 |---|---|---|---|
 | Desktop | `MainWindow`、`Views/`、`Desktop/EndpointAutoController`、`Desktop/LanguageApplyController`、`Themes/` | 组合服务、显示状态、接收用户操作、WPF 定时调度 | 协议细节、游戏目录写入 |
-| Application | `GameTranslationService`、`KnownIssueRepairService` | 游戏启停/修复编排、运行时准备、故障修复流程 | 页面控件、提供者协议 |
+| Application | `GameTranslationService`、`KnownIssueRepairService`、`ReleaseUpdateService`、`ReleaseAssetsService` | 游戏启停/修复编排、运行时准备、故障修复流程、发行资源准备和新版查询 | 页面控件、提供者协议 |
 | Game | `Models/GameInfo`、`SteamScanner`、`SteamAppInfoReader`、`EngineDetector`、`GameNameService`、`NameSegmenter`、`GameLibraryOrder`、`SteamIconService` | 游戏发现、本地 Steam 类型、引擎识别、译名和语言支持、排序和图标 | 安装具体运行时 |
 | Installer | `TranslationInstaller`、`TranslationHealthService` | 安装、配置、健康检查、备份/修复；接收显式中继地址 | 启动中继、翻译文本调度 |
 | Runtime | `RelayServer`、`GameRuntimeMonitor`、`KnownIssueCatalog`、`TranslationTextSegmenter`、`SegmentedTranslationService`、`GameTextSyncService`、`OverlayStatusModel` | 中继边界、并发、失败开放、运行进程监控与故障识别、长文分段与重组、游戏文本同步、悬浮窗状态模型 | UI、Steam 扫描 |

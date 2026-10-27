@@ -82,22 +82,26 @@ graph LR
 
 ### `application`
 
-- 职责：game enable/disable/repair orchestration；known issue repair workflows
-- 文件：2 个；声明依赖：`game`、`installer`、`runtime`、`shared`
+- 职责：game enable/disable/repair orchestration；known issue repair workflows；release update queries and standalone asset preparation
+- 文件：4 个；声明依赖：`game`、`installer`、`runtime`、`shared`
 - 输入：
   - `enable/disable/repair requests from pages`
   - `game identity and target directory`
   - `debounced source/target-language configuration requests with a settings snapshot`
+  - `normal desktop startup release query and embedded distribution resources`
 - 输出：
   - `orchestrated install/health-check/repair steps`
   - `runtime preparation before game launch`
   - `launch games via steam://rungameid/<appid>`
   - `diagnosable per-step results`
+  - `validated newer release metadata and bundled distribution assets beside the executable`
 - 不变量：
   - `installer never holds or starts the relay`
   - `enable/disable is reversible; writes to game directories keep recoverable backups`
   - `automatic language apply only touches stopped installed Unity games; preserves disabled state, skips running/unknown processes, and serializes with toggles/repairs`
+  - `release checks never download or replace executables; bundled asset preparation never writes settings or mutable thcrap patches`
 - 验证探针：
+  - `--probe-release-update`
   - `--probe-toggle`
   - `--probe-health`
   - `--probe-architecture`
@@ -240,7 +244,7 @@ graph LR
 ### `diagnostics`
 
 - 职责：command-line probes and UI verification
-- 文件：25 个；声明依赖：`application`、`desktop`、`game`、`installer`、`runtime`、`translation`、`pack`、`shared`
+- 文件：26 个；声明依赖：`application`、`desktop`、`game`、`installer`、`runtime`、`translation`、`pack`、`shared`
 - 输入：
   - `--probe-* command-line arguments`
 - 输出：

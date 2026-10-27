@@ -45,6 +45,14 @@ internal static partial class ProbeRunner
             && ((NavItem)main.NavList.Items[5]).Label == UiStrings.Get("nav.log")
             && ((NavItem)main.NavList.Items[6]).Label == UiStrings.Get("nav.acknowledgements"));
         await Snapshot(main, "startup-library");
+        Check("release_banner_hidden_initially", main.UpdateBanner.Visibility == Visibility.Collapsed);
+        main.ShowAvailableRelease(new AvailableRelease("Franca next", new Version(0, 2),
+            new Uri(ReleaseUpdateService.RepositoryUrl + "/releases/tag/v0.2")));
+        Check("release_banner_shown", main.UpdateBanner.Visibility == Visibility.Visible
+            && main.UpdateMessage.Text.Contains("Franca next")
+            && (string)main.UpdateDownloadButton.Content == "下载新版");
+        await Snapshot(main, "release-update-banner");
+        main.UpdateBanner.Visibility = Visibility.Collapsed;
         var earlyExit = new MainWindow(startServices: false, new AppSettings { TargetLanguage = "zh-CN" });
         earlyExit.NavigateTo(2);
         Check("settings_agent_collapsed", earlyExit.PageHost.Content is Views.SettingsPage settings && !settings.AgentAdvanced.IsExpanded);

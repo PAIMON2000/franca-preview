@@ -64,11 +64,14 @@
       "id": "application",
       "paths": [
         "src/Franca/Services/GameTranslationService.cs",
-        "src/Franca/Services/KnownIssueRepairService.cs"
+        "src/Franca/Services/KnownIssueRepairService.cs",
+        "src/Franca/Services/ReleaseUpdateService.cs",
+        "src/Franca/Services/ReleaseAssetsService.cs"
       ],
       "owns": [
         "game enable/disable/repair orchestration",
-        "known issue repair workflows"
+        "known issue repair workflows",
+        "release update queries and standalone asset preparation"
       ],
       "dependsOn": [
         "game",
@@ -80,20 +83,24 @@
         "inputs": [
           "enable/disable/repair requests from pages",
           "game identity and target directory",
-          "debounced source/target-language configuration requests with a settings snapshot"
+          "debounced source/target-language configuration requests with a settings snapshot",
+          "normal desktop startup release query and embedded distribution resources"
         ],
         "outputs": [
           "orchestrated install/health-check/repair steps",
           "runtime preparation before game launch",
           "launch games via steam://rungameid/<appid>",
-          "diagnosable per-step results"
+          "diagnosable per-step results",
+          "validated newer release metadata and bundled distribution assets beside the executable"
         ],
         "invariants": [
           "installer never holds or starts the relay",
           "enable/disable is reversible; writes to game directories keep recoverable backups",
-          "automatic language apply only touches stopped installed Unity games; preserves disabled state, skips running/unknown processes, and serializes with toggles/repairs"
+          "automatic language apply only touches stopped installed Unity games; preserves disabled state, skips running/unknown processes, and serializes with toggles/repairs",
+          "release checks never download or replace executables; bundled asset preparation never writes settings or mutable thcrap patches"
         ],
         "probes": [
+          "--probe-release-update",
           "--probe-toggle",
           "--probe-health",
           "--probe-architecture",
@@ -440,6 +447,14 @@
     }
   ],
   "features": [
+    {
+      "id": "standalone-release-and-update-check",
+      "entryPoints": ["src/Launcher/Publish-Release.ps1", "src/Franca/Services/ReleaseUpdateService.cs", "src/Franca/Services/ReleaseAssetsService.cs"],
+      "relatedPaths": ["src/Launcher/Test-Standalone.ps1", "src/Franca/Properties/PublishProfiles/Standalone.pubxml", "src/Franca/Franca.csproj", "src/Franca/App.xaml.cs", "src/Franca/MainWindow.xaml", "src/Franca/MainWindow.xaml.cs", "src/Franca/Services/UiStrings.cs", "src/Franca/Diagnostics/ReleaseUpdateProbe.cs", "src/Franca/Diagnostics/ProbeRunner.cs", "README.md"],
+      "verification": ["--probe-release-update", "--probe-startup", "--probe-navigation", "--probe-blueprint", "pwsh -File src/Launcher/Publish-Release.ps1"],
+      "sideEffects": "Probe uses injected HTTP handlers, never GitHub or real games. Normal window startup queries the fixed public GitHub latest-release API asynchronously with an eight-second timeout and cancellation on close; only published stable releases with Franca EXE assets and a newer numeric v<Version> tag show a banner. Clicking opens the validated repository release page; no automatic download or replacement. Standalone publish downloads the win-x64 .NET runtime at build time, embeds only declared Content, writes a single EXE and SHA256 under ignored dist/. Standalone startup verifies and extracts bundled assets beside the EXE, never includes settings/keys/packs or alters mutable thcrap working trees. Ordinary builds have no embedded distribution assets.",
+      "references": ["tests/2026-10-27-release.md"]
+    },
     {
       "id": "ue-static-preparation",
       "entryPoints": ["src/Franca/Services/UeStaticService.cs", "src/Franca/Services/StaticTextTranslationService.cs"],
