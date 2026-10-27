@@ -1,10 +1,30 @@
 # Franca
 
-Windows 游戏翻译桌面原型，使用 .NET 9 / WPF。免费、开源、非商业项目。当前提供 Steam 游戏库扫描、部分 Unity 游戏（BepInEx / XUnity.AutoTranslator）与东方 Project 自研引擎（thcrap 运行时注入）的翻译安装与配置、本机翻译中继和译文缓存；Unreal 静态适配仍在实验阶段。
+<img src="src/Franca/Assets/Brand/franca-pixel.png" alt="Franca 项目标识" width="96">
 
-Windows game-translation desktop prototype (.NET 9 / WPF), free and open source. It scans installed Steam games and provides translation setup for selected Unity games and Touhou Project games, plus a local translation relay and cache. Unreal support is experimental. Compatibility is verified per game and version; OCR, community package distribution and Steam Workshop integration are not implemented.
+**让更多游戏能用你熟悉的语言游玩。**
 
-源码仓库：<https://github.com/PAIMON2000/franca-preview>（问题与建议请开 Issue）。
+免费开源的 Windows 游戏翻译工具，集中管理部分游戏的翻译配置与本地译文缓存。目前由维护者和朋友试用，欢迎愿意记录结果的玩家参与测试。
+
+**[下载测试版](https://github.com/PAIMON2000/franca-preview/releases/latest)** · **[查看已测游戏](#已测游戏)** · **[参与测试](docs/TESTING.md)**
+
+> 早期桌面原型 · Windows x64 · 兼容性按游戏和版本确认。部分 Unity 游戏与东方作品已有实际显示证据；Unreal 尚未开放正式启用。Franca 免费，所选翻译服务可能收费。
+
+Free, open-source Windows game translation prototype. Set up translation for selected Unity and Touhou games, with per-game local caches. Early testing: compatibility depends on the game and version; Unreal integration remains experimental. Translation services may charge separately.
+
+## 已测游戏
+
+更新：2026-10-27。下表是测试范围摘要，完整版本与证据见 [兼容性矩阵](docs/COMPATIBILITY.md)。
+
+| 游戏 | 已确认的实际结果 | 仍需测试 |
+|---|---|---|
+| Suzerain | 既有环境的主菜单、选项页及序章正文/选项中文显示 | 干净安装、完整剧情、停用恢复与长期游玩 |
+| BALL x PIT | 英语 → 印尼语菜单；重启缓存、停用恢复与配置修复 | 存档游玩；8 次启动中 2 次退出码 1，原因待查 |
+| Potion Craft | 英语 → 印尼语主菜单；重启缓存、停用恢复与配置修复 | 存档游玩与长时间稳定性 |
+| Book of Hours | 英语 → 印尼语首次实际显示获用户确认 | 具体页面、排版、重启缓存与停用恢复 |
+| 东方 th10 / th11 | 对话与界面中文获用户确认；th11 含结局与音乐室评论 | 停用恢复；符卡名跳过，其余作品未逐款验收 |
+
+**实验进展：**《逸剑风云决》已有核心表、部分菜单日语显示和菜单停用恢复证据；《歧路旅人 2》已确认少量菜单日语显示，10 月 27 日完整表的日语译文包已在游戏目录外准备完成，尚待换包显示与停用恢复验收。两者均未接入正式启用入口，不能据此推断其他 UE 游戏可用。
 
 ## 下载即用（Windows 64 位）
 
@@ -18,18 +38,21 @@ Windows game-translation desktop prototype (.NET 9 / WPF), free and open source.
 
 更新时先关闭 Franca 和使用翻译运行时的游戏，把新版 EXE 放回原文件夹；保留 `franca-settings.json`、`thcrap` 等已有文件，更新后从新版 EXE 启动。不要删除或移动旧文件夹后再迁移：已启用的东方游戏可能仍引用其中的运行时路径。程序不会自动下载或覆盖更新。
 
-此版本为未签名的桌面原型，仅提供 Windows x64 包；其他架构未经验证。GitHub 下载失败可稍后重试。[发布页](https://github.com/PAIMON2000/franca-preview/releases/tag/v0.1.20261027)同时提供 SHA-256 校验文件。兼容范围仍以下方逐游戏证据为准。
+此版本为未签名的桌面原型，仅提供 Windows x64 包；其他架构未经验证。GitHub 下载失败可稍后重试。[发布页](https://github.com/PAIMON2000/franca-preview/releases/tag/v0.1.20261027)同时提供 SHA-256 校验文件。兼容范围以逐游戏证据为准。
 
-## 实际状态
+## 一起补齐下一份测试结果
 
-- Suzerain 既有环境有主菜单、选项页及序章正文中文画面证据；不代表干净安装、完整剧情或更新兼容性验收通过。
-- BALL x PIT（IL2CPP）与 Potion Craft（Unity Mono）通过干净基线安装、英语 → 印尼语菜单、重启缓存复用、停用/恢复与配置注错修复；未进入存档游玩。BALL x PIT 8 次启动中 2 次退出码 1，根因未定。
-- 东方 Project th10/th11 走 thcrap 运行时路线：交换 exe 存根并生成 jdiff 补丁，不改游戏数据包。th11 局内对话、结局、音乐室评论、主菜单与全部下级界面精灵图，以及 th10 对话与界面经用户真机确认；符卡名因发行版加密跳过，其余正作未逐款验收。
-- Unreal：《逸剑风云决》核心数据表与主菜单图片、《歧路旅人 2》少量菜单日语显示经用户确认；未接入正式启用入口，第二款完整译文包未完成。
-- 自研 Loader 有独立构建和 CoreCLR 隔离验证，真实 Unity 初始化时序未验收，未纳入默认安装路径。
-- 引擎特征识别不等于翻译支持。尚无 OCR、社区上传订阅服务或 Steam／创意工坊集成，也未设发布日期。
+有上表中的游戏？欢迎选择一款，记录菜单或正文显示、排版、重启缓存与停用恢复。成功、失败和“尚未测试”都值得记录，无需先读源码。
 
-具体版本与证据见 [兼容性矩阵](docs/COMPATIBILITY.md)；当前状态见 [开发进度](docs/DEVELOPMENT-PROGRESS.md)。
+**[查看测试步骤与隐私提示](docs/TESTING.md)** · **[填写测试反馈](https://github.com/PAIMON2000/franca-preview/issues/new?template=game-test.yml)**
+
+请先备份存档并在单机环境测试；UE 实验流程暂不作为普通玩家测试入口。一次只验证一个小范围，无需承诺通关。
+
+## 能做什么与当前限制
+
+扫描本机 Steam 游戏库；为部分 Unity 游戏（BepInEx / XUnity.AutoTranslator）及东方游戏（thcrap）配置翻译；按游戏缓存译文，提供端点选择、短语词典和分段翻译，以及游戏侧停用、修复与卸载恢复。
+
+引擎识别不等于翻译支持。尚无 OCR、社区翻译包上传订阅或 Steam／创意工坊集成。自研 Loader 仍为独立实验，不在默认安装路径中。机器翻译未经人工审校，长时间游玩和游戏更新后的兼容性仍需测试。当前工作见 [开发进度](docs/DEVELOPMENT-PROGRESS.md)。
 
 ## 运行与使用条件
 

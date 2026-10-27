@@ -1,0 +1,57 @@
+name: 游戏测试反馈
+description: 记录某款游戏的实际显示、重启及停用恢复结果；成功和失败都欢迎。
+title: "[游戏测试] 游戏名 / 版本"
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢参与测试！未做的步骤请写“未测”。请勿上传密钥、完整设置、存档、翻译缓存或游戏资源；截图和日志先脱敏。
+        测试说明：https://github.com/PAIMON2000/franca-preview/blob/main/docs/TESTING.md
+  - type: input
+    id: game
+    attributes:
+      label: 游戏与版本
+      description: 游戏名、平台或 Steam App ID、版本或 build；不知道版本时请注明。
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Franca 与 Windows 版本
+      placeholder: "例如：Franca0.1-1027 / Windows 11 x64"
+    validations:
+      required: true
+  - type: input
+    id: translation
+    attributes:
+      label: 翻译设置
+      description: 源语言 → 目标语言、服务名称；不要填写密钥或私人端点 URL。
+    validations:
+      required: true
+  - type: textarea
+    id: baseline
+    attributes:
+      label: 测试前环境
+      description: 已有模组、翻译插件或加载器；是否备份、是否已有安装。不确定的部分写未知。
+  - type: textarea
+    id: result
+    attributes:
+      label: 步骤与实际结果
+      value: |
+        测试日期：
+        启用与启动：
+        菜单显示（场景、原文与译文示例）：
+        正文或动态文本（未测可留“未测”）：
+        缺字、溢出、漏译：
+        正常退出与重启：
+        停用后原文恢复：
+        重新启用：
+        游玩时长与范围：
+        异常及复现顺序：
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 截图或必要日志（可选）
+      description: 请注明场景及语言。只附脱敏后的必要片段，避免账号、密钥、私人路径和存档。

@@ -466,7 +466,7 @@
     {
       "id": "local-launcher-and-project-navigation",
       "entryPoints": ["src/Launcher/Setup-Shortcut.ps1", "README.md"],
-      "relatedPaths": ["docs/README.md", "docs/site/index.html", "docs/site/engines.html", "docs/CHANGELOG.md", "docs/THIRD-PARTY-NOTICES.md", "src/Franca/Franca.csproj", "src/Franca/Assets/Brand/franca-taskbar.ico"],
+      "relatedPaths": ["docs/README.md", "docs/site/index.html", "docs/site/engines.html", "docs/site.css", "docs/TESTING.md", ".github/ISSUE_TEMPLATE/game-test.yml", "docs/CHANGELOG.md", "docs/THIRD-PARTY-NOTICES.md", "src/Franca/Franca.csproj", "src/Franca/Assets/Brand/franca-taskbar.ico"],
       "verification": ["dotnet build src/Franca/Franca.csproj -c Release", "powershell -NoProfile -ExecutionPolicy Bypass -File src/Launcher/Setup-Shortcut.ps1"],
       "sideEffects": "Creates or updates the local root launch shortcut with absolute executable/icon paths; does not start Franca. A successful standard Windows Release build refreshes the shortcut automatically; custom output directories and design-time builds do not. The setup script can also regenerate it manually after relocating the checkout. Static documentation checks only require JSON, links and paths. Packaged notices retain their existing runtime filenames.",
       "references": ["tests/2026-10-23-root-launcher.md"]

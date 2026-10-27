@@ -11,6 +11,7 @@
 | 查功能代码和安全验证方式 | [architecture.json](../architecture.json)、[AGENTS](../AGENTS.md) |
 | 理解模块边界与数据流 | [系统地图](SYSTEM-MAP.md)、[生成蓝图](BLUEPRINT.md)、[时序图](BLUEPRINT-FLOWS.md) |
 | 查真实兼容性 | [游戏兼容性矩阵](COMPATIBILITY.md) |
+| 参与玩家测试、提交结果 | [测试参与说明](TESTING.md)、[游戏反馈表](https://github.com/PAIMON2000/franca-preview/issues/new?template=game-test.yml) |
 | 查用例、证据 | [测试导航](../tests/README.md)、[测试计划](../tests/test-plan.md) |
 | 查安装恢复机制 | [安装事务](INSTALLATION.md) |
 | 查设计与历史经验 | [实验记录](../lab/)、[交接与排障](HANDOFF.md)、[后续优化](OPTIMIZATIONS.md) |
