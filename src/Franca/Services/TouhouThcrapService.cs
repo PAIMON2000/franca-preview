@@ -1080,7 +1080,7 @@ public static class TouhouThcrapService
     private static HttpClient CreateHttp()
     {
         var client = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
-        client.DefaultRequestHeaders.UserAgent.ParseAdd("Franca/0.1 (+https://github.com/hongweihu184/franca)");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Franca/0.1 (+https://github.com/hongweihu184/franca-preview)");
         return client;
     }
 

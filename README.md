@@ -4,6 +4,8 @@ Windows 游戏翻译桌面原型，使用 .NET 9 / WPF。免费、开源、非�
 
 Windows game-translation desktop prototype (.NET 9 / WPF), free and open source. It scans installed Steam games and provides translation setup for selected Unity games and Touhou Project games, plus a local translation relay and cache. Unreal support is experimental. Compatibility is verified per game and version; OCR, community package distribution and Steam Workshop integration are not implemented.
 
+源码仓库：<https://github.com/hongweihu184/franca-preview>（问题与建议请开 Issue）。
+
 ## 实际状态
 
 - Suzerain 既有环境有主菜单、选项页及序章正文中文画面证据；不代表干净安装、完整剧情或更新兼容性验收通过。
