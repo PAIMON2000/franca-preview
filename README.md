@@ -4,11 +4,11 @@ Windows 游戏翻译桌面原型，使用 .NET 9 / WPF。免费、开源、非�
 
 Windows game-translation desktop prototype (.NET 9 / WPF), free and open source. It scans installed Steam games and provides translation setup for selected Unity games and Touhou Project games, plus a local translation relay and cache. Unreal support is experimental. Compatibility is verified per game and version; OCR, community package distribution and Steam Workshop integration are not implemented.
 
-源码仓库：<https://github.com/hongweihu184/franca-preview>（问题与建议请开 Issue）。
+源码仓库：<https://github.com/PAIMON2000/franca-preview>（问题与建议请开 Issue）。
 
 ## 下载即用（Windows 64 位）
 
-**[点击下载 Franca0.1-1027.exe](https://github.com/hongweihu184/franca-preview/releases/download/v0.1.20261027/Franca0.1-1027.exe)** · [最新版本与更新说明](https://github.com/hongweihu184/franca-preview/releases/latest)
+**[点击下载 Franca0.1-1027.exe](https://github.com/PAIMON2000/franca-preview/releases/download/v0.1.20261027/Franca0.1-1027.exe)** · [最新版本与更新说明](https://github.com/PAIMON2000/franca-preview/releases/latest)
 
 不需要会用 GitHub，也不需要安装 .NET 或编译源码：
 
@@ -18,7 +18,7 @@ Windows game-translation desktop prototype (.NET 9 / WPF), free and open source.
 
 更新时先关闭 Franca 和使用翻译运行时的游戏，把新版 EXE 放回原文件夹；保留 `franca-settings.json`、`thcrap` 等已有文件，更新后从新版 EXE 启动。不要删除或移动旧文件夹后再迁移：已启用的东方游戏可能仍引用其中的运行时路径。程序不会自动下载或覆盖更新。
 
-此版本为未签名的桌面原型，仅提供 Windows x64 包；其他架构未经验证。GitHub 下载失败可稍后重试。[发布页](https://github.com/hongweihu184/franca-preview/releases/tag/v0.1.20261027)同时提供 SHA-256 校验文件。兼容范围仍以下方逐游戏证据为准。
+此版本为未签名的桌面原型，仅提供 Windows x64 包；其他架构未经验证。GitHub 下载失败可稍后重试。[发布页](https://github.com/PAIMON2000/franca-preview/releases/tag/v0.1.20261027)同时提供 SHA-256 校验文件。兼容范围仍以下方逐游戏证据为准。
 
 ## 实际状态
 

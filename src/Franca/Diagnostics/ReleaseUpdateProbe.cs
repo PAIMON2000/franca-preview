@@ -17,7 +17,7 @@ internal static class ReleaseUpdateProbe
             if (!ok) failures++;
         }
         string Payload(string tag = "v0.2.20261028", bool draft = false, bool prerelease = false,
-            string page = "https://github.com/hongweihu184/franca-preview/releases/tag/v0.2.20261028",
+            string page = "https://github.com/PAIMON2000/franca-preview/releases/tag/v0.2.20261028",
             string asset = "Franca0.2-1028.exe") => JsonSerializer.Serialize(new
             { tag_name = tag, name = "Franca next", draft, prerelease, html_url = page, assets = new[] { new { name = asset } } });
         var current = new Version(0, 1, 20261027);
@@ -33,7 +33,7 @@ internal static class ReleaseUpdateProbe
         Check("invalid_tag", Parse(Payload("Franca0.1-1027")) is null);
         Check("foreign_url", Parse(Payload(page: "https://example.org/download")) is null);
         Check("other_repository", Parse(Payload(page: "https://github.com/other/repo/releases/tag/v1")) is null);
-        Check("http_url", Parse(Payload(page: "http://github.com/hongweihu184/franca-preview/releases/tag/v1")) is null);
+        Check("http_url", Parse(Payload(page: "http://github.com/PAIMON2000/franca-preview/releases/tag/v1")) is null);
         Check("no_exe", Parse(Payload(asset: "source.zip")) is null);
         Check("incomplete_json", Parse("{}") is null);
         var handler = new StubHandler(Payload());

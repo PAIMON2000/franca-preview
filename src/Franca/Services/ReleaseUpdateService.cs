@@ -9,8 +9,8 @@ internal sealed record AvailableRelease(string Name, Version Version, Uri Page);
 
 internal sealed class ReleaseUpdateService
 {
-    public const string RepositoryUrl = "https://github.com/hongweihu184/franca-preview";
-    public const string LatestApi = "https://api.github.com/repos/hongweihu184/franca-preview/releases/latest";
+    public const string RepositoryUrl = "https://github.com/PAIMON2000/franca-preview";
+    public const string LatestApi = "https://api.github.com/repos/PAIMON2000/franca-preview/releases/latest";
     public static Version CurrentVersion => Version.Parse(typeof(ReleaseUpdateService).Assembly
         .GetCustomAttributes<AssemblyMetadataAttribute>().Single(a => a.Key == "ReleaseVersion").Value!);
     public static string DisplayVersion => typeof(ReleaseUpdateService).Assembly
@@ -51,7 +51,7 @@ internal sealed class ReleaseUpdateService
             || !release.TryGetProperty("html_url", out var url) || url.ValueKind != JsonValueKind.String
             || !Uri.TryCreate(url.GetString(), UriKind.Absolute, out var page)
             || page.Scheme != Uri.UriSchemeHttps || page.Host != "github.com" || !string.IsNullOrEmpty(page.UserInfo)
-            || !page.AbsolutePath.StartsWith("/hongweihu184/franca-preview/releases/tag/", StringComparison.Ordinal)
+            || !page.AbsolutePath.StartsWith("/PAIMON2000/franca-preview/releases/tag/", StringComparison.Ordinal)
             || !release.TryGetProperty("assets", out var assets) || assets.ValueKind != JsonValueKind.Array
             || !assets.EnumerateArray().Any(a => a.TryGetProperty("name", out var n) && n.ValueKind == JsonValueKind.String
                 && n.GetString()!.StartsWith("Franca", StringComparison.OrdinalIgnoreCase)
