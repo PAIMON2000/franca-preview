@@ -105,6 +105,36 @@ internal static partial class ProbeRunner
             app.Shutdown();
             return true;
         }
+        if (args.Length > 0 && args[0] == "--ue-font-refs")
+        {
+            // Read-only: list every Font composite asset in a pak with its ordered
+            // FontFace references (default typeface first, then fallbacks).
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            try
+            {
+                if (args.Length != 2) throw new ArgumentException("--ue-font-refs <pak>");
+                using var pak = Franca.Services.UePak.PakFileReader.Open(args[1]);
+                var result = new List<object>();
+                foreach (var e in pak.Entries.Where(e => e.Path.EndsWith(".uasset", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var asset = Franca.Services.UePak.UeCookedPackageRefs.ReadFontAsset(
+                        e.Path.Split('/')[^1][..^".uasset".Length], pak.Extract(e));
+                    if (asset.FontFaces.Count > 0)
+                        result.Add(new { Asset = e.Path, asset.FontFaces,
+                            FacePaths = asset.FontFaces.ToDictionary(f => f, f => asset.PathOf(f)) });
+                }
+                Console.WriteLine(JsonSerializer.Serialize(result,
+                    new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UE_ERROR\t{ex.GetType().Name}\t{ex.Message}");
+                Environment.ExitCode = 1;
+            }
+            app.Shutdown();
+            return true;
+        }
         if (args.Length > 0 && args[0] == "--ue-font-check")
         {
             // Read-only inspection: parse every .ufont/.ttf in a directory and report

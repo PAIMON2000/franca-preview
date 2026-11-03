@@ -4,7 +4,7 @@
 
 ## 当前结论
 
-2026-11-03 UE 字体健康检查组件落地（阶段三静态检查目标）：应用内新增最小 TTF 解析器 `TtfFont` 与 `UeFontHealthService`（.ufont 即裸 TTF），合成夹具探针 `--probe-ue-fonts` 15 项，真实只读检查命令 `--ue-font-check`（JSON 报告、有缺字退出码 2）。真实数据交叉验证：25 款本作字体中 15 款符号字体（无假名无 CJK，含 KS_Meldir/Skech，**不能也不承接日文文本，嫁接需求闭环**）、10 款文本可用字体的缺字集合与此前 Python 分析完全吻合；8 款嫁接后字体复检 0 缺字。Noto 可变字体经权威源（google/fonts raw）与镜像哈希比对一致。Release 构建 0 错误，ue-fonts/ue-static/blueprint/architecture 探针 124 项全过。嫁接手术（fontTools）移植决策、Font 资产引用链解析、UE 安装事务接入字体产物为后续。详见 [字体健康检查记录](../tests/2026-11-03-ue-font-health.md)。
+2026-11-03 UE 字体健康检查组件落地（阶段三静态检查目标）：应用内新增最小 TTF 解析器 `TtfFont` 与 `UeFontHealthService`（.ufont 即裸 TTF），合成夹具探针 `--probe-ue-fonts` 15 项，真实只读检查命令 `--ue-font-check`（JSON 报告、有缺字退出码 2）。真实数据交叉验证：25 款本作字体中 15 款符号字体（无假名无 CJK，含 KS_Meldir/Skech，**不能也不承接日文文本，嫁接需求闭环**）、10 款文本可用字体的缺字集合与此前 Python 分析完全吻合；8 款嫁接后字体复检 0 缺字。Noto 可变字体经权威源（google/fonts raw）与镜像哈希比对一致。Release 构建 0 错误，ue-fonts（19 项）/ue-static/blueprint/architecture 探针 128 项全过。Font 资产引用链解析同日落地：`UeCookedPackageRefs` 读取 cooked .uasset 导入表，`--ue-font-refs <pak>` 列出 112 个 Font 复合资产的有序 FontFace 回退链（80 个共享回退 YoonGothicPro770，与缺字矩阵吻合）。嫁接手术（fontTools）移植决策、UE 安装事务接入字体产物为后续。详见 [字体健康检查记录](../tests/2026-11-03-ue-font-health.md)。
 
 2026-11-03 歧路旅人 2 字体嫁接**真机验收通过**：11-02 的"译文+字体"包（`fontfix-1030`）启动成功但观感不通过——补字与原字形深浅不一（诊断：共享回退字体原字形 28px 墨量 0.592 vs Noto Regular 补字 0.405，差 +0.187 量级）。修复为**逐字体字重匹配**：从 Noto Sans JP 可变字体实例化 250–900 候选档，按渲染墨量最接近原则逐款选字重（共享回退选 500，其余 250–500），8 款字体重嫁接后构建 `pakchunk99-fontfix-1102.pak`（SHA-256 `4841B371…`），真机确认补字笔画粗细与原字形一致。工具链陷阱记录：可变字体实例化须 `inplace=False` 取返回值，`inplace=True` 对本字体静默失败。覆盖包目前仍部署在游戏目录供用户游玩，恢复基线随时可执行（原 pak 哈希已存档）。详见 [字体嫁接记录](../tests/2026-11-02-octopath2-fonts.md)。
 

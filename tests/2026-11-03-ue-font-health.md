@@ -19,6 +19,13 @@ UE 路线图阶段三的"静态检查译文所需字符、实际字体资源缺�
 
 Release 构建 0 错误；`--probe-ue-fonts` 15 项、`--probe-ue-static`（含 datatable）44 项、`--probe-blueprint` 14 项、`--probe-architecture` 51 项全过。
 
+## Font 资产引用链解析（同日追加）
+
+- 新增 `UeCookedPackageRefs`： cooked .uasset 导入表读取器（布局经本作验证：nameCount/nameOffset@41/45、importCount/importOffset@65/69、name 表 = FString+4 字节、FObjectImport 28 字节）。Font 复合资产通过 FontFace 导入项引用子字体，**导入顺序即回退链顺序**（默认字体在前）。
+- 新命令 `--ue-font-refs <pak>`：列出 pak 内全部 Font 复合资产及有序 FontFace 引用 + 包路径配对（JSON，只读）。
+- 真实数据（本作原 pak）：112 个 Font 复合资产，**80 个引用 `MJ_KR_YoonGothicPro770`**（共享回退实证），`KS_NewCinema_Std_D` 64 次、`KS_Meldir_Default` 49 次；31 个引擎内置字体（RobotoRegular 等）的 `Default__FontFace` 无包路径配对，属正常。
+- 探针新增 4 项合成 cooked 包断言（`--probe-ue-fonts` 现 19 项）：有序性、路径配对、非法魔数/表界拒绝。
+
 ## 边界与下一步
 
 - 嫁接（glyf 手术 + 字重匹配）仍由本机 Python/fontTools 工具链执行，尚未移植进应用；产品化时决策"应用内嵌字体处理"还是"准备期工具产出字体、应用只做检查与注入"。

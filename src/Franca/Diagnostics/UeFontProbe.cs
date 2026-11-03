@@ -56,8 +56,54 @@ internal static class UeFontProbe
         try { UeFontHealthService.Parse("bad", BuildFont(upem: 0, weight: 400, glyphs: 1, [(0x20, 0x21)])); Check("zero_upem_rejected", false); }
         catch (InvalidDataException) { Check("zero_upem_rejected", true); }
 
+        // cooked package import-table reading (composite Font -> FontFace chain)
+        var cooked = BuildCookedFontPackage();
+        var fontAsset = Franca.Services.UePak.UeCookedPackageRefs.ReadFontAsset("FONT_Test", cooked);
+        Check("font_faces_ordered", fontAsset.FontFaces.SequenceEqual(["KS_Meldir_Default", "MJ_KR_YoonGothicPro770"]));
+        Check("face_path_resolved", fontAsset.PathOf("MJ_KR_YoonGothicPro770") == "/Game/UI/Font/MJ_KR_YoonGothicPro770"
+            && fontAsset.PathOf("KS_Meldir_Default") == "/Game/UI/Font/KS_Meldir_Default");
+        try { Franca.Services.UePak.UeCookedPackageRefs.ReadFontAsset("bad", new byte[256]); Check("cooked_short_rejected", false); }
+        catch (InvalidDataException) { Check("cooked_short_rejected", true); }
+        var broken = (byte[])cooked.Clone();
+        broken[69] = 99; // import offset no longer matches name table extent
+        try { Franca.Services.UePak.UeCookedPackageRefs.ReadFontAsset("bad", broken); Check("cooked_extent_rejected", false); }
+        catch (InvalidDataException) { Check("cooked_extent_rejected", true); }
+
         Console.WriteLine($"RESULT\tUEFONT\tfailures={failures}");
         if (failures > 0) Environment.ExitCode = 1;
+    }
+
+    // Minimal cooked .uasset: verified package summary header, one FString (LE length
+    // prefix) + 4 opaque bytes per name table entry, 28-byte FObjectImport records.
+    private static byte[] BuildCookedFontPackage()
+    {
+        string[] names = ["FontFace", "KS_Meldir_Default", "MJ_KR_YoonGothicPro770", "Package",
+            "/Game/UI/Font/KS_Meldir_Default", "/Game/UI/Font/MJ_KR_YoonGothicPro770", "Class", "Default__Font"];
+        // import records: (className index, objectName index)
+        (int Class, int Object)[] imports = [(0, 1), (0, 2), (3, 4), (3, 5), (6, 7)];
+        var nameTable = new LeWriter();
+        foreach (var n in names)
+        {
+            var b = System.Text.Encoding.UTF8.GetBytes(n);
+            nameTable.I32(b.Length + 1).Raw(b).U8(0).I32(0);
+        }
+        const int headerSize = 193;
+        var importOffset = headerSize + nameTable.ToArray().Length;
+        var total = importOffset + imports.Length * 28;
+        var w = new LeWriter();
+        w.I32(unchecked((int)0x9e2a83c1)).I32(-7);
+        for (var i = 0; i < 4; i++) w.I32(0); // 8..23
+        w.I32(total).I32(5);                 // 24, 28
+        w.Raw(System.Text.Encoding.ASCII.GetBytes("None\0\0\0\0\0")); // 32..40 (mapped name "None\0" + 4 pad bytes)
+        w.I32(names.Length).I32(headerSize); // 41, 45
+        w.I32(0).I32(0);                     // 49, 53 (gatherable name count/offset)
+        w.I32(1).I32(0);                     // 57, 61 (export count/offset)
+        w.I32(imports.Length).I32(importOffset); // 65, 69
+        for (var p = w.ToArray().Length; p < headerSize; p++) w.U8(0);
+        w.Raw(nameTable.ToArray());
+        foreach (var (cls, obj) in imports)
+            w.I32(0).I32(0).I32(cls).I32(0).I32(0).I32(obj).I32(0); // 28-byte FObjectImport
+        return w.ToArray();
     }
 
     // Minimal sfnt: head (54B), maxp (6B), OS/2 (96B), cmap with one format 4 subtable.
@@ -138,6 +184,15 @@ internal static class UeFontProbe
         public BeWriter U16(ushort v) { _bytes.Add((byte)(v >> 8)); _bytes.Add((byte)v); return this; }
         public BeWriter U32(uint v) { _bytes.Add((byte)(v >> 24)); _bytes.Add((byte)(v >> 16)); _bytes.Add((byte)(v >> 8)); _bytes.Add((byte)v); return this; }
         public BeWriter Raw(byte[] b) { _bytes.AddRange(b); return this; }
+        public byte[] ToArray() => [.. _bytes];
+    }
+
+    private sealed class LeWriter
+    {
+        private readonly List<byte> _bytes = [];
+        public LeWriter I32(int v) { _bytes.Add((byte)v); _bytes.Add((byte)(v >> 8)); _bytes.Add((byte)(v >> 16)); _bytes.Add((byte)(v >> 24)); return this; }
+        public LeWriter U8(byte v) { _bytes.Add(v); return this; }
+        public LeWriter Raw(byte[] b) { _bytes.AddRange(b); return this; }
         public byte[] ToArray() => [.. _bytes];
     }
 }

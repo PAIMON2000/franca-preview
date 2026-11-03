@@ -41,7 +41,7 @@
 - **注入**：准备阶段把字体资产注入游戏外覆盖包（同路径替换或挂 Font 资产回退链），原 pak 不动。
 - **方法实证（2026-11-02）**：本作 `.ufont` 为裸 TTF、游戏字体 upem=1024。fontTools Merger 因 VarStore 与 upem 差异不可用；改用逐码点嫁接（原字形零改动，供体字形按 upem 比缩放，同步 cmap/hmtx/glyphOrder），FreeType 验证通过。方法记录见 [字体嫁接记录](../tests/2026-11-02-octopath2-fonts.md)。
 - **观感实证（2026-11-03）**：嫁接字体真机验收发现并修复字重不匹配问题——补字观感须与原字体匹配，不能统一用 Regular。逐字体字重匹配流程：可变字体实例化候选档（`inplace=False`，`inplace=True` 对本字体静默失败）→ 28px 渲染墨量覆盖率对比 → 选差值最小档重嫁接。本作 8 款字体实测选用 250–500 档，验收通过。
-- **静态检查能力（2026-11-03）**：阶段三"报告缺字集合"在应用内落地——`TtfFont` 最小解析器 + `UeFontHealthService` + `--probe-ue-fonts`（合成夹具）+ `--ue-font-check <fontsDir> <textFile>...`（真实只读检查，JSON 输出，有缺字退出码 2）。符号字体（无假名无 CJK）自动分类不告警。本作实证见 [字体健康检查记录](../tests/2026-11-03-ue-font-health.md)。嫁接手术移植、Font 资产引用链解析、安装事务接入仍为后续。
+- **静态检查能力（2026-11-03）**：阶段三"报告缺字集合"在应用内落地——`TtfFont` 最小解析器 + `UeFontHealthService` + `--probe-ue-fonts`（合成夹具）+ `--ue-font-check <fontsDir> <textFile>...`（真实只读检查，JSON 输出，有缺字退出码 2）。符号字体（无假名无 CJK）自动分类不告警。本作实证见 [字体健康检查记录](../tests/2026-11-03-ue-font-health.md)。引用链解析同日落地（`UeCookedPackageRefs` + `--ue-font-refs <pak>`，导入表即回退链，本作 112 个 Font 资产、80 个共享回退实证）。嫁接手术移植、安装事务接入仍为后续。
 
 完成门槛：显示、假名字形、变量/富文本、换行、长文溢出分别记录；启动存活不替代验收。正式译文移除诊断标记。
 
