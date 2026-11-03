@@ -1,5 +1,6 @@
 using System.IO;
 using System.Net.Http;
+using System.Text.Json;
 using System.Windows;
 using Franca.Models;
 using Franca.Services;
@@ -93,6 +94,43 @@ internal static partial class ProbeRunner
             AttachConsole(-1);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             UePakProbe.Run(args.Length > 1 ? args[1] : null);
+            app.Shutdown();
+            return true;
+        }
+        if (args.Length > 0 && args[0] == "--probe-ue-fonts")
+        {
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            UeFontProbe.Run();
+            app.Shutdown();
+            return true;
+        }
+        if (args.Length > 0 && args[0] == "--ue-font-check")
+        {
+            // Read-only inspection: parse every .ufont/.ttf in a directory and report
+            // cmap coverage against the characters found in the given text files.
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            try
+            {
+                if (args.Length < 3) throw new ArgumentException("--ue-font-check <fontsDir> <textFile>...");
+                var faces = Directory.GetFiles(args[1], "*.*")
+                    .Where(p => p.EndsWith(".ufont", StringComparison.OrdinalIgnoreCase)
+                        || p.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase))
+                    .Select(p => (Name: Path.GetFileNameWithoutExtension(p), Data: File.ReadAllBytes(p)))
+                    .ToArray();
+                if (faces.Length == 0) throw new ArgumentException("No .ufont/.ttf faces found");
+                var texts = args[2..].SelectMany(f => File.ReadLines(f));
+                var report = UeFontHealthService.Analyze(faces, texts);
+                Console.WriteLine(JsonSerializer.Serialize(report,
+                    new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+                if (!report.Healthy) Environment.ExitCode = 2;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UE_ERROR\t{ex.GetType().Name}\t{ex.Message}");
+                Environment.ExitCode = 1;
+            }
             app.Shutdown();
             return true;
         }

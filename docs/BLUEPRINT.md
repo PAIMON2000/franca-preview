@@ -57,7 +57,7 @@ graph LR
 
 - 未声明边：无
 - 漂移边：无
-- 未归类文件：无
+- 未归类文件：`src/Franca/Services/UeFontHealthService.cs`
 
 ## 模块契约
 
@@ -129,7 +129,7 @@ graph LR
 ### `installer`
 
 - 职责：runtime installation；configuration health；repair；journalled installation and interrupted-install recovery；static archive patching for Touhou (ZUN engine) data packages；thcrap runtime translation patching for Touhou (ZUN engine) games；procedural localized menu sprite generation for Touhou th10/th11 (title.anm PNGs)；experimental UE v11 pak, locres and restricted cooked FText DataTable preparation outside game directories
-- 文件：18 个；声明依赖：`game`、`translation`、`runtime`、`pack`、`shared`
+- 文件：19 个；声明依赖：`game`、`translation`、`runtime`、`pack`、`shared`
 - 输入：
   - `explicit relay address`
   - `target game directory`
@@ -244,7 +244,7 @@ graph LR
 ### `diagnostics`
 
 - 职责：command-line probes and UI verification
-- 文件：26 个；声明依赖：`application`、`desktop`、`game`、`installer`、`runtime`、`translation`、`pack`、`shared`
+- 文件：27 个；声明依赖：`application`、`desktop`、`game`、`installer`、`runtime`、`translation`、`pack`、`shared`
 - 输入：
   - `--probe-* command-line arguments`
 - 输出：
