@@ -20,9 +20,38 @@ public static class UeFontHealthService
     {
         public bool Healthy => Issues.Count == 0;
     }
+    // One UI font composite (a fallback chain): a character is covered when ANY
+    // face in the chain has it, matching engine fallback semantics.
+    public sealed record ChainFace(string Name, int GlyphCount, int KanaCount, int CjkCount, int Missing);
+    public sealed record ChainReport(string Asset, IReadOnlyList<ChainFace> Faces, int ChainMissing, string ChainMissingSample)
+    {
+        public bool Healthy => ChainMissing == 0;
+    }
 
     private const int KanaBegin = 0x3040, KanaEnd = 0x30FF;
     private const int CjkBegin = 0x4E00, CjkEnd = 0x9FFF;
+
+    public static IReadOnlySet<int> NeededCodepoints(IEnumerable<string> texts)
+        => texts.SelectMany(t => t).Where(c => c >= 0x20 && !char.IsSurrogate(c))
+            .Select(c => (int)c).ToHashSet();
+
+    public static ChainReport AnalyzeChain(string asset, IReadOnlyList<(string Name, byte[] Data)> faces,
+        IReadOnlySet<int> needed)
+    {
+        var union = new HashSet<int>();
+        var list = new List<ChainFace>(faces.Count);
+        foreach (var (name, data) in faces)
+        {
+            var face = Parse(name, data);
+            var cmap = TtfFont.Parse(data).Codepoints;
+            union.UnionWith(cmap);
+            list.Add(new ChainFace(name, face.GlyphCount, face.KanaCount, face.CjkCount,
+                needed.Count(cp => !cmap.Contains(cp))));
+        }
+        var missing = needed.Where(cp => !union.Contains(cp)).Order().ToArray();
+        return new ChainReport(asset, list, missing.Length,
+            string.Concat(missing.Take(24).Select(cp => char.ConvertFromUtf32(cp))));
+    }
 
     public static FontFace Parse(string name, byte[] data)
     {
@@ -39,8 +68,7 @@ public static class UeFontHealthService
 
     public static Report Analyze(IReadOnlyList<(string Name, byte[] Data)> faces, IEnumerable<string> texts)
     {
-        var needed = texts.SelectMany(t => t).Where(c => c >= 0x20 && !char.IsSurrogate(c))
-            .Select(c => (int)c).ToHashSet();
+        var needed = NeededCodepoints(texts);
         var issues = new List<FontIssue>();
         var textCapable = 0;
         var symbolOnly = 0;

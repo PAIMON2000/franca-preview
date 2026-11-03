@@ -105,6 +105,65 @@ internal static partial class ProbeRunner
             app.Shutdown();
             return true;
         }
+        if (args.Length > 0 && args[0] == "--ue-font-report")
+        {
+            // Read-only composite-chain health report: for every Font asset in the pak,
+            // resolve its FontFace references to .ufont files in the same pak and report
+            // characters missing from the whole fallback chain (union semantics).
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            try
+            {
+                if (args.Length < 3) throw new ArgumentException("--ue-font-report <pak> <textFile>... [--facesDir <dir>]");
+                string? facesDir = args.FirstOrDefault(a => a.StartsWith("--facesDir=", StringComparison.Ordinal))?[11..];
+                var files = args[2..].Where(a => !a.StartsWith("--", StringComparison.Ordinal)).ToArray();
+                using var pak = Franca.Services.UePak.PakFileReader.Open(args[1]);
+                var byFile = pak.Entries.GroupBy(e => e.Path.Split('/')[^1], StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.ToArray(), StringComparer.OrdinalIgnoreCase);
+                var needed = Franca.Services.UeFontHealthService.NeededCodepoints(files.SelectMany(File.ReadLines));
+                var reports = new List<object>();
+                var unhealthy = 0; var skippedFaces = 0;
+                foreach (var e in pak.Entries.Where(e => e.Path.EndsWith(".uasset", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var asset = Franca.Services.UePak.UeCookedPackageRefs.ReadFontAsset(
+                        e.Path.Split('/')[^1][..^".uasset".Length], pak.Extract(e));
+                    if (asset.FontFaces.Count == 0) continue;
+                    var dir = e.Path[..(e.Path.LastIndexOf('/') + 1)];
+                    var faces = new List<(string Name, byte[] Data)>();
+                    var missing = new List<string>();
+                    foreach (var face in asset.FontFaces)
+                    {
+                        byte[]? data = null;
+                        if (facesDir is not null)
+                        {
+                            var local = Path.Combine(facesDir, face + ".ttf");
+                            var grafted = Path.Combine(facesDir, "graft-" + face + ".ttf");
+                            if (File.Exists(grafted)) data = File.ReadAllBytes(grafted);
+                            else if (File.Exists(local)) data = File.ReadAllBytes(local);
+                        }
+                        data ??= (pak.Find(dir + face + ".ufont") ?? byFile.GetValueOrDefault(face + ".ufont")?.FirstOrDefault()) is { } entry
+                            ? pak.Extract(entry) : null;
+                        if (data is null) { missing.Add(face); continue; }
+                        faces.Add((face, data));
+                    }
+                    if (missing.Count > 0) { skippedFaces++; reports.Add(new { Asset = e.Path, Note = "faces not in pak/dir: " + string.Join(", ", missing) }); continue; }
+                    var report = Franca.Services.UeFontHealthService.AnalyzeChain(e.Path, faces, needed);
+                    if (!report.Healthy) unhealthy++;
+                    reports.Add(report);
+                }
+                Console.WriteLine(JsonSerializer.Serialize(reports,
+                    new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+                Console.WriteLine($"UE_FONT_REPORT\tchains={reports.Count(r => r is Franca.Services.UeFontHealthService.ChainReport)}\tskipped={skippedFaces}\tunhealthy={unhealthy}");
+                if (unhealthy > 0) Environment.ExitCode = 2;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UE_ERROR\t{ex.GetType().Name}\t{ex.Message}");
+                Environment.ExitCode = 1;
+            }
+            app.Shutdown();
+            return true;
+        }
         if (args.Length > 0 && args[0] == "--ue-font-refs")
         {
             // Read-only: list every Font composite asset in a pak with its ordered

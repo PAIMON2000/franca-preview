@@ -26,6 +26,17 @@ Release 构建 0 错误；`--probe-ue-fonts` 15 项、`--probe-ue-static`（含 
 - 真实数据（本作原 pak）：112 个 Font 复合资产，**80 个引用 `MJ_KR_YoonGothicPro770`**（共享回退实证），`KS_NewCinema_Std_D` 64 次、`KS_Meldir_Default` 49 次；31 个引擎内置字体（RobotoRegular 等）的 `Default__FontFace` 无包路径配对，属正常。
 - 探针新增 4 项合成 cooked 包断言（`--probe-ue-fonts` 现 19 项）：有序性、路径配对、非法魔数/表界拒绝。
 
+## 复合字体链级健康报告（同日追加，阶段三静态检查闭环）
+
+- 回退链并集语义：UE 复合字体是一条 fallback 链（`--ue-font-refs` 的导入顺序），**链上任一字体覆盖即算覆盖**。新增 `UeFontHealthService.AnalyzeChain` + `NeededCodepoints`。
+- 新命令 `--ue-font-report <pak> <textFile>... [--facesDir <dir>]`：pak 内解析每个 Font 资产的链 → FontFace 名 → 同 pak `.ufont`（`--facesDir` 的嫁接字体优先，支持验证修复后状态）→ 链级缺字 JSON 报告；有缺字退出码 2；链上字体在 pak 和目录都找不到的（引擎内置 Roboto 等）记 Note 跳过不计失败。
+- **本作实证（原 pak + 全部译文 2,209 字符）**：81 条链、31 条引擎链跳过、**仅 3 条不健康**——
+  - `FONT_KS_Skech`：缺 303 日文汉字。链 = 6 款 Skech 符号字体 + YoonGothicPro770，Yoon 的韩系 4,620 汉字盖不住日文用字。**官方日文能正常显示 ⇒ 证明 CJK 文本从不路由到此链**（装饰性拉丁字体），与"符号字体不告警"结论互证。
+  - `FONT_MJ_TW_YuanMeldir_Switch`：缺 178（Yoon + 台系字体的日文汉字缺口）。
+  - `Roboto`：缺 4（㌀㌁㌂㌄）——译文中仅 2 条英文源即含此串（`Gate of ㌀㌁㌂㌃㌄`，开发测试行），非玩家内容。
+- **嫁接修复链级验证**：`--facesDir` 指向 8 款重嫁接字体后复检，81 条链仅 Roboto 测试串仍缺（3→1），部署修复在链级层面闭环。
+- 局限：链覆盖 ≠ 文本路由。哪些字符串实际走哪个字体由 `TalkFontTable_*.uasset`（Font/Database 下按语言的 DataTable）决定，其 schema 非 Id/Text 对，现有 DataTable 解析器不适用——路由表解析是下一步。
+
 ## 边界与下一步
 
 - 嫁接（glyf 手术 + 字重匹配）仍由本机 Python/fontTools 工具链执行，尚未移植进应用；产品化时决策"应用内嵌字体处理"还是"准备期工具产出字体、应用只做检查与注入"。

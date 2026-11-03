@@ -51,6 +51,15 @@ internal static class UeFontProbe
         var covered = UeFontHealthService.Analyze([("text", text)], ["abc ア"]);
         Check("healthy_when_covered", covered.Healthy && covered.Issues.Count == 0 && covered.UncoveredSample == "");
 
+        // fallback chain: a character is covered when ANY face has it
+        var needed = UeFontHealthService.NeededCodepoints(["ab ア ① 設"]);
+        var chain = UeFontHealthService.AnalyzeChain("FONT_T", [("text", text), ("symbol", symbol)], needed);
+        Check("chain_union_covered", chain.ChainMissing == 1 && chain.ChainMissingSample.Contains('設'));
+        Check("chain_per_face_missing", chain.Faces.Single(f => f.Name == "text").Missing == 2 // ① 設
+            && chain.Faces.Single(f => f.Name == "symbol").Missing == 2); // ア 設
+        var solo = UeFontHealthService.AnalyzeChain("FONT_S", [("symbol", symbol)], needed);
+        Check("chain_solo_missing", !solo.Healthy && solo.ChainMissing == 2); // ア 設 (① covered)
+
         try { UeFontHealthService.Parse("bad", new byte[64]); Check("short_file_rejected", false); }
         catch (InvalidDataException) { Check("short_file_rejected", true); }
         try { UeFontHealthService.Parse("bad", BuildFont(upem: 0, weight: 400, glyphs: 1, [(0x20, 0x21)])); Check("zero_upem_rejected", false); }
