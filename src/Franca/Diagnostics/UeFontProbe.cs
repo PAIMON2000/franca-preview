@@ -77,6 +77,9 @@ internal static class UeFontProbe
         broken[69] = 99; // import offset no longer matches name table extent
         try { Franca.Services.UePak.UeCookedPackageRefs.ReadFontAsset("bad", broken); Check("cooked_extent_rejected", false); }
         catch (InvalidDataException) { Check("cooked_extent_rejected", true); }
+        Check("cooked_names_read", Franca.Services.UePak.UeCookedPackageRefs.ReadNames(cooked).SequenceEqual(
+            (string[])["FontFace", "KS_Meldir_Default", "MJ_KR_YoonGothicPro770", "Package",
+                "/Game/UI/Font/KS_Meldir_Default", "/Game/UI/Font/MJ_KR_YoonGothicPro770", "Class", "Default__Font"]));
 
         Console.WriteLine($"RESULT\tUEFONT\tfailures={failures}");
         if (failures > 0) Environment.ExitCode = 1;

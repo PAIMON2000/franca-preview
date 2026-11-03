@@ -37,6 +37,14 @@ Release 构建 0 错误；`--probe-ue-fonts` 15 项、`--probe-ue-static`（含 
 - **嫁接修复链级验证**：`--facesDir` 指向 8 款重嫁接字体后复检，81 条链仅 Roboto 测试串仍缺（3→1），部署修复在链级层面闭环。
 - 局限：链覆盖 ≠ 文本路由。哪些字符串实际走哪个字体由 `TalkFontTable_*.uasset`（Font/Database 下按语言的 DataTable）决定，其 schema 非 Id/Text 对，现有 DataTable 解析器不适用——路由表解析是下一步。
 
+## TalkFontTable 路由级闭环（同日追加）
+
+- `--ue-font-routes <pak>`：对 pak 内每个 `*FontTable*` 资产扫描 cooked name 表中的 `/Game/.../FONT_*` 引用，按语言给出对话/气泡字体的路由（行级 .uexp 属性解码的低成本近似；name 表收录了行数据引用的全部字体路径）。
+- **本作五语言路由实证**：EN→`FONT_KS_Skech_PC`、JA→`FONT_KS_NewCinema_PC`、KR→`FONT_KR_YDHopeL_PC`、**ZH_CN→`FONT_MJ_CN_WeiBei_PC`**（本部署活动槽）、ZH_TW→`FONT_MJ_TW_FangSong_PC`。
+- **关键结论**：ZH_CN 对话链 = NewCinema（默认，完整日文字体，0 缺字）→ 魏碑 → Yoon → 图标字体。**即使不嫁接，对话气泡也零缺字**——默认字体全覆盖；嫁接后链上魏碑/Yoon 也达到 0 缺字（与原字体观感一致）。此前标题菜单缺字是 UI 部件字体（不在 TalkFontTable 管辖），两处证据合拢。
+- 路由级风险评估闭环：需要承接日文的链（ZH_CN 对话、各 UI 复合字体）在嫁接后全部 0 缺字；不承担日文的链（Skech 等）官方本来就不路由 CJK。
+- `UeCookedPackageRefs` 重构出公开 `ReadNames`（name 表读取复用）。
+
 ## 边界与下一步
 
 - 嫁接（glyf 手术 + 字重匹配）仍由本机 Python/fontTools 工具链执行，尚未移植进应用；产品化时决策"应用内嵌字体处理"还是"准备期工具产出字体、应用只做检查与注入"。

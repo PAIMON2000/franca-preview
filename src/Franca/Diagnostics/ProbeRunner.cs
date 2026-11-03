@@ -194,6 +194,38 @@ internal static partial class ProbeRunner
             app.Shutdown();
             return true;
         }
+        if (args.Length > 0 && args[0] == "--ue-font-routes")
+        {
+            // Read-only routing approximation: for every *FontTable* asset in the pak,
+            // list the Font asset paths referenced by its rows (cooked name table scan).
+            // TalkFontTable_<LANG> decides which font chains serve talk/balloon text
+            // per game language, so this narrows chain-level gaps to routed ones.
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            try
+            {
+                if (args.Length != 2) throw new ArgumentException("--ue-font-routes <pak>");
+                using var pak = Franca.Services.UePak.PakFileReader.Open(args[1]);
+                var result = new List<object>();
+                foreach (var e in pak.Entries.Where(e => e.Path.EndsWith(".uasset", StringComparison.OrdinalIgnoreCase)
+                         && e.Path.Split('/')[^1].Contains("FontTable", StringComparison.OrdinalIgnoreCase)))
+                {
+                    var names = Franca.Services.UePak.UeCookedPackageRefs.ReadNames(pak.Extract(e));
+                    var fonts = names.Where(n => n.StartsWith("/Game/", StringComparison.Ordinal)
+                        && n.Contains("FONT_", StringComparison.Ordinal)).Distinct(StringComparer.Ordinal).ToArray();
+                    result.Add(new { Table = e.Path, Fonts = fonts });
+                }
+                Console.WriteLine(JsonSerializer.Serialize(result,
+                    new JsonSerializerOptions { WriteIndented = true, Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping }));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UE_ERROR\t{ex.GetType().Name}\t{ex.Message}");
+                Environment.ExitCode = 1;
+            }
+            app.Shutdown();
+            return true;
+        }
         if (args.Length > 0 && args[0] == "--ue-font-check")
         {
             // Read-only inspection: parse every .ufont/.ttf in a directory and report

@@ -34,7 +34,7 @@ public sealed class UeCookedPackageRefs
     private static void Require(bool condition, string message)
     { if (!condition) throw new InvalidDataException("Unsupported cooked package: " + message); }
 
-    public static FontAsset ReadFontAsset(string name, byte[] data)
+    public static IReadOnlyList<string> ReadNames(byte[] data)
     {
         int I32(int p)
         { Require(p >= 0 && p <= data.Length - 4, "integer bounds"); return BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(p)); }
@@ -57,19 +57,28 @@ public sealed class UeCookedPackageRefs
             "package summary");
         var nameCount = I32(41);
         var nameOffset = I32(45);
-        var importCount = I32(65);
         var importOffset = I32(69);
         Require(nameCount > 0 && nameCount <= 1_000_000 && nameOffset >= 193 && nameOffset < data.Length, "name table");
-        Require(importCount >= 0 && importCount <= 1_000_000, "import count");
         var p = nameOffset;
         var names = new string[nameCount];
         for (var i = 0; i < names.Length; i++) { names[i] = ReadString(ref p); p = checked(p + 4); }
         Require(p == importOffset, "name table extent");
+        return names;
+    }
+
+    public static FontAsset ReadFontAsset(string name, byte[] data)
+    {
+        var names = ReadNames(data);
+        var importCount = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(65));
+        var importOffset = BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(69));
+        Require(importCount >= 0 && importCount <= 1_000_000, "import count");
         Require((long)importOffset + (long)importCount * 28 <= data.Length, "import table bounds");
+        int I32(int p)
+        { Require(p >= 0 && p <= data.Length - 4, "integer bounds"); return BinaryPrimitives.ReadInt32LittleEndian(data.AsSpan(p)); }
         string Name(int at)
         {
             var index = I32(at); var number = I32(at + 4);
-            Require(index >= 0 && index < names.Length && number >= 0, "FName");
+            Require(index >= 0 && index < names.Count && number >= 0, "FName");
             return names[index] + (number == 0 ? "" : "_" + (number - 1));
         }
         var imports = new List<Import>(importCount);
