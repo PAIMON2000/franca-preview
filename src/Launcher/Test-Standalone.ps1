@@ -10,8 +10,12 @@ function Invoke-Probe([string]$Name) {
     $errorPath = Join-Path $testDirectory "$Name-error.txt"
     $process = Start-Process -FilePath $testExe -ArgumentList "--probe-$Name" -WorkingDirectory $testDirectory -WindowStyle Hidden -PassThru -RedirectStandardOutput $outputPath -RedirectStandardError $errorPath
     if (!$process.WaitForExit(45000)) { Stop-Process -Id $process.Id; throw "Probe timed out: $Name ($testDirectory)" }
+    # Windows PowerShell 5.1：Start-Process+重定向+手动 WaitForExit 后 ExitCode 恒为 $null，
+    # 无法用于断言；改用输出内容三查：有 RESULT、无 FAIL、stderr 为空、最后一行是 PASS（防中途崩溃）
     $outputText = [IO.File]::ReadAllText($outputPath)
-    if ($process.ExitCode -ne 0 -or $outputText -notmatch "RESULT\s" -or $outputText -match "\tFAIL" -or (Get-Item $errorPath).Length) {
+    $lastLine = (($outputText -split "`r?`n") | Where-Object { $_.Trim().Length -gt 0 } | Select-Object -Last 1)
+    if ($outputText -notmatch "RESULT\s" -or $outputText -match "\tFAIL" -or (Get-Item $errorPath).Length -gt 0 -or
+        $lastLine -notmatch "\tPASS") {
         throw "Probe failed: $Name ($testDirectory)"
     }
     Write-Output "$Name PASS"
@@ -21,7 +25,8 @@ if (Test-Path (Join-Path $testDirectory 'franca-settings.json')) { throw 'Settin
 $assets = @(Get-ChildItem (Join-Path $testDirectory 'ThirdParty') -Recurse -File)
 if ($assets.Count -lt 30) { throw 'Missing distribution assets.' }
 foreach ($file in $assets) {
-    $relative = [IO.Path]::GetRelativePath($testDirectory, $file.FullName)
+    # Windows PowerShell 5.1（.NET Framework）无 Path.GetRelativePath，手动裁剪前缀
+    $relative = $file.FullName.Substring($testDirectory.Length).TrimStart('\', '/')
     $source = Join-Path $repository "src/Franca/$relative"
     if ((Get-FileHash $source).Hash -ne (Get-FileHash $file.FullName).Hash) { throw "Asset mismatch: $relative" }
 }

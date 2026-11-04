@@ -8,7 +8,7 @@
 
 **[下载测试版](https://github.com/PAIMON2000/franca-preview/releases/latest)** · **[查看已测游戏](#已测游戏)** · **[参与测试](docs/TESTING.md)**
 
-> 早期桌面原型 · Windows x64 · 兼容性按游戏和版本确认。部分 Unity 游戏与东方作品已有实际显示证据；Unreal 尚未开放正式启用。Franca 免费，所选翻译服务可能收费。
+> 早期桌面原型 · Windows x64 · 兼容性按游戏和版本确认。部分 Unity 游戏与东方作品已有实际显示证据；Unreal 实验路线已可在游戏库启用（限已验证游戏与准备产物）。Franca 免费，所选翻译服务可能收费。
 
 Free, open-source Windows game translation prototype. Set up translation for selected Unity and Touhou games, with per-game local caches. Early testing: compatibility depends on the game and version; Unreal integration remains experimental. Translation services may charge separately.
 
@@ -24,11 +24,11 @@ Free, open-source Windows game translation prototype. Set up translation for sel
 | Book of Hours | 英语 → 印尼语首次实际显示获用户确认 | 具体页面、排版、重启缓存与停用恢复 |
 | 东方 th10 / th11 | 对话与界面中文获用户确认；th11 含结局与音乐室评论 | 停用恢复；符卡名跳过，其余作品未逐款验收 |
 
-**实验进展：**《逸剑风云决》已有核心表、部分菜单日语显示和菜单停用恢复证据；《歧路旅人 2》已确认少量菜单日语显示，10 月 27 日完整表的日语译文包已在游戏目录外准备完成，尚待换包显示与停用恢复验收。两者均未接入正式启用入口，不能据此推断其他 UE 游戏可用。
+**实验进展：**《逸剑风云决》已有核心表、部分菜单日语显示和菜单停用恢复证据；《歧路旅人 2》已确认少量菜单日语显示，10 月 27 日完整表的日语译文包已在游戏目录外准备完成，尚待换包显示与停用恢复验收。游戏库已开放实验性启用入口（选择准备产物 manifest.json 事务安装），但换包显示与停用恢复整循环仍未验收，不能据此推断其他 UE 游戏可用。
 
 ## 下载即用（Windows 64 位）
 
-**[点击下载 Franca0.1-1027.exe](https://github.com/PAIMON2000/franca-preview/releases/download/v0.1.20261027/Franca0.1-1027.exe)** · [最新版本与更新说明](https://github.com/PAIMON2000/franca-preview/releases/latest)
+**[点击下载 Franca0.1-1103.exe](https://github.com/PAIMON2000/franca-preview/releases/download/v0.1.20261103/Franca0.1-1103.exe)** · [最新版本与更新说明](https://github.com/PAIMON2000/franca-preview/releases/latest)
 
 不需要会用 GitHub，也不需要安装 .NET 或编译源码：
 
@@ -38,7 +38,7 @@ Free, open-source Windows game translation prototype. Set up translation for sel
 
 更新时先关闭 Franca 和使用翻译运行时的游戏，把新版 EXE 放回原文件夹；保留 `franca-settings.json`、`thcrap` 等已有文件，更新后从新版 EXE 启动。不要删除或移动旧文件夹后再迁移：已启用的东方游戏可能仍引用其中的运行时路径。程序不会自动下载或覆盖更新。
 
-此版本为未签名的桌面原型，仅提供 Windows x64 包；其他架构未经验证。GitHub 下载失败可稍后重试。[发布页](https://github.com/PAIMON2000/franca-preview/releases/tag/v0.1.20261027)同时提供 SHA-256 校验文件。兼容范围以逐游戏证据为准。
+此版本为未签名的桌面原型，仅提供 Windows x64 包；其他架构未经验证。GitHub 下载失败可稍后重试。[发布页](https://github.com/PAIMON2000/franca-preview/releases/tag/v0.1.20261103)同时提供 SHA-256 校验文件。兼容范围以逐游戏证据为准。
 
 ## 一起补齐下一份测试结果
 
@@ -70,7 +70,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File src/Launcher/Setup-Shortcut.
 
 安装及修复会改动选定游戏目录，应先保留备份。游戏侧支持停用、配置修复和卸载（卸载整体还原到未安装基线）；桌面程序提供免安装 EXE，暂不提供安装器和一键卸载。删除程序文件夹前请先停用/卸载依赖该目录的游戏翻译。测试用例的副作用按 [功能索引](architecture.json) 说明，真实游戏测试保持窗口化。
 
-维护者可用 `pwsh -File src/Launcher/Publish-Release.ps1` 重建自带 .NET 的单 EXE，输出位于 `dist/Franca0.1-1027/`。后续发布需同步修改项目中的 `Version`（对应 GitHub 标签 `v<Version>`）、`InformationalVersion`（下载文件名）及 `FileVersion`，再上传 EXE 和校验文件到 GitHub Releases；只有带 Franca EXE 的正式 Release 才会触发新版提示。
+维护者可用 `pwsh -File src/Launcher/Publish-Release.ps1` 重建自带 .NET 的单 EXE，输出位于 `dist/Franca0.1-1103/`。后续发布需同步修改项目中的 `Version`（对应 GitHub 标签 `v<Version>`）、`InformationalVersion`（下载文件名）及 `FileVersion`，再上传 EXE 和校验文件到 GitHub Releases；只有带 Franca EXE 的正式 Release 才会触发新版提示。
 
 东方路线首次启用时需要联网从上游镜像下载补丁数据（约 1 MB，逐个校验哈希）；下载失败会明确报错中止，不影响其他引擎。
 

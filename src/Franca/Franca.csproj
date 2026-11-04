@@ -11,10 +11,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets/Brand/franca-taskbar.ico</ApplicationIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Version>0.1.20261027</Version>
+    <Version>0.1.20261103</Version>
     <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.1027.0</FileVersion>
-    <InformationalVersion>Franca0.1-1027</InformationalVersion>
+    <FileVersion>0.1.1103.0</FileVersion>
+    <InformationalVersion>Franca0.1-1103</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 

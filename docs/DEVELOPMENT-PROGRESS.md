@@ -4,6 +4,8 @@
 
 ## 当前结论
 
+2026-11-03 发布 `Franca0.1-1103`：Unreal 游戏库启用入口（manifest.json 事务安装）、引擎页实验适配徽标统一、设置页可选代理修复官方支持刷新。版本同步四处（csproj 三元组、ReleaseUpdateProbe 常量、README/site 下载链接、CHANGELOG）。本机发布环境两处变化需记录：pwsh 已卸载改用 Windows PowerShell 5.1，`Test-Standalone.ps1` 修了两处 5.1 兼容（ExitCode 恒空改输出三查含末行 PASS、Path.GetRelativePath 手工裁剪）；GUI 长开锁定 bin 输出曾致健康探针误跑旧 1027 二进制（流程：先关 GUI 再构建）。21 项合成探针全量体检约 670 PASS / 0 FAIL（1103 构建），Test-Standalone 全部通过（34 组件哈希一致、损坏修复、哨兵保持）。详见 [发布记录](../tests/2026-11-03-release.md)。
+
 2026-11-03 按用户要求统一 UE 按钮文案与引擎页口径：UE 安装按钮不再单写「安装 UE 译文…」，与 Unity 行统一用「启用翻译」（`ue.install` key 全语言移除，`UeInstallLabel` 直接取 `game.enable`；选择产物清单的说明保留在 tooltip/对话框标题 `ue.install.hint`）。引擎页全部已支持引擎（Unity IL2CPP/Mono、Touhou、Unreal）统一标「实验适配」徽标（`engines.supported` key 移除，导航探针加 `engine_supported_all_experimental_badge` 锁定）；`engines.note.unreal` 四行说明精简为一行关键限制（未加密 pak v11；UE5/IoStore/加密未验证），其余引擎说明本已单行保留。Release 0 错误；navigation 73 / ue-install 18 / ue-fonts 23 / ue-static 44 / blueprint 14 / architecture 51 共 224 项全过。
 
 2026-11-03 「刷新官方支持」失败根因与修复：官方支持/译名解析请求 Steam 商店 API，`GameNameService` 默认客户端硬编码 `UseProxy=false`（早前实测国内直连更稳的遗留），本机现已直连超时（实测 10s 超时 000，走本机代理 200）。修复为可选代理：新增 `AppSettings.ProxyUrl` + 设置页输入框（失焦/回车保存，15 语言文案），`GameNameService.ProxyOverride` 变更即重建默认客户端；默认仍直连，探针注入客户端不受影响。Release 0 错误，navigation 72 / ue-install 18 / ue-fonts 23 / ue-static 44 / blueprint 14 / architecture 51 共 222 项全过。设置项随既有 settings JSON 持久化，旧设置文件无此字段默认为空（直连）。
