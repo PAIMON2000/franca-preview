@@ -105,6 +105,44 @@ internal static partial class ProbeRunner
             app.Shutdown();
             return true;
         }
+        if (args.Length > 0 && args[0] == "--probe-ue-install")
+        {
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            await UeInstallProbe.RunAsync();
+            app.Shutdown();
+            return true;
+        }
+        if (args.Length > 0 && args[0] is "--ue-install" or "--ue-uninstall" or "--ue-repair")
+        {
+            // Real game writes. Requires the game to be stopped.
+            // --ue-install <gameDir> <prepared.pak> <pakDirRelative> <overrideFileName> <originalPakRelative> <originalSha256>
+            // --ue-uninstall <gameDir> | --ue-repair <gameDir>
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            try
+            {
+                var service = new Franca.Services.UePakInstallService(args[1]);
+                Franca.Services.UePakInstallService.Result result = args[0] switch
+                {
+                    "--ue-install" => args.Length == 7
+                        ? service.Install(args[2], args[3], args[4], args[5], args[6], Console.WriteLine)
+                        : throw new ArgumentException(
+                            "--ue-install <gameDir> <prepared.pak> <pakDirRelative> <overrideFileName> <originalPakRelative> <originalSha256>"),
+                    "--ue-uninstall" => service.Uninstall(Console.WriteLine),
+                    _ => service.Repair(Console.WriteLine),
+                };
+                Console.WriteLine(JsonSerializer.Serialize(result));
+                if (result.State is "not-installed") Environment.ExitCode = 2;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UE_ERROR\t{ex.GetType().Name}\t{ex.Message}");
+                Environment.ExitCode = 1;
+            }
+            app.Shutdown();
+            return true;
+        }
         if (args.Length > 0 && args[0] == "--ue-font-report")
         {
             // Read-only composite-chain health report: for every Font asset in the pak,
