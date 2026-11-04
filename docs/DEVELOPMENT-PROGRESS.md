@@ -4,6 +4,8 @@
 
 ## 当前结论
 
+2026-11-03 按用户要求统一 UE 按钮文案与引擎页口径：UE 安装按钮不再单写「安装 UE 译文…」，与 Unity 行统一用「启用翻译」（`ue.install` key 全语言移除，`UeInstallLabel` 直接取 `game.enable`；选择产物清单的说明保留在 tooltip/对话框标题 `ue.install.hint`）。引擎页全部已支持引擎（Unity IL2CPP/Mono、Touhou、Unreal）统一标「实验适配」徽标（`engines.supported` key 移除，导航探针加 `engine_supported_all_experimental_badge` 锁定）；`engines.note.unreal` 四行说明精简为一行关键限制（未加密 pak v11；UE5/IoStore/加密未验证），其余引擎说明本已单行保留。Release 0 错误；navigation 73 / ue-install 18 / ue-fonts 23 / ue-static 44 / blueprint 14 / architecture 51 共 224 项全过。
+
 2026-11-03 「刷新官方支持」失败根因与修复：官方支持/译名解析请求 Steam 商店 API，`GameNameService` 默认客户端硬编码 `UseProxy=false`（早前实测国内直连更稳的遗留），本机现已直连超时（实测 10s 超时 000，走本机代理 200）。修复为可选代理：新增 `AppSettings.ProxyUrl` + 设置页输入框（失焦/回车保存，15 语言文案），`GameNameService.ProxyOverride` 变更即重建默认客户端；默认仍直连，探针注入客户端不受影响。Release 0 错误，navigation 72 / ue-install 18 / ue-fonts 23 / ue-static 44 / blueprint 14 / architecture 51 共 222 项全过。设置项随既有 settings JSON 持久化，旧设置文件无此字段默认为空（直连）。
 
 2026-11-03 UE 翻译选项对游戏库一等开放（同轮第 3 项）：Unreal 游戏主按钮与 Unity 行同位——未安装「安装 UE 译文…」（选 `--ue-prepare` 产物 manifest.json），已安装变「启动」（`CanLaunch` 认 UE 事务日志）；`IsSupported` 纳入 UE，注入式开关仍限 Unity/Touhou（新增 `HasToggle` 门控），UE 详情区保留安装/修复/卸载按钮组。引擎页 Unreal 升「已支持（实验徽标）」，`engines.note.unreal` 15 语言文案同步，导航探针加 `engine_unreal_supported_experimental`（72 项全过）。Release 0 错误，ue-install 18 / ue-fonts 23 / ue-static 44 / blueprint 14 / architecture 51 全过。真机事务整循环与 UE5 游戏验证按用户决定后续再测。详见 [UE 安装记录](../tests/2026-11-03-ue-install.md)。

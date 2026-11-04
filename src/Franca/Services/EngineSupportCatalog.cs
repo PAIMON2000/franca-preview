@@ -2,13 +2,12 @@ using Franca.Models;
 
 namespace Franca.Services;
 
-// 引擎清单：安装能力决定支持状态；UE 另标实验适配，不改变正式启用门槛。
+// 引擎清单：安装能力决定支持状态；全部已支持引擎统一标「实验适配」，不写正式承诺。
 public sealed record EngineSupportEntry(GameEngine Engine, string NoteKey)
 {
     public string Name => Engine.Label();
     public bool IsSupported => Engine.IsInstallable() || Engine.IsUe();
-    public string BadgeText => UiStrings.Get(Engine == GameEngine.Unreal ? "engines.experimental"
-        : IsSupported ? "engines.supported" : "engines.recognized");
+    public string BadgeText => UiStrings.Get(IsSupported ? "engines.experimental" : "engines.recognized");
     public string Note => UiStrings.Get(NoteKey);
 }
 

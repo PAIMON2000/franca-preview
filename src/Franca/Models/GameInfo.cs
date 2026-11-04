@@ -122,7 +122,8 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
     public bool UeNotInstalled => IsUe && !UeInstalled;
     public bool UeCanInstall => IsUe && !UeInstalled && !IsToggling;
     public bool UeCanManage => UeInstalled && !IsToggling;
-    public string UeInstallLabel => Services.UiStrings.Get("ue.install");
+    // 按钮文案与 Unity 行统一用「启用翻译」；hint 说明需要选择准备产物清单
+    public string UeInstallLabel => Services.UiStrings.Get("game.enable");
     public string UeInstallHint => Services.UiStrings.Get("ue.install.hint");
     public string UeRepairLabel => Services.UiStrings.Get("health.repair");
 
@@ -192,7 +193,7 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
     public string LaunchHint => Services.UiStrings.Get("games.play.hint");
 
     public string ActionText => IsUe
-        ? Services.UiStrings.Get(UeInstalled ? "game.ready" : "ue.install")
+        ? Services.UiStrings.Get(UeInstalled ? "game.ready" : "game.enable")
         : !Engine.IsInstallable()
         ? Services.UiStrings.Get("ui.unsupported")
         : Services.UiStrings.Get(IsReady ? "game.ready" : "game.enable");

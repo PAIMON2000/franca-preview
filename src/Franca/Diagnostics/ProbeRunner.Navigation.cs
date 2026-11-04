@@ -139,6 +139,8 @@ internal static partial class ProbeRunner
         Check("engine_touhou_supported", EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.Touhou).IsSupported);
         Check("engine_unreal_supported_experimental", EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.Unreal).IsSupported
             && EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.Unreal).BadgeText == UiStrings.Get("engines.experimental"));
+        Check("engine_supported_all_experimental_badge", EngineSupportCatalog.All.Where(e => e.IsSupported)
+            .All(e => e.BadgeText == UiStrings.Get("engines.experimental")));
         Check("engine_renpy_recognized_only", !EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.RenPy).IsSupported);
         main.NavigateTo(1);
         var endpoints = (Views.EndpointsPage)main.PageHost.Content;
