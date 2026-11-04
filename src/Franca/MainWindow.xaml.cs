@@ -22,6 +22,7 @@ public partial class MainWindow : Window
     private readonly OverlayStatusModel _overlayStatus;
     private OverlayWindow? _overlayWindow;
     private bool _closed;
+    private readonly bool _servicesEnabled;
     private readonly CancellationTokenSource _releaseCheckCancellation = new();
     private AvailableRelease? _availableRelease;
     private Announcement? _latestAnnouncement;
@@ -35,6 +36,8 @@ public partial class MainWindow : Window
     private readonly EndpointsPage _endpointsPage = new();
     private readonly LogPage _logPage = new();
     private readonly SettingsPage _settingsPage = new();
+    private readonly AnnouncementPage _announcementPage = new();
+    private readonly UpdatePage _updatePage = new();
     private readonly StatusPage _statusPage = new();
     private readonly EnginesPage _enginesPage = new();
     private readonly AcknowledgementsPage _acknowledgementsPage = new();
@@ -47,6 +50,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         AppLog.Init();
+        _servicesEnabled = startServices;
 
         Settings = settings ?? AppSettings.Load();
         GameNameService.ProxyOverride = Settings.ProxyUrl;
@@ -86,11 +90,15 @@ public partial class MainWindow : Window
         _endpointsPage.Init(this);
         _logPage.Init(this);
         _settingsPage.Init(this);
+        _announcementPage.Init(this);
+        _updatePage.Init(this);
         _statusPage.Init(this);
 
         _navItems.Add(new NavItem("\uE7FC", "nav.games"));
         _navItems.Add(new NavItem("\uE774", "nav.endpoints"));
         _navItems.Add(new NavItem("\uE713", "nav.settings"));
+        _navItems.Add(new NavItem("\uE7C3", "announce.button"));
+        _navItems.Add(new NavItem("\uE777", "update.button"));
         _navItems.Add(new NavItem("\uEC05", "nav.status"));
         _navItems.Add(new NavItem("\uE9D5", "nav.engines"));
         _navItems.Add(new NavItem("\uE8A5", "nav.log"));
@@ -120,6 +128,8 @@ public partial class MainWindow : Window
         _endpointsPage.ApplyUiLanguage();
         _logPage.ApplyUiLanguage();
         _settingsPage.ApplyUiLanguage();
+        _announcementPage.ApplyUiLanguage();
+        _updatePage.ApplyUiLanguage();
         _statusPage.ApplyUiLanguage();
         _enginesPage.ApplyUiLanguage();
         AppLog.LineAdded += OnLogLineAdded;
@@ -169,19 +179,24 @@ public partial class MainWindow : Window
 
     private void OnNavSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (NavList.SelectedIndex != 6)
+        if (NavList.SelectedIndex != 8)
             _acknowledgementsPage.CancelStartupCountdown();
         PageHost.Content = NavList.SelectedIndex switch
         {
             0 => _gamesPage,
             1 => _endpointsPage,
             2 => _settingsPage,
-            3 => _statusPage,
-            4 => _enginesPage,
-            5 => _logPage,
-            6 => _acknowledgementsPage,
+            3 => _announcementPage,
+            4 => _updatePage,
+            5 => _statusPage,
+            6 => _enginesPage,
+            7 => _logPage,
+            8 => _acknowledgementsPage,
             _ => _gamesPage
         };
+        // 公告/更新页：选中即带加载动画重新检查（探针窗口跳过真实网络）
+        if (NavList.SelectedIndex == 3) _ = _announcementPage.ShowAsync();
+        else if (NavList.SelectedIndex == 4) _ = _updatePage.ShowAsync();
     }
 
     internal void NavigateTo(int pageIndex) => NavList.SelectedIndex = pageIndex;
@@ -382,14 +397,23 @@ public partial class MainWindow : Window
         if (_closed) return;
         if (release is not null)
             ShowAvailableRelease(release);
-        _settingsPage.RefreshGitHubButtons();
+        RefreshGitHubBadges();
     }
 
-    // ---- 设置页 公告/更新 按钮（数据经 GitHub，按钮状态统一在这里维护）----
+    // ---- 公告/更新导航页（数据经 GitHub，徽标状态统一在这里维护）----
 
+    // 探针窗口（startServices=false）跳过真实网络拉取，页面只读缓存
+    internal bool ServicesEnabled => _servicesEnabled;
     internal AvailableRelease? CurrentAvailableRelease => _availableRelease;
+    internal Announcement? CurrentAnnouncement => _latestAnnouncement;
     internal bool AnnouncementIsNew => _latestAnnouncement is not null
         && _latestAnnouncement.Id != Settings.LastSeenAnnouncementId;
+
+    private void RefreshGitHubBadges()
+    {
+        _navItems[3].SetBadge(AnnouncementIsNew ? "●" : "");
+        _navItems[4].SetBadge(_availableRelease is not null ? "!" : "");
+    }
 
     internal async Task<AvailableRelease?> RecheckReleaseAsync(CancellationToken ct = default)
     {
@@ -397,7 +421,7 @@ public partial class MainWindow : Window
         if (_closed) return null;
         if (release is not null)
             ShowAvailableRelease(release);
-        _settingsPage.RefreshGitHubButtons();
+        RefreshGitHubBadges();
         return release;
     }
 
@@ -407,7 +431,7 @@ public partial class MainWindow : Window
         if (_closed) return null;
         if (announcement is not null)
             _latestAnnouncement = announcement;
-        _settingsPage.RefreshGitHubButtons();
+        RefreshGitHubBadges();
         return announcement ?? _latestAnnouncement;
     }
 
@@ -416,7 +440,7 @@ public partial class MainWindow : Window
         if (_latestAnnouncement is null) return;
         Settings.LastSeenAnnouncementId = _latestAnnouncement.Id;
         Settings.Save();
-        _settingsPage.RefreshGitHubButtons();
+        RefreshGitHubBadges();
     }
 
 
@@ -512,7 +536,7 @@ public partial class MainWindow : Window
     }
 }
 
-// 导航项：图标字形 + 随语言切换的文字
+// 导航项：图标字形 + 随语言切换的文字；Badge 为公告/更新的未读标记（● / !）
 public class NavItem : INotifyPropertyChanged
 {
     public string Glyph { get; }
@@ -525,6 +549,16 @@ public class NavItem : INotifyPropertyChanged
     }
 
     public string Label => UiStrings.Get(_labelKey);
+    public string Badge { get; private set; } = "";
+    public bool HasBadge => Badge.Length > 0;
+
+    public void SetBadge(string badge)
+    {
+        if (Badge == badge) return;
+        Badge = badge;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Badge)));
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HasBadge)));
+    }
 
     public void RefreshLabel()
     {

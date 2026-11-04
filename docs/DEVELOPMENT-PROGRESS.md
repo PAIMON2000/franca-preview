@@ -4,7 +4,7 @@
 
 ## 当前结论
 
-2026-11-04 设置页新增「公告」与「更新」按钮（位于端点管理下方）：每次启动自动检查——公告从仓库 `ANNOUNCEMENT.md`（main 分支，raw.githubusercontent.com）拉取，首个 `##` 标题为公告标识，未读时按钮带 ●；更新走最新 Release API，可用时按钮带 !。点击两个按钮均复用刷新官方支持的盲文加载动画重新检查：公告弹出对话框展示全文并记已读（`AppSettings.LastSeenAnnouncementId`），更新有新版打开发布页、无新版短暂显示「已是最新」。GitHub 请求默认直连、经 `GitHubHttp` 统一走设置页代理；`ReleaseUpdateService` 默认客户端同步换为该助手。公告解析/404/空态探针并入 `--probe-release-update`（20→24 项）。Release 0 错误，21 项合成探针全过。
+2026-11-04 公告/更新改为左侧导航项（按用户要求从设置页内按钮改为与设置平级）：导航顺序游戏/端点/设置/**公告**/**更新**/状态/引擎/日志/鸣谢（3、4 为新项，后四项索引 5–8 全量调整，导航探针同步）。每次启动自动检查；公告未读导航徽标 ●（`NavItem.Badge`），有新版徽标 !；选中页面即带盲文加载动画重新检查——公告页展示 `ANNOUNCEMENT.md` 全文并记已读，更新页显示当前版本 + 已是最新/新版 + 下载按钮。探针窗口（startServices=false）跳过真实网络只读缓存。公告解析/404/空态探针并入 `--probe-release-update`（20→24 项），导航探针加 `announcement_page_rendered`/`update_page_rendered`（75 项）。Release 0 错误，21 项合成探针全过。
 
 2026-11-03 发布 `Franca0.1-1103`：Unreal 游戏库启用入口（manifest.json 事务安装）、引擎页实验适配徽标统一、设置页可选代理修复官方支持刷新。版本同步四处（csproj 三元组、ReleaseUpdateProbe 常量、README/site 下载链接、CHANGELOG）。本机发布环境两处变化需记录：pwsh 已卸载改用 Windows PowerShell 5.1，`Test-Standalone.ps1` 修了两处 5.1 兼容（ExitCode 恒空改输出三查含末行 PASS、Path.GetRelativePath 手工裁剪）；GUI 长开锁定 bin 输出曾致健康探针误跑旧 1027 二进制（流程：先关 GUI 再构建）。21 项合成探针全量体检约 670 PASS / 0 FAIL（1103 构建），Test-Standalone 全部通过（34 组件哈希一致、损坏修复、哨兵保持）。详见 [发布记录](../tests/2026-11-03-release.md)。
 

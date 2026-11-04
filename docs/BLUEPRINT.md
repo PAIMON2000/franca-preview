@@ -64,7 +64,7 @@ graph LR
 ### `desktop`
 
 - 职责：user interaction；presentation state
-- 文件：22 个；声明依赖：`application`、`game`、`installer`、`runtime`、`translation`、`shared`、`diagnostics`
+- 文件：23 个；声明依赖：`application`、`game`、`installer`、`runtime`、`translation`、`shared`、`diagnostics`
 - 输入：
   - `user actions on pages (library toggle, settings, endpoint management)`
   - `WPF timers and service events (relay counters, auto-pick results)`

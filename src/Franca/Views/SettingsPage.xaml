@@ -79,12 +79,6 @@
                        Foreground="{DynamicResource TextSecondaryBrush}" FontSize="12" TextWrapping="Wrap"/>
             <Button x:Name="ManageEndpointsButton" Click="OnManageEndpoints" HorizontalAlignment="Left" Margin="0,8,0,0"/>
 
-            <!-- 公告与更新：经 GitHub 获取；新公告/可更新时按钮带标记 -->
-            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
-                <Button x:Name="AnnouncementButton" Click="OnAnnouncementClick" Padding="12,5" Margin="0,8,0,0"/>
-                <Button x:Name="UpdateButton" Click="OnUpdateClick" Padding="12,5"/>
-            </StackPanel>
-
             <!-- 开发者 / Agent 区块 -->
             <Expander x:Name="AgentAdvanced" Margin="0,24,0,0"><Expander.Header><TextBlock x:Name="AgentTitle" FontWeight="SemiBold"/></Expander.Header><StackPanel Margin="0,12,0,0">
             <TextBlock x:Name="AgentDesc" FontSize="12" TextWrapping="Wrap"

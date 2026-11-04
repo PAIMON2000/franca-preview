@@ -39,11 +39,13 @@ internal static partial class ProbeRunner
         UiStrings.Current = "zh-CN";
         var main = new MainWindow(startServices: false, new AppSettings { TargetLanguage = "zh-CN" });
         Check("startup_direct_library", main.NavList.SelectedIndex == 0 && main.PageHost.Content is Views.GamesPage);
-        Check("nav_order_engines_after_status", main.NavList.Items.Count == 7
-            && ((NavItem)main.NavList.Items[3]).Label == UiStrings.Get("nav.status")
-            && ((NavItem)main.NavList.Items[4]).Label == UiStrings.Get("nav.engines")
-            && ((NavItem)main.NavList.Items[5]).Label == UiStrings.Get("nav.log")
-            && ((NavItem)main.NavList.Items[6]).Label == UiStrings.Get("nav.acknowledgements"));
+        Check("nav_order_engines_after_status", main.NavList.Items.Count == 9
+            && ((NavItem)main.NavList.Items[3]).Label == UiStrings.Get("announce.button")
+            && ((NavItem)main.NavList.Items[4]).Label == UiStrings.Get("update.button")
+            && ((NavItem)main.NavList.Items[5]).Label == UiStrings.Get("nav.status")
+            && ((NavItem)main.NavList.Items[6]).Label == UiStrings.Get("nav.engines")
+            && ((NavItem)main.NavList.Items[7]).Label == UiStrings.Get("nav.log")
+            && ((NavItem)main.NavList.Items[8]).Label == UiStrings.Get("nav.acknowledgements"));
         await Snapshot(main, "startup-library");
         Check("release_banner_hidden_initially", main.UpdateBanner.Visibility == Visibility.Collapsed);
         main.ShowAvailableRelease(new AvailableRelease("Franca next", new Version(0, 2),
@@ -117,17 +119,21 @@ internal static partial class ProbeRunner
             && libraryPage.RefreshSupportButton.IsEnabled
             && libraryPage.RefreshSupportButton.Content!.ToString() == UiStrings.Get("btn.refreshsupport"));
         await Snapshot(earlyExit, "settings");
-        main.NavigateTo(6);
+        main.NavigateTo(8);
         var page = (Views.AcknowledgementsPage)main.PageHost.Content;
         Check("manual_acknowledgements_no_countdown", !page.AutoAdvanceEnabled && page.CountdownText.Visibility == Visibility.Collapsed);
         await Snapshot(main, "embedded-manual");
         main.NavigateTo(3);
+        Check("announcement_page_rendered", main.PageHost.Content is Views.AnnouncementPage);
+        main.NavigateTo(4);
+        Check("update_page_rendered", main.PageHost.Content is Views.UpdatePage);
+        main.NavigateTo(5);
         await Snapshot(main, "status");
         Check("status_diagnostics_always_visible", main.PageHost.Content is Views.StatusPage status
             && status.FlowsHost.ActualHeight > 0 && status.HealthText.Text.Length > 0);
         Check("status_page_has_no_engine_list", main.PageHost.Content is Views.StatusPage statusOnly
             && FindVisual<FrameworkElement>(statusOnly, f => f.Name == "EnginesList") is null);
-        main.NavigateTo(4);
+        main.NavigateTo(6);
         var enginesPage = (Views.EnginesPage)main.PageHost.Content;
         await Snapshot(main, "engines");
         Check("engines_page_rendered", enginesPage.EnginesList.Items.Count == EngineSupportCatalog.All.Length
@@ -214,9 +220,9 @@ internal static partial class ProbeRunner
             && legacyPage.KimiKeyBox.Password == "legacy-fixture");
         legacyHost.Close();
         main.NavigateTo(0);
-        main.NavigateTo(6);
+        main.NavigateTo(8);
         await main.Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
-        Check("manual_reentry_stays", main.NavList.SelectedIndex == 6 && !page.AutoAdvanceEnabled);
+        Check("manual_reentry_stays", main.NavList.SelectedIndex == 8 && !page.AutoAdvanceEnabled);
         // 六套主题检查真实页面；仅合成游戏行，不扫描、不启停游戏、不访问端点。
         main.NavigateTo(0);
         var games = (Views.GamesPage)main.PageHost.Content;
@@ -271,7 +277,7 @@ internal static partial class ProbeRunner
         foreach (var theme in Themes.ThemeCatalog.All)
         {
             main.OnThemeChanged(theme.Id);
-            main.NavigateTo(3);
+            main.NavigateTo(5);
             await Snapshot(main, "theme-" + theme.Id);
             main.NavigateTo(2);
             var settingsPage = (Views.SettingsPage)main.PageHost.Content;
