@@ -24,6 +24,7 @@ public partial class MainWindow : Window
     private bool _closed;
     private readonly CancellationTokenSource _releaseCheckCancellation = new();
     private AvailableRelease? _availableRelease;
+    private Announcement? _latestAnnouncement;
 
     private void OnLogLineAdded(string line) => StatusLatestLog.Text = line;
 
@@ -155,6 +156,7 @@ public partial class MainWindow : Window
         Loaded += async (_, _) =>
         {
             _ = CheckForReleaseAsync();
+            _ = FetchAnnouncementAsync(_releaseCheckCancellation.Token);
             DnsWarmup.KickOff();
             await _gamesPage.StartupAsync();
             if (_closed) return;
@@ -377,9 +379,46 @@ public partial class MainWindow : Window
     private async Task CheckForReleaseAsync()
     {
         var release = await new ReleaseUpdateService().CheckAsync(_releaseCheckCancellation.Token);
-        if (_closed || release is null) return;
-        ShowAvailableRelease(release);
+        if (_closed) return;
+        if (release is not null)
+            ShowAvailableRelease(release);
+        _settingsPage.RefreshGitHubButtons();
     }
+
+    // ---- 设置页 公告/更新 按钮（数据经 GitHub，按钮状态统一在这里维护）----
+
+    internal AvailableRelease? CurrentAvailableRelease => _availableRelease;
+    internal bool AnnouncementIsNew => _latestAnnouncement is not null
+        && _latestAnnouncement.Id != Settings.LastSeenAnnouncementId;
+
+    internal async Task<AvailableRelease?> RecheckReleaseAsync(CancellationToken ct = default)
+    {
+        var release = await new ReleaseUpdateService().CheckAsync(ct);
+        if (_closed) return null;
+        if (release is not null)
+            ShowAvailableRelease(release);
+        _settingsPage.RefreshGitHubButtons();
+        return release;
+    }
+
+    internal async Task<Announcement?> FetchAnnouncementAsync(CancellationToken ct = default)
+    {
+        var announcement = await new AnnouncementService().FetchAsync(ct);
+        if (_closed) return null;
+        if (announcement is not null)
+            _latestAnnouncement = announcement;
+        _settingsPage.RefreshGitHubButtons();
+        return announcement ?? _latestAnnouncement;
+    }
+
+    internal void MarkAnnouncementSeen()
+    {
+        if (_latestAnnouncement is null) return;
+        Settings.LastSeenAnnouncementId = _latestAnnouncement.Id;
+        Settings.Save();
+        _settingsPage.RefreshGitHubButtons();
+    }
+
 
     internal void ShowAvailableRelease(AvailableRelease release)
     {

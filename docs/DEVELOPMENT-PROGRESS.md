@@ -4,6 +4,8 @@
 
 ## 当前结论
 
+2026-11-04 设置页新增「公告」与「更新」按钮（位于端点管理下方）：每次启动自动检查——公告从仓库 `ANNOUNCEMENT.md`（main 分支，raw.githubusercontent.com）拉取，首个 `##` 标题为公告标识，未读时按钮带 ●；更新走最新 Release API，可用时按钮带 !。点击两个按钮均复用刷新官方支持的盲文加载动画重新检查：公告弹出对话框展示全文并记已读（`AppSettings.LastSeenAnnouncementId`），更新有新版打开发布页、无新版短暂显示「已是最新」。GitHub 请求默认直连、经 `GitHubHttp` 统一走设置页代理；`ReleaseUpdateService` 默认客户端同步换为该助手。公告解析/404/空态探针并入 `--probe-release-update`（20→24 项）。Release 0 错误，21 项合成探针全过。
+
 2026-11-03 发布 `Franca0.1-1103`：Unreal 游戏库启用入口（manifest.json 事务安装）、引擎页实验适配徽标统一、设置页可选代理修复官方支持刷新。版本同步四处（csproj 三元组、ReleaseUpdateProbe 常量、README/site 下载链接、CHANGELOG）。本机发布环境两处变化需记录：pwsh 已卸载改用 Windows PowerShell 5.1，`Test-Standalone.ps1` 修了两处 5.1 兼容（ExitCode 恒空改输出三查含末行 PASS、Path.GetRelativePath 手工裁剪）；GUI 长开锁定 bin 输出曾致健康探针误跑旧 1027 二进制（流程：先关 GUI 再构建）。21 项合成探针全量体检约 670 PASS / 0 FAIL（1103 构建），Test-Standalone 全部通过（34 组件哈希一致、损坏修复、哨兵保持）。详见 [发布记录](../tests/2026-11-03-release.md)。
 
 2026-11-03 按用户要求统一 UE 按钮文案与引擎页口径：UE 安装按钮不再单写「安装 UE 译文…」，与 Unity 行统一用「启用翻译」（`ue.install` key 全语言移除，`UeInstallLabel` 直接取 `game.enable`；选择产物清单的说明保留在 tooltip/对话框标题 `ue.install.hint`）。引擎页全部已支持引擎（Unity IL2CPP/Mono、Touhou、Unreal）统一标「实验适配」徽标（`engines.supported` key 移除，导航探针加 `engine_supported_all_experimental_badge` 锁定）；`engines.note.unreal` 四行说明精简为一行关键限制（未加密 pak v11；UE5/IoStore/加密未验证），其余引擎说明本已单行保留。Release 0 错误；navigation 73 / ue-install 18 / ue-fonts 23 / ue-static 44 / blueprint 14 / architecture 51 共 224 项全过。

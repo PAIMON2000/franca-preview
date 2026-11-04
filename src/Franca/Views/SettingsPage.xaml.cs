@@ -68,6 +68,7 @@ public partial class SettingsPage : UserControl
         AgentTitle.Text = UiStrings.Get("settings.agent.title");
         AgentDesc.Text = UiStrings.Get("settings.agent.desc");
         AgentCopyButton.Content = UiStrings.Get("log.copy");
+        RefreshGitHubButtons();
         RefreshSourceLanguages();
         SyncSecondaryLanguageCombo(_host.Settings.SecondaryLanguage);
         RefreshModeCombo();
@@ -199,6 +200,93 @@ public partial class SettingsPage : UserControl
     private void OnProxyKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key == System.Windows.Input.Key.Enter) OnProxySave(sender, e);
+    }
+
+    // ---- 公告与更新按钮（数据经 GitHub，启动时自动检查；点击时显示加载动画）----
+    private bool _announcementLoading;
+    private bool _updateLoading;
+    private int _githubSpinnerFrame;
+    private System.Windows.Threading.DispatcherTimer? _githubSpinnerTimer;
+    private static readonly string[] GitHubSpinner = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"];
+
+    public void RefreshGitHubButtons()
+    {
+        if (_host is null) return;
+        AnnouncementButton.Content = GitHubButtonText(UiStrings.Get("announce.button"),
+            _announcementLoading, _host.AnnouncementIsNew ? "●" : null);
+        UpdateButton.Content = GitHubButtonText(UiStrings.Get("update.button"),
+            _updateLoading, _host.CurrentAvailableRelease is not null ? "!" : null);
+        AnnouncementButton.IsEnabled = !_announcementLoading && !_updateLoading;
+        UpdateButton.IsEnabled = !_announcementLoading && !_updateLoading;
+    }
+
+    private string GitHubButtonText(string label, bool loading, string? badge)
+    {
+        var text = loading ? GitHubSpinner[_githubSpinnerFrame] + " " + label : label;
+        return badge is null ? text : text + " " + badge;
+    }
+
+    private void StartGitHubSpinner()
+    {
+        if (_githubSpinnerTimer is not null) return;
+        _githubSpinnerTimer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+        _githubSpinnerTimer.Tick += (_, _) =>
+        {
+            _githubSpinnerFrame = (_githubSpinnerFrame + 1) % GitHubSpinner.Length;
+            RefreshGitHubButtons();
+        };
+        _githubSpinnerTimer.Start();
+    }
+
+    private void StopGitHubSpinner()
+    {
+        _githubSpinnerTimer?.Stop();
+        _githubSpinnerTimer = null;
+    }
+
+    private async void OnAnnouncementClick(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded || _host is null || _announcementLoading || _updateLoading) return;
+        _announcementLoading = true;
+        StartGitHubSpinner();
+        RefreshGitHubButtons();
+        var announcement = await _host.FetchAnnouncementAsync();
+        _announcementLoading = false;
+        StopGitHubSpinner();
+        RefreshGitHubButtons();
+        if (announcement is not null)
+            _host.MarkAnnouncementSeen();
+        new AnnouncementDialog(announcement?.Text ?? UiStrings.Get("announce.none"))
+        {
+            Owner = Window.GetWindow(this),
+        }.ShowDialog();
+    }
+
+    private async void OnUpdateClick(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded || _host is null || _announcementLoading || _updateLoading) return;
+        _updateLoading = true;
+        StartGitHubSpinner();
+        RefreshGitHubButtons();
+        var release = await _host.RecheckReleaseAsync();
+        _updateLoading = false;
+        StopGitHubSpinner();
+        RefreshGitHubButtons();
+        if (release is not null)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(release.Page.AbsoluteUri)
+                    { UseShellExecute = true });
+            }
+            catch (Exception ex) { AppLog.Write("Could not open release page: " + ex.GetType().Name); }
+            return;
+        }
+        // 已是最新：短暂提示后恢复按钮
+        UpdateButton.Content = UiStrings.Get("update.latest");
+        UpdateButton.IsEnabled = false;
+        await Task.Delay(2500);
+        RefreshGitHubButtons();
     }
 
     // 中英双语指引：路径动态拼接，其余为模板

@@ -56,6 +56,14 @@ internal static class ReleaseUpdateProbe
         using var cancelled = new CancellationTokenSource();
         cancelled.Cancel();
         Check("cancelled", await service.CheckAsync(cancelled.Token, client) is null);
+
+        // 公告服务（同为 GitHub 拉取）：首个 "## " 标题为公告标识；404/空/无标题均视为无公告
+        Check("announcement_parse", AnnouncementService.Parse("# Franca 公告\n\n## 2026-11-04\n\n你好，世界")
+            is { Id: "2026-11-04" } parsed && parsed.Text.Contains("你好，世界", StringComparison.Ordinal));
+        Check("announcement_no_heading", AnnouncementService.Parse("# 只有一级标题\n内容") is null);
+        Check("announcement_empty", AnnouncementService.Parse("   ") is null);
+        using var annClient = new HttpClient(new StubHandler("x") { Status = HttpStatusCode.NotFound });
+        Check("announcement_404", await new AnnouncementService().FetchAsync(CancellationToken.None, annClient) is null);
         Environment.ExitCode = failures == 0 ? 0 : 1;
     }
 

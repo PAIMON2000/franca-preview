@@ -18,7 +18,7 @@ internal sealed class ReleaseUpdateService
 
     public async Task<AvailableRelease?> CheckAsync(CancellationToken ct, HttpClient? client = null)
     {
-        using var owned = client is null ? new HttpClient { Timeout = TimeSpan.FromSeconds(8) } : null;
+        using var owned = client is null ? GitHubHttp.Create() : null;
         client ??= owned!;
         try
         {

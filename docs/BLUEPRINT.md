@@ -57,14 +57,14 @@ graph LR
 
 - 未声明边：无
 - 漂移边：无
-- 未归类文件：`src/Franca/Services/UeFontHealthService.cs`、`src/Franca/Services/UePakInstallService.cs`
+- 未归类文件：`src/Franca/Services/AnnouncementService.cs`、`src/Franca/Services/GitHubHttp.cs`、`src/Franca/Services/UeFontHealthService.cs`、`src/Franca/Services/UePakInstallService.cs`
 
 ## 模块契约
 
 ### `desktop`
 
 - 职责：user interaction；presentation state
-- 文件：21 个；声明依赖：`application`、`game`、`installer`、`runtime`、`translation`、`shared`、`diagnostics`
+- 文件：22 个；声明依赖：`application`、`game`、`installer`、`runtime`、`translation`、`shared`、`diagnostics`
 - 输入：
   - `user actions on pages (library toggle, settings, endpoint management)`
   - `WPF timers and service events (relay counters, auto-pick results)`
