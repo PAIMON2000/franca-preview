@@ -4,6 +4,8 @@
 
 ## 当前结论
 
+2026-11-04 发布 `Franca0.1-1104`：左侧导航「公告」「更新」（启动自动检查、未读 ● / 可更新 !）+ 8 小时缓存窗口 + 页面手动刷新。版本同步四处（csproj、ReleaseUpdateProbe 常量、README/site、CHANGELOG），`ANNOUNCEMENT.md` 更新为 2026-11-04 条目（用户下次启动会看到 ●）。GitHub Release `v0.1.20261104` 已上传 EXE + SHA-256。`Test-Standalone` 全过（34 组件哈希一致、修复与哨兵保持）。详见 [发布记录](../tests/2026-11-04-release.md)。
+
 2026-11-04 公告/更新降频（按用户反馈）：新增 8 小时缓存窗口（`GitHubHttp.IsFresh` + 设置持久化 `LastAnnouncementFetchUtc/LastReleaseCheckUtc`），窗口内选中页面/启动检查不再联网、直接展示缓存；公告正文缓存到设置（`CachedAnnouncementId/Text`），未读徽标重启后仍在；两页各加「刷新」按钮强制重查（带盲文动画）。`github.refresh` key ×15 语言；缓存窗口边界探针并入 `--probe-release-update`（24→26 项）。Release 0 错误；navigation 75、release-update 26、startup/architecture/blueprint 全过。
 
 2026-11-04 公告/更新改为左侧导航项（按用户要求从设置页内按钮改为与设置平级）：导航顺序游戏/端点/设置/**公告**/**更新**/状态/引擎/日志/鸣谢（3、4 为新项，后四项索引 5–8 全量调整，导航探针同步）。每次启动自动检查；公告未读导航徽标 ●（`NavItem.Badge`），有新版徽标 !；选中页面即带盲文加载动画重新检查——公告页展示 `ANNOUNCEMENT.md` 全文并记已读，更新页显示当前版本 + 已是最新/新版 + 下载按钮。探针窗口（startServices=false）跳过真实网络只读缓存。公告解析/404/空态探针并入 `--probe-release-update`（20→24 项），导航探针加 `announcement_page_rendered`/`update_page_rendered`（75 项）。Release 0 错误，21 项合成探针全过。

@@ -2,8 +2,10 @@
 
 ## 2026-11-04
 
-欢迎使用 Franca 早期测试版。
+Franca0.1-1104 已发布。
 
-- Unreal 实验路线已开放游戏库启用入口：选择翻译准备产物（manifest.json）即按事务安装，原包零写入。限未加密 pak v11，UE5 未验证。
-- 官方支持刷新失败可在设置页填写代理后重试。
-- 遇到问题请在仓库 Issues 反馈：https://github.com/PAIMON2000/franca-preview/issues
+- 左侧导航新增「公告」「更新」：启动自动检查，未读公告带 ●、可更新带 !。
+- 8 小时内使用缓存不重复联网；页面右上角「刷新」可随时强制检查。
+- 网络不通时在设置页填写「代理」后重试。
+
+欢迎使用与反馈：https://github.com/PAIMON2000/franca-preview/issues
