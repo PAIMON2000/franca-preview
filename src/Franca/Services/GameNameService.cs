@@ -44,7 +44,6 @@ public class GameNameService
         ["ar"] = "arabic", ["fr"] = "french", ["de"] = "german",
     };
 
-    private static readonly HttpClient Http = CreateClient();
     private static readonly Random Rng = new();
     private readonly HttpClient _steamHttp;
 
@@ -56,10 +55,45 @@ public class GameNameService
     private readonly string? _cacheFileName;
     private string CachePath => Path.Combine(AppContext.BaseDirectory, _cacheFileName ?? CacheFileName);
 
+    private static readonly object DefaultClientLock = new();
+    private static HttpClient? _defaultClient;
+    private static string _proxyOverride = "";
+
+    // 由 MainWindow 加载设置后赋值（AppSettings.ProxyUrl）。空 = 直连：早期实测国内直连 Steam
+    // 商店更稳，走 Clash 代理频发 SSL EOF，故默认禁代理；仅用户显式配置后才启用。
+    public static string ProxyOverride
+    {
+        get => _proxyOverride;
+        set
+        {
+            lock (DefaultClientLock)
+            {
+                _proxyOverride = value ?? "";
+                _defaultClient = null; // 下次使用时按新代理重建
+            }
+        }
+    }
+
+    private static HttpClient DefaultClient
+    {
+        get
+        {
+            lock (DefaultClientLock)
+                return _defaultClient ??= CreateClient();
+        }
+    }
+
     private static HttpClient CreateClient()
     {
-        // Steam 国内可直连（实测 1.2s），走系统代理（Clash）反而不稳：SSL EOF 频发
-        var client = new HttpClient(new HttpClientHandler { UseProxy = false }) { Timeout = TimeSpan.FromSeconds(8) };
+        var handler = new HttpClientHandler { UseProxy = false };
+        if (!string.IsNullOrWhiteSpace(_proxyOverride)
+            && Uri.TryCreate(_proxyOverride.Trim(), UriKind.Absolute, out var proxyUri)
+            && proxyUri.Scheme is "http" or "https")
+        {
+            handler.UseProxy = true;
+            handler.Proxy = new System.Net.WebProxy(proxyUri);
+        }
+        var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(8) };
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Franca/0.1");
         return client;
     }
@@ -67,7 +101,7 @@ public class GameNameService
     // cacheFileName 为 null 时用默认缓存文件；无头探针传独立文件名，避免污染 GUI 缓存
     public GameNameService(string? cacheFileName = null, HttpClient? steamHttp = null)
     {
-        _steamHttp = steamHttp ?? Http;
+        _steamHttp = steamHttp ?? DefaultClient;
         _cacheFileName = cacheFileName;
         try
         {

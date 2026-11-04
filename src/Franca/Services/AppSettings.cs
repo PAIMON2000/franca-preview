@@ -29,6 +29,10 @@ public class AppSettings
     public string FallbackEndpoint { get; set; } = "GoogleTranslateV2";
     public bool FallbackManual { get; set; }
 
+    // 可选 HTTP 代理（如 http://127.0.0.1:7890），仅官方支持/译名解析等 Steam 商店请求使用；
+    // 空 = 直连（早期实测国内直连 Steam 更稳，代理频发 SSL EOF），网络环境变化时由用户在设置页填写
+    public string ProxyUrl { get; set; } = "";
+
     // 翻译模式（lab/010）：speed = 词典→包缓存→在线；quality = 包缓存→在线（完全绕过词典）。
     // 旧设置文件无此字段时反序列化默认为 speed。
     public string TranslationMode { get; set; } = "speed";

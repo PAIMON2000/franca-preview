@@ -48,6 +48,7 @@ public partial class MainWindow : Window
         AppLog.Init();
 
         Settings = settings ?? AppSettings.Load();
+        GameNameService.ProxyOverride = Settings.ProxyUrl;
         if (!startServices)
             Settings.IsTransient = true;
         PublishRuntimeSettings();
@@ -307,6 +308,15 @@ public partial class MainWindow : Window
         Settings.HideNonGameSoftware = value;
         Settings.Save();
         _gamesPage.ApplyLibraryView();
+    }
+
+    // 代理仅影响 Steam 商店请求（官方支持/译名）；立即重建 GameNameService 默认客户端
+    internal void OnProxyUrlChanged(string value)
+    {
+        if (value == Settings.ProxyUrl) return;
+        Settings.ProxyUrl = value;
+        GameNameService.ProxyOverride = value;
+        Settings.Save();
     }
 
     internal void OnOverlayEnabledChanged(bool value)

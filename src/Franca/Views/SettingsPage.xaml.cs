@@ -39,6 +39,7 @@ public partial class SettingsPage : UserControl
         NoOptimizeCheck.IsChecked = _host.Settings.NoOptimizeAfterGenerate;
         OverlayCheck.IsChecked = _host.Settings.OverlayEnabled;
         HideNonGameSoftwareCheck.IsChecked = _host.Settings.HideNonGameSoftware;
+        ProxyText.Text = _host.Settings.ProxyUrl;
         AgentText.Text = BuildAgentText();
     }
 
@@ -59,6 +60,9 @@ public partial class SettingsPage : UserControl
         OverlayCheck.Content = UiStrings.Get("settings.overlay");
         OverlayHint.Text = UiStrings.Get("settings.overlay.hint");
         ThemeLabel.Text = UiStrings.Get("label.theme");
+        ProxyLabel.Text = UiStrings.Get("settings.proxy.label");
+        ProxyText.ToolTip = UiStrings.Get("settings.proxy.hint");
+        ProxyHint.Text = UiStrings.Get("settings.proxy.hint");
         RefreshThemeCombo();
         KeyLocalNote.Text = UiStrings.Get("note.keylocal");
         AgentTitle.Text = UiStrings.Get("settings.agent.title");
@@ -179,6 +183,22 @@ public partial class SettingsPage : UserControl
     {
         if (!IsLoaded || _host is null) return;
         _host.OnOverlayEnabledChanged(OverlayCheck.IsChecked == true);
+    }
+
+    // 代理地址在失焦或回车时保存；空白 = 直连。非法地址由 MainWindow 原样保存，
+    // GameNameService 校验失败时按直连处理（不弹错打扰）。
+    private void OnProxySave(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded || _host is null) return;
+        var value = (ProxyText.Text ?? "").Trim();
+        if (value == ProxyText.Text && value == _host.Settings.ProxyUrl) return;
+        ProxyText.Text = value;
+        _host.OnProxyUrlChanged(value);
+    }
+
+    private void OnProxyKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Enter) OnProxySave(sender, e);
     }
 
     // 中英双语指引：路径动态拼接，其余为模板
