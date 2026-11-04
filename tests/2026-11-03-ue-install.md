@@ -16,12 +16,13 @@ UE 游戏从"手工换包"进入事务化安装：`UePakInstallService` 提供�
 
 清单推导（`ResolvePrepared`，5 项）：合法清单→安装参数全部正确（相对目录统一正斜杠）、IsInstalled 助手、appId 不符拒绝、原 pak 被换（长度变）拒绝、产物 pak 被改拒绝、SourcePak 指向游戏外拒绝。
 
-## UI 接线（GamesPage）
+## UI 接线（GamesPage，一等选项）
 
-- UE 游戏（Unreal 引擎）详情区新增操作组：未安装显示「安装 UE 译文…」（文件对话框选择准备产物目录的 `manifest.json`），已安装显示「修复」+「卸载翻译」。状态列/详情区对 UE 行显示已就绪/未启用，不再显示「暂未支持」。
+- Unreal 游戏在游戏库与 Unity 行同位：主按钮 = 未安装「安装 UE 译文…」（文件对话框选择准备产物目录的 `manifest.json`）→ 已安装「启动」（经 Steam）；状态列显示已就绪/未启用。`IsSupported` 含 UE，注入式启用开关（`HasToggle`）仍只给 Unity/Touhou，UE 详情区用按钮组（安装/修复/卸载）。
 - 安装参数全部由 `UePakInstallService.ResolvePrepared(gameDir, manifestPath, appId)` 推导：清单状态、appId、SourcePak 游戏内 containment、原 pak 长度与索引 SHA1（=准备时基线，防游戏更新后张冠李戴）、产物 pak 哈希逐项校验，基线 SHA-256 现场计算。
 - 工作流在 `GameTranslationService.UeInstallAsync/UeUninstallAsync/UeRepairAsync`：复用 `IsGameStopped` 进程检查（运行中拒绝并提示），`_operations` 信号量串行化，写操作 `Task.Run` 离开 UI 线程；页面沿用 `_busy` + `IsToggling` + `SetInstallError` 行内错误模式。
 - UE 安装态读已提交事务日志（`UePakInstallService.IsInstalled`），随 `RefreshRow` 重建行时重新求值。
+- 引擎页 Unreal 升为「已支持（实验徽标）」，`engines.note.unreal` 文案更新为游戏库安装译文包启用；导航探针增 `engine_unreal_supported_experimental` 锁定该状态（72 项全过）。
 
 ## 边界
 

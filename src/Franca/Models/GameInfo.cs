@@ -84,13 +84,17 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
         RaiseChanged(nameof(InstallError));
         RaiseChanged(nameof(HasInstallError));
     }
-    public bool IsSupported => Engine.IsInstallable();
+    public bool IsSupported => Engine.IsInstallable() || Engine.IsUe();
+    // 详情区启用开关仅 Unity/Touhou 注入路线；UE 用安装按钮组，不用开关
+    public bool HasToggle => Engine.IsInstallable();
     public string LibraryTitle => string.IsNullOrWhiteSpace(TranslatedName) ? Name : TranslatedName;
     public string LibrarySubtitle => LibraryTitle == Name ? EngineLabel : Name;
     public string EnableTranslationLabel => Services.UiStrings.Get("game.enable");
     public string PrimaryActionLabel => IsToggling ? Services.UiStrings.Get("ui.working")
+        : IsUe ? (UeInstalled ? LaunchLabel : UeInstallLabel)
         : IsActive ? LaunchLabel : EnableTranslationLabel;
-    public bool CanPrimaryAction => IsActive ? CanLaunch : CanToggle;
+    public bool CanPrimaryAction => IsUe ? (UeInstalled ? CanLaunch : UeCanInstall)
+        : IsActive ? CanLaunch : CanToggle;
     public string LibraryStatusText => IsToggling ? Services.UiStrings.Get("ui.working")
         : NeedsTranslationRepair ? Services.UiStrings.Get("health.problem")
         : IsDisabledByUser ? Services.UiStrings.Get("game.disabled")
@@ -182,8 +186,8 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
     // 开关可用性：仅可安装引擎且不在切换过程中
     public bool CanToggle => Engine.IsInstallable() && !IsToggling;
 
-    // 经 Steam 启动：仅翻译已启用且有 appId 的 Steam 游戏
-    public bool CanLaunch => IsActive && AppId is > 0 && !IsToggling;
+    // 经 Steam 启动：翻译已启用（Unity 激活 / UE 覆盖包已安装）且有 appId 的 Steam 游戏
+    public bool CanLaunch => (IsActive || UeInstalled) && AppId is > 0 && !IsToggling;
     public string LaunchLabel => Services.UiStrings.Get("games.play");
     public string LaunchHint => Services.UiStrings.Get("games.play.hint");
 

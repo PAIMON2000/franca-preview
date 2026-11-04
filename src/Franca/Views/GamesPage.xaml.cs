@@ -476,8 +476,13 @@ public partial class GamesPage : UserControl
 
     private async void OnUeInstallClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not FrameworkElement { Tag: GameInfo game } || _busy || !game.UeCanInstall)
-            return;
+        if (sender is FrameworkElement { Tag: GameInfo game }) await InstallUeAsync(game);
+    }
+
+    // UE 安装主流程：选择准备产物清单 → 清单推导参数 → 事务安装；详情区按钮与主按钮共用
+    private async Task InstallUeAsync(GameInfo game)
+    {
+        if (_busy || !game.UeCanInstall) return;
         var dialog = new Microsoft.Win32.OpenFileDialog
         {
             Title = game.UeInstallHint,
@@ -631,6 +636,13 @@ public partial class GamesPage : UserControl
     private async void OnGamePrimaryClick(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement { Tag: GameInfo game }) return;
+        // UE：主按钮 = 安装译文（选产物清单）或已安装后启动，与 Unity 行的"启用/启动"同位
+        if (game.IsUe)
+        {
+            if (game.UeInstalled) OnLaunchClick(sender, e);
+            else await InstallUeAsync(game);
+            return;
+        }
         if (game.IsActive) OnLaunchClick(sender, e);
         else await ToggleGameAsync(game);
     }

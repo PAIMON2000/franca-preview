@@ -105,7 +105,7 @@
                             </WrapPanel>
                             <TextBlock Text="{Binding TranslationHealthDetail}" TextWrapping="Wrap" Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,10"/>
                             <WrapPanel>
-                                <StackPanel Orientation="Horizontal" Visibility="{Binding IsSupported, Converter={StaticResource BoolToVis}}" Margin="0,0,20,0">
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding HasToggle, Converter={StaticResource BoolToVis}}" Margin="0,0,20,0">
                                     <ToggleButton Style="{StaticResource ToggleSwitchStyle}" IsChecked="{Binding IsActive, Mode=OneWay}"
                                                   IsEnabled="{Binding CanToggle}" Click="OnToggleClick" Tag="{Binding}" VerticalAlignment="Center"/>
                                     <TextBlock Text="{Binding EnableTranslationLabel}" VerticalAlignment="Center" Margin="8,0,0,0"/>
