@@ -472,6 +472,94 @@ public partial class GamesPage : UserControl
         }
     }
 
+    // ---- UE 覆盖包路线（实验）：详情区按钮，安装入口选择准备产物清单 ----
+
+    private async void OnUeInstallClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: GameInfo game } || _busy || !game.UeCanInstall)
+            return;
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = game.UeInstallHint,
+            Filter = "Franca prepared manifest (manifest.json)|manifest.json",
+        };
+        if (dialog.ShowDialog(Window.GetWindow(this)) != true) return;
+
+        _busy = true;
+        game.IsToggling = true;
+        game.SetInstallError(null);
+        RefreshRow(game);
+        try
+        {
+            await _host.GameTranslation.UeInstallAsync(game, dialog.FileName, new Progress<string>(AppLog.Write));
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write(UiStrings.Format("log.enable.fail", ex.Message));
+            game.SetInstallError(ex.Message);
+        }
+        finally
+        {
+            game.IsToggling = false;
+            _busy = false;
+            RefreshRow(game);
+        }
+    }
+
+    private async void OnUeUninstallClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: GameInfo game } || _busy || !game.UeCanManage)
+            return;
+        var dialog = new UninstallConfirmDialog { Owner = Window.GetWindow(this) };
+        if (dialog.ShowDialog() != true) return;
+
+        _busy = true;
+        game.IsToggling = true;
+        game.SetInstallError(null);
+        RefreshRow(game);
+        try
+        {
+            await _host.GameTranslation.UeUninstallAsync(game, new Progress<string>(AppLog.Write));
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write(UiStrings.Format("log.enable.fail", ex.Message));
+            game.SetInstallError(ex.Message);
+        }
+        finally
+        {
+            game.IsToggling = false;
+            _busy = false;
+            RefreshRow(game);
+        }
+    }
+
+    private async void OnUeRepairClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: GameInfo game } || _busy || !game.UeCanManage)
+            return;
+
+        _busy = true;
+        game.IsToggling = true;
+        game.SetInstallError(null);
+        RefreshRow(game);
+        try
+        {
+            await _host.GameTranslation.UeRepairAsync(game, new Progress<string>(AppLog.Write));
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write(UiStrings.Format("log.enable.fail", ex.Message));
+            game.SetInstallError(ex.Message);
+        }
+        finally
+        {
+            game.IsToggling = false;
+            _busy = false;
+            RefreshRow(game);
+        }
+    }
+
     private void RefreshTranslationHealth(GameInfo game)
     {
         if (!game.IsReady || !game.Engine.IsUnity())

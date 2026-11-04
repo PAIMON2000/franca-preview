@@ -55,6 +55,50 @@ public sealed class UePakInstallService
 
     public IReadOnlyList<Journal> InstalledJournals() => ReadJournals().Select(t => t.Journal).ToList();
 
+    // 安装参数全部由准备产物清单推导，调用方只提供游戏目录与清单路径：
+    // 原 pak 相对路径/基线哈希/索引 SHA1/长度逐项核对后才允许写入，防止张冠李戴。
+    public sealed record PreparedPlan(string PreparedPakPath, string PakDirectoryRelative,
+        string OverrideFileName, string OriginalPakRelative, string OriginalSha256);
+
+    public static PreparedPlan ResolvePrepared(string gameDirectory, string preparedManifestPath, int? appId = null)
+    {
+        var game = Path.GetFullPath(gameDirectory).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        var manifestPath = Path.GetFullPath(preparedManifestPath);
+        var dir = Path.GetDirectoryName(manifestPath)!;
+        using var document = JsonDocument.Parse(File.ReadAllText(manifestPath));
+        var root = document.RootElement;
+        if (root.GetProperty("Status").GetString() != "PreparedNotInstalled")
+            throw new InvalidDataException("Prepared manifest is not in PreparedNotInstalled state.");
+        if (appId is > 0 && root.GetProperty("AppId").GetInt32() != appId.Value)
+            throw new InvalidDataException("Prepared manifest belongs to a different appId.");
+        var sourcePak = root.GetProperty("SourcePak").GetString() ?? "";
+        if (!Path.GetFullPath(sourcePak).StartsWith(game, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidDataException("Prepared manifest source pak is outside the selected game directory.");
+        var originalRelative = Path.GetRelativePath(game, Path.GetFullPath(sourcePak)).Replace('\\', '/');
+        var original = Path.Combine(game, originalRelative);
+        if (!File.Exists(original))
+            throw new FileNotFoundException("Original pak recorded in the prepared manifest is missing.", originalRelative);
+        if (new FileInfo(original).Length != root.GetProperty("SourceLength").GetInt64())
+            throw new InvalidDataException("Original pak size differs from the prepared manifest (game updated?); prepare again.");
+        using (var pak = UePak.PakFileReader.Open(original))
+            if (!pak.IndexSha1Valid || pak.IndexSha1 != root.GetProperty("SourceIndexSha1").GetString())
+                throw new InvalidDataException("Original pak index SHA1 differs from the prepared manifest (game updated?); prepare again.");
+        var prepared = Directory.GetFiles(dir, "*.pak");
+        if (prepared.Length != 1)
+            throw new FileNotFoundException("Expected exactly one prepared pak beside the manifest.", dir);
+        var expectedPrepared = root.GetProperty("PreparedSha256").GetString() ?? "";
+        var preparedPath = prepared[0];
+        if (HashFile(preparedPath) != expectedPrepared)
+            throw new InvalidDataException("Prepared pak hash differs from the manifest; the output directory is inconsistent.");
+        var baseline = HashFile(original);
+        var pakDirRelative = Path.GetDirectoryName(originalRelative)!.Replace('\\', '/');
+        return new PreparedPlan(preparedPath, pakDirRelative, Path.GetFileName(preparedPath), originalRelative, baseline);
+    }
+
+    public static bool IsInstalled(string gameDirectory) =>
+        new UePakInstallService(gameDirectory).InstalledJournals().Any(j =>
+            j.UePak && j.Status == "committed" && j.Files.Count > 0);
+
     public Result Install(string preparedPakPath, string pakDirectoryRelative, string overrideFileName,
         string originalPakRelative, string expectedOriginalSha256, Action<string>? log = null,
         CancellationToken ct = default)

@@ -116,6 +116,21 @@
                                 <Button Content="{Binding UninstallLabel}" ToolTip="{Binding UninstallHint}"
                                         Visibility="{Binding CanUninstall, Converter={StaticResource BoolToVis}}"
                                         Click="OnUninstallClick" Tag="{Binding}" Padding="12,5"/>
+                                <!-- UE 覆盖包路线（实验）：安装入口选择准备产物清单；已安装后提供修复/移除 -->
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding IsUe, Converter={StaticResource BoolToVis}}" Margin="0,0,20,0">
+                                    <Button Content="{Binding UeInstallLabel}" ToolTip="{Binding UeInstallHint}"
+                                            Visibility="{Binding UeNotInstalled, Converter={StaticResource BoolToVis}}"
+                                            IsEnabled="{Binding UeCanInstall}"
+                                            Click="OnUeInstallClick" Tag="{Binding}" Padding="12,5"/>
+                                    <Button Content="{Binding UeRepairLabel}" ToolTip="{Binding UeInstallHint}"
+                                            Visibility="{Binding UeInstalled, Converter={StaticResource BoolToVis}}"
+                                            IsEnabled="{Binding UeCanManage}"
+                                            Click="OnUeRepairClick" Tag="{Binding}" Padding="12,5" Margin="0,0,8,0"/>
+                                    <Button Content="{Binding UninstallLabel}" ToolTip="{Binding UninstallHint}"
+                                            Visibility="{Binding UeInstalled, Converter={StaticResource BoolToVis}}"
+                                            IsEnabled="{Binding UeCanManage}"
+                                            Click="OnUeUninstallClick" Tag="{Binding}" Padding="12,5"/>
+                                </StackPanel>
                             </WrapPanel>
                         </StackPanel>
                     </Border>

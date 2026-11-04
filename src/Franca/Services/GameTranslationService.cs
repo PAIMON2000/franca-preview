@@ -276,6 +276,68 @@ public sealed class GameTranslationService
         finally { _operations.Release(); }
     }
 
+    // ---- UE 覆盖包工作流（阶段四）：安装/停用（卸载）/修复，全部要求游戏已停止 ----
+
+    public async Task<UePakInstallService.Result> UeInstallAsync(GameInfo game, string preparedManifestPath,
+        IProgress<string> progress, CancellationToken ct = default)
+    {
+        await _operations.WaitAsync(ct);
+        try
+        {
+            return await Task.Run(() =>
+            {
+                if (!IsGameStopped(game))
+                    throw new IOException("Game is running; stop it before installing the UE override pak.");
+                var plan = UePakInstallService.ResolvePrepared(game.Path, preparedManifestPath, game.AppId);
+                progress.Report(UiStrings.Format("log.ue.install.start", game.Name));
+                var result = new UePakInstallService(game.Path).Install(
+                    plan.PreparedPakPath, plan.PakDirectoryRelative, plan.OverrideFileName,
+                    plan.OriginalPakRelative, plan.OriginalSha256, progress.Report, ct);
+                progress.Report(UiStrings.Format("log.ue.install.done", game.Name, result.State));
+                return result;
+            }, ct);
+        }
+        finally { _operations.Release(); }
+    }
+
+    public async Task<UePakInstallService.Result> UeUninstallAsync(GameInfo game,
+        IProgress<string> progress, CancellationToken ct = default)
+    {
+        await _operations.WaitAsync(ct);
+        try
+        {
+            return await Task.Run(() =>
+            {
+                if (!IsGameStopped(game))
+                    throw new IOException("Game is running; stop it before removing the UE override pak.");
+                var result = new UePakInstallService(game.Path).Uninstall(progress.Report);
+                if (result.State != "not-installed")
+                    progress.Report(UiStrings.Format("log.ue.uninstall.done", game.Name));
+                return result;
+            }, ct);
+        }
+        finally { _operations.Release(); }
+    }
+
+    public async Task<UePakInstallService.Result> UeRepairAsync(GameInfo game,
+        IProgress<string> progress, CancellationToken ct = default)
+    {
+        await _operations.WaitAsync(ct);
+        try
+        {
+            return await Task.Run(() =>
+            {
+                if (!IsGameStopped(game))
+                    throw new IOException("Game is running; stop it before repairing the UE override pak.");
+                var result = new UePakInstallService(game.Path).Repair(progress.Report);
+                if (result.State == "repaired")
+                    progress.Report(UiStrings.Format("log.ue.repair.done", game.Name));
+                return result;
+            }, ct);
+        }
+        finally { _operations.Release(); }
+    }
+
     private async Task<string?> EnsureRelayAsync(GameInfo game, CancellationToken ct)
     {
         try

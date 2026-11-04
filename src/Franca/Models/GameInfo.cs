@@ -39,6 +39,8 @@ public static class GameEngineExtensions
     public static bool IsUnity(this GameEngine engine) =>
         engine is GameEngine.UnityIL2CPP or GameEngine.UnityMono;
 
+    public static bool IsUe(this GameEngine engine) => engine is GameEngine.Unreal;
+
     // 可安装翻译的引擎：Unity 注入 + 东方自研引擎 thcrap 运行时路线（TouhouThcrapService）
     public static bool IsInstallable(this GameEngine engine) =>
         engine.IsUnity() || engine is GameEngine.Touhou;
@@ -94,9 +96,10 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
         : IsDisabledByUser ? Services.UiStrings.Get("game.disabled")
         : IsActive ? Services.UiStrings.Get("ui.configured")
         : !string.IsNullOrEmpty(AvailableOfficialSupportLabel) ? AvailableOfficialSupportLabel
+        : IsUe ? (UeInstalled ? Services.UiStrings.Get("game.ready") : Services.UiStrings.Get("game.notready"))
         : !IsSupported ? Services.UiStrings.Get("ui.unsupported") : Services.UiStrings.Get("game.notready");
     public System.Windows.Media.Brush LibraryStatusColor => (System.Windows.Media.Brush)
-        System.Windows.Application.Current.FindResource(NeedsTranslationRepair ? "WarnBrush" : IsActive ? "OkBrush" : "TextSecondaryBrush");
+        System.Windows.Application.Current.FindResource(NeedsTranslationRepair ? "WarnBrush" : IsActive || UeInstalled ? "OkBrush" : "TextSecondaryBrush");
     public bool CanRepairTranslationConfig => Engine.IsInstallable() && IsReady && !IsToggling;
     public string RepairConfigLabel => Services.UiStrings.Get("health.repair");
     public string RepairConfigHint => Services.UiStrings.Get("health.hint");
@@ -108,6 +111,16 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
         || (Engine.IsUnity() && Services.TranslationInstaller.HasInstalledArtifacts(Path)));
     public string UninstallLabel => Services.UiStrings.Get("uninstall.button");
     public string UninstallHint => Services.UiStrings.Get("uninstall.hint");
+
+    // ---- UE 覆盖包路线（实验）：状态读事务日志；安装入口在详情区选择准备产物清单 ----
+    public bool IsUe => Engine.IsUe();
+    public bool UeInstalled => IsUe && Services.UePakInstallService.IsInstalled(Path);
+    public bool UeNotInstalled => IsUe && !UeInstalled;
+    public bool UeCanInstall => IsUe && !UeInstalled && !IsToggling;
+    public bool UeCanManage => UeInstalled && !IsToggling;
+    public string UeInstallLabel => Services.UiStrings.Get("ue.install");
+    public string UeInstallHint => Services.UiStrings.Get("ue.install.hint");
+    public string UeRepairLabel => Services.UiStrings.Get("health.repair");
 
     public string TranslatedName { get; set; } = "";
     public string NameSource { get; set; } = ""; // official / machine / failed / en
@@ -145,6 +158,7 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
 
     // 官方语言标注最优先（有官中的游戏这条信息最有价值）；其次非可安装引擎占位、停用/就绪/未启用
     public string StatusText => !string.IsNullOrEmpty(AvailableOfficialSupportLabel) ? AvailableOfficialSupportLabel
+        : IsUe ? Services.UiStrings.Get(UeInstalled ? "game.ready" : "game.notready")
         : !Engine.IsInstallable() ? "—"
         : IsDisabledByUser ? Services.UiStrings.Get("game.disabled")
         : Services.UiStrings.Get(IsReady ? "game.ready" : "game.notready");
@@ -173,7 +187,9 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
     public string LaunchLabel => Services.UiStrings.Get("games.play");
     public string LaunchHint => Services.UiStrings.Get("games.play.hint");
 
-    public string ActionText => !Engine.IsInstallable()
+    public string ActionText => IsUe
+        ? Services.UiStrings.Get(UeInstalled ? "game.ready" : "ue.install")
+        : !Engine.IsInstallable()
         ? Services.UiStrings.Get("ui.unsupported")
         : Services.UiStrings.Get(IsReady ? "game.ready" : "game.enable");
 }

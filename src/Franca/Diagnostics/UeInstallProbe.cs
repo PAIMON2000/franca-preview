@@ -59,6 +59,49 @@ internal static class UeInstallProbe
                 && File.ReadAllBytes(Path.Combine(paks, overrideName)).SequenceEqual(prepared));
             Check("repair_intact", service.Repair().State == "intact");
 
+            // ResolvePrepared: all install parameters derived from the preparation manifest
+            string originalIndexSha1;
+            using (var opened = PakFileReader.Open(originalPath)) originalIndexSha1 = opened.IndexSha1;
+            var staging = Path.Combine(root, "prepared-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(staging);
+            var stagedPak = Path.Combine(staging, overrideName);
+            await File.WriteAllBytesAsync(stagedPak, prepared);
+            var preparedHash = Convert.ToHexString(SHA256.HashData(prepared));
+            async Task WriteManifestAsync(long length, string sha1)
+            {
+                await File.WriteAllTextAsync(Path.Combine(staging, "manifest.json"), System.Text.Json.JsonSerializer.Serialize(
+                    new { Status = "PreparedNotInstalled", AppId = 1971650, SourcePak = Path.GetFullPath(originalPath),
+                          SourceLength = length, SourceIndexSha1 = sha1, PreparedSha256 = preparedHash },
+                    new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+            }
+            await WriteManifestAsync(original.Length, originalIndexSha1);
+            var plan = UePakInstallService.ResolvePrepared(game, Path.Combine(staging, "manifest.json"), 1971650);
+            Check("resolve_prepared_plan", plan.PakDirectoryRelative == pakDir && plan.OverrideFileName == overrideName
+                && plan.OriginalPakRelative == pakDir + "/Game-WindowsNoEditor.pak"
+                && plan.OriginalSha256 == originalHash && plan.PreparedPakPath == stagedPak);
+            Check("is_installed_helper", UePakInstallService.IsInstalled(game));
+
+            try { UePakInstallService.ResolvePrepared(game, Path.Combine(staging, "manifest.json"), 123); Check("resolve_wrong_appid_refused", false); }
+            catch (InvalidDataException) { Check("resolve_wrong_appid_refused", true); }
+
+            await File.WriteAllBytesAsync(originalPath, [9, 9, 9, 9, 9, 9, 9, 9]);
+            try { UePakInstallService.ResolvePrepared(game, Path.Combine(staging, "manifest.json")); Check("resolve_updated_game_refused", false); }
+            catch (InvalidDataException) { Check("resolve_updated_game_refused", true); }
+            await File.WriteAllBytesAsync(originalPath, original);
+
+            await File.WriteAllBytesAsync(stagedPak, [6, 6]);
+            try { UePakInstallService.ResolvePrepared(game, Path.Combine(staging, "manifest.json")); Check("resolve_tampered_prepared_refused", false); }
+            catch (InvalidDataException) { Check("resolve_tampered_prepared_refused", true); }
+            await File.WriteAllBytesAsync(stagedPak, prepared);
+
+            await WriteManifestAsync(original.Length, originalIndexSha1);
+            var foreignManifest = Path.Combine(root, "foreign-manifest.json");
+            await File.WriteAllTextAsync(foreignManifest, System.Text.Json.JsonSerializer.Serialize(
+                new { Status = "PreparedNotInstalled", AppId = 1971650, SourcePak = Path.Combine(root, "elsewhere.pak"),
+                      SourceLength = 1L, SourceIndexSha1 = "00", PreparedSha256 = preparedHash }));
+            try { UePakInstallService.ResolvePrepared(game, foreignManifest); Check("resolve_foreign_game_refused", false); }
+            catch (InvalidDataException) { Check("resolve_foreign_game_refused", true); }
+
             // baseline mismatch: game updated under us
             await File.WriteAllBytesAsync(originalPath, [9, 9, 9, 9]);
             try

@@ -10,12 +10,20 @@ UE 游戏从"手工换包"进入事务化安装：`UePakInstallService` 提供�
 - **事务目录双备份**：`backup/` 存被替换的旧覆盖（回滚用），`prepared.pak` 存本次安装内容（修复用）。
 - CLI：`--ue-install <gameDir> <prepared.pak> <pakDirRelative> <overrideFileName> <originalPakRelative> <originalSha256>`、`--ue-uninstall <gameDir>`、`--ue-repair <gameDir>`。真实游戏写入，需游戏已停止。
 
-## 探针（`--probe-ue-install`，合成游戏目录，12 项全过）
+## 探针（`--probe-ue-install`，合成游戏目录，18 项全过）
 
 安装提交且原 pak 不变、幂等重复安装、卸载只删自有文件、卸载后无清单态、修复恢复/完好、基线不匹配拒绝、外来覆盖文件拒绝、外部篡改拒绝卸载、**崩溃恢复**（pending 清单 + 半成品自有覆盖 → 共享 Recover 回滚删除并标记 rolled-back）。
 
+清单推导（`ResolvePrepared`，5 项）：合法清单→安装参数全部正确（相对目录统一正斜杠）、IsInstalled 助手、appId 不符拒绝、原 pak 被换（长度变）拒绝、产物 pak 被改拒绝、SourcePak 指向游戏外拒绝。
+
+## UI 接线（GamesPage）
+
+- UE 游戏（Unreal 引擎）详情区新增操作组：未安装显示「安装 UE 译文…」（文件对话框选择准备产物目录的 `manifest.json`），已安装显示「修复」+「卸载翻译」。状态列/详情区对 UE 行显示已就绪/未启用，不再显示「暂未支持」。
+- 安装参数全部由 `UePakInstallService.ResolvePrepared(gameDir, manifestPath, appId)` 推导：清单状态、appId、SourcePak 游戏内 containment、原 pak 长度与索引 SHA1（=准备时基线，防游戏更新后张冠李戴）、产物 pak 哈希逐项校验，基线 SHA-256 现场计算。
+- 工作流在 `GameTranslationService.UeInstallAsync/UeUninstallAsync/UeRepairAsync`：复用 `IsGameStopped` 进程检查（运行中拒绝并提示），`_operations` 信号量串行化，写操作 `Task.Run` 离开 UI 线程；页面沿用 `_busy` + `IsToggling` + `SetInstallError` 行内错误模式。
+- UE 安装态读已提交事务日志（`UePakInstallService.IsInstalled`），随 `RefreshRow` 重建行时重新求值。
+
 ## 边界
 
-- 尚未接 UI（GamesPage 按钮）；当前为 CLI + 服务能力。
-- 与 `GameTranslationService` 的游戏停止检查、进程交互未接线（CLI 要求调用方保证游戏停止）。
-- 歧路旅人 2 真机安装/停用/恢复整循环尚待用本服务重跑验收（当前部署的包仍是手工放置）。
+- 真机整循环尚待用本服务重跑验收（当前部署的包对服务而言是外来文件，会正确拒绝——需先手工删除再用 UI/CLI 安装；这是特性不是缺陷）。
+- 准备（`--ue-prepare`）仍为 CLI 实验命令，UI 只消费其产物。
