@@ -6,6 +6,13 @@ namespace Franca.Services;
 // 用户在设置页填写代理后走代理；设置页字段见 AppSettings.ProxyUrl。
 internal static class GitHubHttp
 {
+    // 拉取结果缓存窗口：8 小时内页面选中/启动检查不重复联网
+    public const long FreshWindowSeconds = 8 * 3600;
+
+    public static bool IsFresh(long fetchedUtcSeconds) =>
+        fetchedUtcSeconds > 0
+        && DateTimeOffset.UtcNow.ToUnixTimeSeconds() - fetchedUtcSeconds < FreshWindowSeconds;
+
     public static HttpClient Create(TimeSpan? timeout = null)
     {
         var handler = new HttpClientHandler { UseProxy = false };

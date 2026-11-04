@@ -20,21 +20,31 @@ public partial class AnnouncementPage : UserControl
 
     public void Init(MainWindow host) => _host = host;
 
-    public void ApplyUiLanguage() => Title.Text = UiStrings.Get("announce.button");
+    public void ApplyUiLanguage()
+    {
+        Title.Text = UiStrings.Get("announce.button");
+        RefreshButton.Content = UiStrings.Get("github.refresh");
+    }
 
-    public async Task ShowAsync()
+    // 选中页：8 小时缓存窗口内直接展示缓存（不联网）；手动刷新按钮强制重查
+    public async Task ShowAsync(bool force = false)
     {
         if (_loading) return;
-        if (_host.ServicesEnabled)
+        _loading = true;
+        RefreshButton.IsEnabled = false;
+        var showSpinner = force || !GitHubHttp.IsFresh(_host.Settings.LastAnnouncementFetchUtc);
+        if (showSpinner)
         {
-            _loading = true;
             ContentScroller.Visibility = Visibility.Collapsed;
             LoadingText.Visibility = Visibility.Visible;
             StartSpinner();
-            await _host.FetchAnnouncementAsync();
-            StopSpinner();
-            _loading = false;
         }
+        if (_host.ServicesEnabled)
+            await _host.FetchAnnouncementAsync(force);
+        if (showSpinner)
+            StopSpinner();
+        _loading = false;
+        RefreshButton.IsEnabled = true;
         var announcement = _host.CurrentAnnouncement;
         LoadingText.Visibility = Visibility.Collapsed;
         ContentScroller.Visibility = Visibility.Visible;
@@ -42,6 +52,8 @@ public partial class AnnouncementPage : UserControl
         if (announcement is not null)
             _host.MarkAnnouncementSeen();
     }
+
+    private async void OnRefreshClick(object sender, RoutedEventArgs e) => await ShowAsync(force: true);
 
     private void StartSpinner()
     {

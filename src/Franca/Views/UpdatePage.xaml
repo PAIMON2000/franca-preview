@@ -3,7 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Background="{DynamicResource PageBackgroundBrush}">
     <StackPanel Margin="24">
-        <TextBlock x:Name="Title" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,18"/>
+        <DockPanel Margin="0,0,0,18">
+            <Button x:Name="RefreshButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="10,4"
+                    Click="OnRefreshClick"/>
+            <TextBlock x:Name="Title" FontSize="24" FontWeight="SemiBold"/>
+        </DockPanel>
         <TextBlock x:Name="VersionText" Margin="0,0,0,10"
                    Foreground="{DynamicResource TextSecondaryBrush}"/>
         <TextBlock x:Name="LoadingText" FontSize="15" Visibility="Collapsed"

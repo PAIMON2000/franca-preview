@@ -36,6 +36,12 @@ public class AppSettings
     // 已读公告标识（ANNOUNCEMENT.md 首个 "## " 标题）；空 = 尚未读过任何公告
     public string LastSeenAnnouncementId { get; set; } = "";
 
+    // GitHub 拉取缓存（公告/更新）：8 小时窗口内页面选中不重复联网，仅手动刷新强制重查
+    public string CachedAnnouncementId { get; set; } = "";
+    public string CachedAnnouncementText { get; set; } = "";
+    public long LastAnnouncementFetchUtc { get; set; }
+    public long LastReleaseCheckUtc { get; set; }
+
     // 翻译模式（lab/010）：speed = 词典→包缓存→在线；quality = 包缓存→在线（完全绕过词典）。
     // 旧设置文件无此字段时反序列化默认为 speed。
     public string TranslationMode { get; set; } = "speed";

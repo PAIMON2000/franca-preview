@@ -64,6 +64,11 @@ internal static class ReleaseUpdateProbe
         Check("announcement_empty", AnnouncementService.Parse("   ") is null);
         using var annClient = new HttpClient(new StubHandler("x") { Status = HttpStatusCode.NotFound });
         Check("announcement_404", await new AnnouncementService().FetchAsync(CancellationToken.None, annClient) is null);
+
+        // GitHub 拉取 8 小时缓存窗口：窗口内视为新鲜、窗口外/未拉取视为过期
+        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        Check("cache_window_fresh", GitHubHttp.IsFresh(now - 3600) && GitHubHttp.IsFresh(now));
+        Check("cache_window_stale", !GitHubHttp.IsFresh(now - GitHubHttp.FreshWindowSeconds - 1) && !GitHubHttp.IsFresh(0));
         Environment.ExitCode = failures == 0 ? 0 : 1;
     }
 

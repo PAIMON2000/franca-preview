@@ -26,26 +26,35 @@ public partial class UpdatePage : UserControl
         Title.Text = UiStrings.Get("update.button");
         VersionText.Text = ReleaseUpdateService.DisplayVersion;
         DownloadButton.Content = UiStrings.Get("update.download");
+        RefreshButton.Content = UiStrings.Get("github.refresh");
         ShowResult();
     }
 
-    public async Task ShowAsync()
+    // 选中页：8 小时缓存窗口内直接展示缓存结果（不联网）；手动刷新按钮强制重查
+    public async Task ShowAsync(bool force = false)
     {
         if (_loading) return;
-        if (_host.ServicesEnabled)
+        _loading = true;
+        RefreshButton.IsEnabled = false;
+        var showSpinner = force || !GitHubHttp.IsFresh(_host.Settings.LastReleaseCheckUtc);
+        if (showSpinner)
         {
-            _loading = true;
             ResultText.Visibility = Visibility.Collapsed;
             DownloadButton.Visibility = Visibility.Collapsed;
             LoadingText.Visibility = Visibility.Visible;
             StartSpinner();
-            await _host.RecheckReleaseAsync();
-            StopSpinner();
-            _loading = false;
         }
+        if (_host.ServicesEnabled)
+            await _host.RecheckReleaseAsync(force);
+        if (showSpinner)
+            StopSpinner();
+        _loading = false;
+        RefreshButton.IsEnabled = true;
         _release = _host.CurrentAvailableRelease;
         ShowResult();
     }
+
+    private async void OnRefreshClick(object sender, RoutedEventArgs e) => await ShowAsync(force: true);
 
     private void ShowResult()
     {

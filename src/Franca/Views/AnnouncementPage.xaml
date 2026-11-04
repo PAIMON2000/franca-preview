@@ -7,7 +7,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBlock x:Name="Title" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,18"/>
+        <DockPanel Margin="0,0,0,18">
+            <Button x:Name="RefreshButton" DockPanel.Dock="Right" HorizontalAlignment="Right" Padding="10,4"
+                    Click="OnRefreshClick"/>
+            <TextBlock x:Name="Title" FontSize="24" FontWeight="SemiBold"/>
+        </DockPanel>
         <TextBlock x:Name="LoadingText" Grid.Row="1" FontSize="15" Visibility="Collapsed"
                    Foreground="{DynamicResource TextSecondaryBrush}"/>
         <ScrollViewer x:Name="ContentScroller" Grid.Row="1" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">

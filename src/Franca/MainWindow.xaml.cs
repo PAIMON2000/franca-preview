@@ -54,6 +54,9 @@ public partial class MainWindow : Window
 
         Settings = settings ?? AppSettings.Load();
         GameNameService.ProxyOverride = Settings.ProxyUrl;
+        // 公告缓存落盘：重启后未读徽标仍在，窗口内（8h）启动检查不重复联网
+        if (Settings.CachedAnnouncementId.Length > 0)
+            _latestAnnouncement = new Announcement(Settings.CachedAnnouncementId, Settings.CachedAnnouncementText);
         if (!startServices)
             Settings.IsTransient = true;
         PublishRuntimeSettings();
@@ -166,7 +169,7 @@ public partial class MainWindow : Window
         Loaded += async (_, _) =>
         {
             _ = CheckForReleaseAsync();
-            _ = FetchAnnouncementAsync(_releaseCheckCancellation.Token);
+            _ = FetchAnnouncementAsync(ct: _releaseCheckCancellation.Token);
             DnsWarmup.KickOff();
             await _gamesPage.StartupAsync();
             if (_closed) return;
@@ -415,22 +418,35 @@ public partial class MainWindow : Window
         _navItems[4].SetBadge(_availableRelease is not null ? "!" : "");
     }
 
-    internal async Task<AvailableRelease?> RecheckReleaseAsync(CancellationToken ct = default)
+    // force=false 且距上次检查不足 8 小时（GitHubHttp.IsFresh）时直接返回缓存，不联网
+    internal async Task<AvailableRelease?> RecheckReleaseAsync(bool force = false, CancellationToken ct = default)
     {
+        if (!force && GitHubHttp.IsFresh(Settings.LastReleaseCheckUtc))
+            return _availableRelease;
         var release = await new ReleaseUpdateService().CheckAsync(ct);
         if (_closed) return null;
+        Settings.LastReleaseCheckUtc = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        Settings.Save();
         if (release is not null)
             ShowAvailableRelease(release);
         RefreshGitHubBadges();
         return release;
     }
 
-    internal async Task<Announcement?> FetchAnnouncementAsync(CancellationToken ct = default)
+    internal async Task<Announcement?> FetchAnnouncementAsync(bool force = false, CancellationToken ct = default)
     {
+        if (!force && GitHubHttp.IsFresh(Settings.LastAnnouncementFetchUtc))
+            return _latestAnnouncement;
         var announcement = await new AnnouncementService().FetchAsync(ct);
         if (_closed) return null;
+        Settings.LastAnnouncementFetchUtc = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
         if (announcement is not null)
+        {
             _latestAnnouncement = announcement;
+            Settings.CachedAnnouncementId = announcement.Id;
+            Settings.CachedAnnouncementText = announcement.Text;
+        }
+        Settings.Save();
         RefreshGitHubBadges();
         return announcement ?? _latestAnnouncement;
     }
