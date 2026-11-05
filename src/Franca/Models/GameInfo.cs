@@ -14,6 +14,7 @@ public enum GameEngine
     Source2,
     REEngine,
     Touhou,
+    MapleStory,
     Unknown
 }
 
@@ -33,6 +34,7 @@ public static class GameEngineExtensions
         GameEngine.Source2 => "Source 2",
         GameEngine.REEngine => "RE Engine",
         GameEngine.Touhou => "Touhou (ZUN Engine, thcrap)",
+        GameEngine.MapleStory => "MapleStory (Wizet Engine)",
         _ => Services.UiStrings.Get("engine.unknown")
     };
 

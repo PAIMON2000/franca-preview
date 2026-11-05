@@ -138,7 +138,7 @@ internal static partial class ProbeRunner
         await Snapshot(main, "engines");
         Check("engines_page_rendered", enginesPage.EnginesList.Items.Count == EngineSupportCatalog.All.Length
             && enginesPage.EnginesList.ActualHeight > 0);
-        Check("engine_catalog_covers_engines", EngineSupportCatalog.All.Length == 12
+        Check("engine_catalog_covers_engines", EngineSupportCatalog.All.Length == 13
             && !EngineSupportCatalog.All.Any(e => e.Engine == GameEngine.Unknown)
             && EngineSupportCatalog.All.TakeWhile(e => e.IsSupported).Count()
                 == EngineSupportCatalog.All.Count(e => e.IsSupported));
@@ -148,6 +148,10 @@ internal static partial class ProbeRunner
         Check("engine_supported_all_experimental_badge", EngineSupportCatalog.All.Where(e => e.IsSupported)
             .All(e => e.BadgeText == UiStrings.Get("engines.experimental")));
         Check("engine_renpy_recognized_only", !EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.RenPy).IsSupported);
+        Check("engine_maplestory_recognized_online_unsupported", !EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.MapleStory).IsSupported
+            && EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.MapleStory).BadgeText == UiStrings.Get("engines.recognized")
+            && EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.MapleStory).Note == UiStrings.Get("engines.note.online")
+            && GameEngine.MapleStory.Label() == "MapleStory (Wizet Engine)");
         main.NavigateTo(1);
         var endpoints = (Views.EndpointsPage)main.PageHost.Content;
         Check("secondary_groups_collapsed", !endpoints.FreeAdvanced.IsExpanded && !endpoints.ByokAdvanced.IsExpanded

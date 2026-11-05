@@ -4,6 +4,8 @@
 
 ## 当前结论
 
+2026-11-04 引擎识别新增 MapleStory（冒险岛，Nexon/Wizet 自研 2D 引擎）：应用户询问「能否支持冒险岛」调研后结论——经典端游为 Wizet 自研引擎 + 在线 MMO 反作弊环境（GameGuard/HackShield/NGS）+ 国服已有官中，三条现有翻译路线（Unity 注入/东方 thcrap/UE pak 覆盖）均不适用，明确**不支持**。落地为仅识别条目：`GameEngine.MapleStory`、检测签名 `MapleStory*.exe + 限深 2 的 *.wz 数据包`（依据公开客户端布局，暂无本机样本，签名注释已注明待真机复核）、`EngineSupportCatalog` 末尾追加（IsSupported=false 走「仅识别」徽标），新增备注 key `engines.note.online` ×15 语言（用户口径：网络游戏存在被视为外挂的风险，不支持网络游戏）。导航探针 `engine_catalog_covers_engines` 12→13 并加 `engine_maplestory_recognized_online_unsupported`（75→76 项全过）。Release 0 错误。本次不改版本号、不触发更新检查（识别条目非功能变更）。
+
 2026-11-04 发布 `Franca0.1-1104`：左侧导航「公告」「更新」（启动自动检查、未读 ● / 可更新 !）+ 8 小时缓存窗口 + 页面手动刷新。版本同步四处（csproj、ReleaseUpdateProbe 常量、README/site、CHANGELOG），`ANNOUNCEMENT.md` 更新为 2026-11-04 条目（用户下次启动会看到 ●）。GitHub Release `v0.1.20261104` 已上传 EXE + SHA-256。`Test-Standalone` 全过（34 组件哈希一致、修复与哨兵保持）。详见 [发布记录](../tests/2026-11-04-release.md)。
 
 2026-11-04 公告/更新降频（按用户反馈）：新增 8 小时缓存窗口（`GitHubHttp.IsFresh` + 设置持久化 `LastAnnouncementFetchUtc/LastReleaseCheckUtc`），窗口内选中页面/启动检查不再联网、直接展示缓存；公告正文缓存到设置（`CachedAnnouncementId/Text`），未读徽标重启后仍在；两页各加「刷新」按钮强制重查（带盲文动画）。`github.refresh` key ×15 语言；缓存窗口边界探针并入 `--probe-release-update`（24→26 项）。Release 0 错误；navigation 75、release-update 26、startup/architecture/blueprint 全过。

@@ -28,5 +28,6 @@ public static class EngineSupportCatalog
         new(GameEngine.GameMaker, "engines.note.recognized"),
         new(GameEngine.Source2, "engines.note.recognized"),
         new(GameEngine.REEngine, "engines.note.recognized"),
+        new(GameEngine.MapleStory, "engines.note.online"),
     };
 }

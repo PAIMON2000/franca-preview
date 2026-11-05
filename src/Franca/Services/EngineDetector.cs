@@ -80,6 +80,12 @@ public static class EngineDetector
         // RE Engine（卡普空）：re_chunk_*.pak 分块包
         (GameEngine.REEngine, dir => Directory.GetFiles(dir, "re_chunk_*.pak").Length > 0),
 
+        // MapleStory（Nexon/Wizet 自研 2D 引擎）：MapleStory*.exe + *.wz 数据包。
+        // 依据公开客户端布局（String.wz/Data.wz 等，数据包可能在子目录），暂无本机样本，
+        // 待真机复核；仅识别用途，网络游戏不在翻译支持范围（反作弊封号风险）。
+        (GameEngine.MapleStory, dir => Directory.GetFiles(dir, "MapleStory*.exe").Length > 0
+            && GetFilesWithinDepth(dir, "*.wz", 2).Count > 0),
+
         // 东方 Project 自研引擎（ZUN/thdat 系）：发行目录逐一举证（本机 Steam 官方版
         // th06c/th06nc/th10/th11，真机记录见兼容性矩阵）。三条互证特征：
         //  - th07+ 正作根目录 thbgm.dat 头 4 字节 "ZWAV"（th10/th11 实测）；
