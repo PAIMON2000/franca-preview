@@ -338,26 +338,83 @@ public sealed class GameTranslationService
         finally { _operations.Release(); }
     }
 
-    // ---- RenPy tl 覆盖工作流：安装/卸载，全部要求游戏已停止 ----
+    // ---- RenPy tl 覆盖工作流：一键准备+安装/卸载，全部要求游戏已停止 ----
 
-    public async Task<Services.RenPy.RenPyInstallService.Result> RenPyInstallAsync(GameInfo game,
-        string preparedManifestPath, IProgress<string> progress, CancellationToken ct = default)
+    // 默认准备产物根目录：%AppData%/Franca/renpy-prepared/<appId>。存在有效 manifest 时
+    // 一键启用直接安装；缺失或脚本哈希漂移时先自动跑翻译准备再装（缓存逐条复用）。
+    public static string RenPyPreparedRoot(GameInfo game) => Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+        "Franca", "renpy-prepared", game.AppId?.ToString() ?? "0");
+
+    public async Task<Services.RenPy.RenPyInstallService.Result> RenPyPrepareAndInstallAsync(GameInfo game,
+        IProgress<string> progress, IProgress<(double Percent, string Text)> prepareProgress,
+        CancellationToken ct = default)
     {
         await _operations.WaitAsync(ct);
         try
         {
-            return await Task.Run(() =>
+            return await Task.Run(async () =>
             {
                 if (!IsGameStopped(game))
                     throw new IOException("Game is running; stop it before installing the RenPy tl overlay.");
+                if (game.AppId is not > 0)
+                    throw new NotSupportedException("RenPy translation preparation requires a Steam App ID.");
+
+                var output = RenPyPreparedRoot(game);
+                var manifest = Path.Combine(output, "manifest.json");
+                if (!File.Exists(manifest))
+                {
+                    progress.Report(UiStrings.Format("renpy.prepare.start", game.Name));
+                    var report = await PrepareOnce(game, output, prepareProgress, ct);
+                    progress.Report(UiStrings.Format("renpy.prepare.done", game.Name, report.Translated, report.Cached));
+                }
+
                 progress.Report(UiStrings.Format("log.renpy.install.start", game.Name));
-                var result = new Services.RenPy.RenPyInstallService(game.Path).Install(
-                    preparedManifestPath, progress.Report, ct);
-                progress.Report(UiStrings.Format("log.renpy.install.done", game.Name, result.State));
-                return result;
+                try
+                {
+                    var result = new Services.RenPy.RenPyInstallService(game.Path).Install(manifest, progress.Report, ct);
+                    progress.Report(UiStrings.Format("log.renpy.install.done", game.Name, result.State));
+                    return result;
+                }
+                catch (InvalidDataException ex) when (ex.Message.Contains("differ"))
+                {
+                    // 游戏更新导致产物过期：重跑一次准备（缓存复用、只译增量）再装。
+                    progress.Report(UiStrings.Format("renpy.prepare.stale", game.Name));
+                    File.Delete(manifest);
+                    return await InstallFromFreshPrepare(game, output, manifest, progress, prepareProgress, ct);
+                }
             }, ct);
         }
         finally { _operations.Release(); }
+    }
+
+    // 跑一次翻译准备（复用 PackStore 缓存，只译缺失条目）；未完成时抛异常中止安装。
+    private async Task<Services.RenPy.RenPyStaticService.Report> PrepareOnce(GameInfo game,
+        string output, IProgress<(double Percent, string Text)> prepareProgress, CancellationToken ct)
+    {
+        var settings = _settings.Snapshot();
+        settings.SourceLanguage = "en";
+        var service = new Services.RenPy.RenPyStaticService(_relay.Packs.RootPath);
+        var report = await service.PrepareAsync(game.Path, game.AppId!.Value, output, settings,
+            new Progress<StaticTextTranslationService.StaticTranslationProgress>(p =>
+                prepareProgress.Report((p.Total > 0 ? 100.0 * p.Completed / p.Total : 0,
+                    UiStrings.Format("renpy.prepare.progress", p.Completed, p.Total)))),
+            ct);
+        if (report.Missing > 0)
+            throw new InvalidDataException(UiStrings.Format("renpy.prepare.incomplete", report.Missing));
+        return report;
+    }
+
+    private async Task<Services.RenPy.RenPyInstallService.Result> InstallFromFreshPrepare(GameInfo game,
+        string output, string manifest, IProgress<string> progress,
+        IProgress<(double Percent, string Text)> prepareProgress, CancellationToken ct)
+    {
+        var report = await PrepareOnce(game, output, prepareProgress, ct);
+        progress.Report(UiStrings.Format("renpy.prepare.done", game.Name, report.Translated, report.Cached));
+        progress.Report(UiStrings.Format("log.renpy.install.start", game.Name));
+        var result = new Services.RenPy.RenPyInstallService(game.Path).Install(manifest, progress.Report, ct);
+        progress.Report(UiStrings.Format("log.renpy.install.done", game.Name, result.State));
+        return result;
     }
 
     public async Task<Services.RenPy.RenPyInstallService.Result> RenPyUninstallAsync(GameInfo game,

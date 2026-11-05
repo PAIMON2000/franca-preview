@@ -70,7 +70,8 @@
 - **安装根目录坑**：`--renpy-install/--renpy-uninstall` 的 journal 路径以安装根为基（`game/tl/...`），误传内层 `game` 目录会把产物装进 `game/game/tl`；且 Scan 的 `<gameDir>/game` 优先探测会坠入该 stray 目录，之后所有扫描报 "No compiled scripts"。CLI 现归一化（认 `renpy/` sibling 特征，内层 game 自动上溯父级）。
 - **卸载坑**：安装事务日志漏盖 `Engine="renpy"`，RenPyInstallService.ReadJournals 过滤不到自己写的记录 → 卸载恒 not-installed、IsInstalled 同病。修复：安装时补盖章 + 旧记录按 `game/tl/` 路径前缀兼容识别。卸载往返 rolled-back、tl 目录移除验证通过；手改文件被正确判 Rollback conflict。
 - **.rpyc 残留坑（安装/卸载双侧）**：Ren'Py 首启把 tl/*.rpy 编译成同名 .rpyc，而这些 .rpyc 不在安装 journal 里——安装侧重装时旧 .rpyc 与新 .rpy 同载报 "translation already exists" 启动崩；卸载侧回滚只删 .rpy，.rpyc 残留会被下次启动继续加载。修复：安装提交后与卸载回滚时均连同删除所涉 .rpy 的 .rpyc。
-- **GUI 接入（同日）**：游戏库 RenPy 行与 UE 同模式——主按钮未装「启用翻译」（选择 `--renpy-prepare` 产物目录的 manifest.json）/已装「启动游戏」，详情区「启用翻译/卸载翻译」按钮组，状态读事务日志；`GameTranslationService.RenPyInstallAsync/RenPyUninstallAsync` 复用游戏停止检查与操作串行化。真实卸载走通（确认对话框 → rolled-back → tl 移除）。
+- **GUI 接入与卸载（同日第二轮）**：游戏库 RenPy 行与 UE 同模式——主按钮未装「启用翻译」/已装「启动游戏」，详情区「启用翻译/卸载翻译」按钮组，状态读事务日志；真实卸载走通（确认对话框 → rolled-back → tl 移除）。
+- **GUI 一键启用（同日第三轮）**：游戏库点「启用翻译」自动准备+安装——产物根 `%AppData%/Franca/renpy-prepared/<appId>/`，有 manifest 直接装，缺失自动跑翻译准备（行内进度），哈希漂移自动重跑（缓存只译增量）。真机走通快路径（产物已备→秒装→已就绪）；冷准备 GUI 路径未真机。
 - 真机验收（同日第二轮）：免责声明三页中文、"我同意。"按钮中文渲染且可点击（三层字体修复前为空盒+整页卡死）、主菜单侧栏 5 钮全中文、Load 页标题"加载"/侧栏/9 空槽全中文。已知边界：主菜单按钮是图片贴图（无文本可译）；`Page {}` 页码（带插值的引擎内置串）仍英文；RenPy 8 无真机样本。
 - 合成探针 `--probe-renpy` 14/14 PASS（proto2 手工夹具 + 5 项 screen_* + scan_skips_tl_and_cache）。
 - CLI 三命令：`--renpy-prepare <gameDir> <appId> <outputDir> <settings.json> <packsDir> <seconds> [--language=]`、`--renpy-install <gameDir> <preparedDir>`、`--renpy-uninstall <gameDir>`；另有只读 `--renpy-extract`。
@@ -80,4 +81,4 @@
 1. RenPy 8（py3 pickle 协议 4/5）真机样本验收（解析器已支持，无样本）。
 2. 引擎内置串扩充（`Page {}` 等带插值串需拆固定部分单独映射）。
 3. 长时间游玩稳定性（ poem 小游戏等动态文本路径）留用户手测。
-4. RenPy 准备流程 GUI 化（当前与 UE 同口径：准备 CLI、安装 GUI）。
+4. ~~RenPy 准备流程 GUI 化~~（2026-11-05 已完成：一键准备+安装，哈希漂移自动重跑）。

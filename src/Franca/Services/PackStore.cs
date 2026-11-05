@@ -11,6 +11,9 @@ public sealed class PackStore
     private readonly string Root;
     public PackStore(string? root = null) => Root = root ?? Path.Combine(AppContext.BaseDirectory, "packs");
 
+    // 包缓存根目录；静态翻译服务据此构造同根 PackStore 以复用逐条缓存。
+    public string RootPath => Root;
+
     public static bool IsValidLanguage(string language) => language.Length is > 0 and <= 35
         && language.All(c => char.IsAsciiLetterOrDigit(c) || c == '-');
 

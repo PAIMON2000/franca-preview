@@ -565,23 +565,17 @@ public partial class GamesPage : UserControl
         }
     }
 
-    // ---- RenPy tl 覆盖路线（实验）：详情区按钮，安装入口选择准备产物清单 ----
+    // ---- RenPy tl 覆盖路线（实验）：详情区按钮，一键准备+安装 ----
 
     private async void OnRenPyInstallClick(object sender, RoutedEventArgs e)
     {
         if (sender is FrameworkElement { Tag: GameInfo game }) await InstallRenPyAsync(game);
     }
 
-    // RenPy 安装主流程：选择准备产物清单 → 事务安装；详情区按钮与主按钮共用
+    // RenPy 安装主流程：产物已备好则直接装，缺失/过期则先自动准备再装；详情区按钮与主按钮共用
     private async Task InstallRenPyAsync(GameInfo game)
     {
         if (_busy || !game.RenPyCanInstall) return;
-        var dialog = new Microsoft.Win32.OpenFileDialog
-        {
-            Title = game.RenPyInstallHint,
-            Filter = "Franca prepared manifest (manifest.json)|manifest.json",
-        };
-        if (dialog.ShowDialog(Window.GetWindow(this)) != true) return;
 
         _busy = true;
         game.IsToggling = true;
@@ -589,7 +583,9 @@ public partial class GamesPage : UserControl
         RefreshRow(game);
         try
         {
-            await _host.GameTranslation.RenPyInstallAsync(game, dialog.FileName, new Progress<string>(AppLog.Write));
+            await _host.GameTranslation.RenPyPrepareAndInstallAsync(game,
+                new Progress<string>(AppLog.Write),
+                new Progress<(double Percent, string Text)>(p => game.SetInstallProgress(p.Percent, p.Text)));
         }
         catch (Exception ex)
         {
@@ -598,6 +594,7 @@ public partial class GamesPage : UserControl
         }
         finally
         {
+            game.SetInstallProgress(null, "");
             game.IsToggling = false;
             _busy = false;
             RefreshRow(game);
