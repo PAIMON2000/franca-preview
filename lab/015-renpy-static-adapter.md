@@ -27,7 +27,7 @@
 - 免除块标识复刻（label 游标语义、md5(get_code+"\r\n")、_1 去重后缀全部不需要），且对 RenPy 6/7/8 全版本通用。
 - 保留 [插值] 与 {#tag}；同名文本自动去重。损失：不能拆句/调序，同名异义文本会合并——v1 可接受。
 - 强制语言：tl/<语言>/ 下的 rpy 是常规脚本（init 阶段加载执行），放 `init python: config.language = "<语言>"` 即默认进译文（DDLC 无语言菜单）。卸载即还原。
-- 字体：同文件 `translate <语言> python: style.default.font = "tl/<语言>/xxx.ttf"` 在语言激活时执行；随包装 ttf（Noto Sans SC）。
+- 字体：**必须**用 `translate <语言> style default: font "tl/<语言>/xxx.ttf"` 块——真机实证 6.99.12 上 `translate python: style.default.font=...` 不生效（中文零宽不渲染，只剩 ASCII 尾巴）；随包装 ttf（Noto Sans SC）。
 
 **块标识算法仍在文档中存档（本文件保留原路线描述），未来需要 translate 块时实现**：digest = md5(逐语句 get_code().encode utf-8 + b"\r\n") 取 hex[:8]；id = label.replace('.','_')+'_'+digest，冲突加 _1…（6.99.12 实地核对：无 preexisting/alternate/tlid_only_considers_say；Label 游标是全局可变状态，restructure 先递归嵌套块再分组）。
 
@@ -57,10 +57,20 @@
 - 提取实绩：scripts.rpa 35 个 rpyc 全解析 0 错误；10821 条 Say → **8378 条去重文本**（对话 8350 + 菜单 16 + 混合 10），含 `[player]` 插值。
 - 新增 CLI：`--renpy-extract <gameDir> [--out <txt>] [--json]`（只读盘点 + 节点类型直方图）。tools/ 下证据：rpx.json、ddlc-strings.txt（不进库）。
 
-## 待办（下一步）
+## 验收记录（2026-11-05 真机闭环）
 
-1. 翻译 8378 条（复用现有提供者与 PackStore 每游戏缓存、批量、熔断）。
-2. 生成 game/tl/<lang>/strings.rpy（单文件、去重——StringTranslator.add 对重复 old 抛异常）+ main.rpy（init python 强制 config.language + translate python 字体覆盖 + 随包 ttf）。
-3. 事务安装/卸载/修复（tl 目录放置/移除），CLI 先行。
-4. 真机验收：DDLC 窗口化静音启动截图确认中文。
-5. 合成探针 --probe-renpy（手工构造 proto2 pickle 夹具测解析器与提取器）。
+- 准备二轮：8376/8376 全译、Missing 0（界面串补充提取后重跑，一轮缓存 8354 复用）。
+- 事务安装：游戏脚本现场重扫 SourceStringsSha256 与清单比对（防游戏更新漂移）→ State=installed。
+- 真机（窗口化 1280x720）：开场免责声明三页（不适宜儿童/焦虑抑郁警告/13 岁同意）全部中文渲染正常。自动化截图走 PrintWindow(flags=2) 可行，无黑屏。
+- **字体坑**：`translate python: style.default.font` 在 6.99.12 不生效（症状：中文零宽、整段只剩 URL 等 ASCII）；改 `translate <语言> style default:` 块后正常。生成器已修（RenPyStaticService 的 franca.rpy 模板双保险）。
+- **卸载坑**：安装事务日志漏盖 `Engine="renpy"`，RenPyInstallService.ReadJournals 过滤不到自己写的记录 → 卸载恒 not-installed、IsInstalled 同病。修复：安装时补盖章 + 旧记录按 `game/tl/` 路径前缀兼容识别。卸载往返 rolled-back、tl 目录移除验证通过；手改文件被正确判 Rollback conflict。
+- 已知边界：**screen 块内文本未提取**（`_()` 在 screen AST 里而非 PyCode——Load 页 empty slot/Return/侧栏导航按钮保持英文）；主菜单按钮是图片贴图（无文本可译）。screen AST 提取是后续增强项。
+- 合成探针 `--probe-renpy` 9/9 PASS（proto2 手工夹具）。
+- CLI 三命令：`--renpy-prepare <gameDir> <appId> <outputDir> <settings.json> <packsDir> <seconds> [--language=]`、`--renpy-install <gameDir> <preparedDir>`、`--renpy-uninstall <gameDir>`；另有只读 `--renpy-extract`。
+
+## 待办（后续增强）
+
+1. screen AST 文本提取（`_("...")` 在 screen 语言里，Load/Save/Settings/Help 页导航与空槽文案）。
+2. RenPy 8（py3 pickle 协议 4/5）真机样本验收（解析器已支持，无样本）。
+3. 接正式启用入口（游戏库 GUI），当前仅 CLI。
+4. 长时间游玩稳定性（ poem 小游戏等动态文本路径）留用户手测。

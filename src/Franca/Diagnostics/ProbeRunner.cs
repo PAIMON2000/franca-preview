@@ -34,6 +34,24 @@ internal static partial class ProbeRunner
                 return true;
             }
         }
+        if (args.Length > 0 && args[0] is "--renpy-prepare" or "--renpy-install" or "--renpy-uninstall")
+        {
+            // Real preparation contacts providers and writes caches + an outside-game staging
+            // directory; install/uninstall are real game writes (game must be stopped).
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            await RunRenPyCommandAsync(args);
+            app.Shutdown();
+            return true;
+        }
+        if (args.Length > 0 && args[0] == "--probe-renpy")
+        {
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            RenPyProbe.Run();
+            app.Shutdown();
+            return true;
+        }
         if (args.Length > 0 && args[0] == "--renpy-extract")
         {
             // Read-only: scan a Ren'Py game dir, list translatable strings as JSON.
@@ -62,6 +80,9 @@ internal static partial class ProbeRunner
                         Scripts = scan.Scripts.Count,
                         Errors = scan.Errors,
                         Histogram = Services.RenPy.RenPyExtractService.NodeHistogram(scan.Scripts),
+                        PyCodeSamples = args.Contains("--pycode")
+                            ? scan.Scripts.SelectMany(s => s.Stmts).SelectMany(DumpPyCode).Take(2000).ToArray()
+                            : null,
                         Counts = strings.GroupBy(s => s.Kind).ToDictionary(g => g.Key, g => g.Count()),
                         strings = args.Contains("--json") ? strings : null,
                     };

@@ -57,7 +57,7 @@ graph LR
 
 - 未声明边：无
 - 漂移边：无
-- 未归类文件：`src/Franca/Services/AnnouncementService.cs`、`src/Franca/Services/GitHubHttp.cs`、`src/Franca/Services/RenPy/PyPickle.cs`、`src/Franca/Services/RenPy/RenPyExtractService.cs`、`src/Franca/Services/RenPy/RenPyStringExtractor.cs`、`src/Franca/Services/RenPy/RpaFile.cs`、`src/Franca/Services/RenPy/RpycFile.cs`、`src/Franca/Services/UeFontHealthService.cs`、`src/Franca/Services/UePakInstallService.cs`
+- 未归类文件：`src/Franca/Services/AnnouncementService.cs`、`src/Franca/Services/GitHubHttp.cs`、`src/Franca/Services/RenPy/PyPickle.cs`、`src/Franca/Services/RenPy/RenPyExtractService.cs`、`src/Franca/Services/RenPy/RenPyInstallService.cs`、`src/Franca/Services/RenPy/RenPyStaticService.cs`、`src/Franca/Services/RenPy/RenPyStringExtractor.cs`、`src/Franca/Services/RenPy/RpaFile.cs`、`src/Franca/Services/RenPy/RpycFile.cs`、`src/Franca/Services/UeFontHealthService.cs`、`src/Franca/Services/UePakInstallService.cs`
 
 ## 模块契约
 
@@ -244,7 +244,7 @@ graph LR
 ### `diagnostics`
 
 - 职责：command-line probes and UI verification
-- 文件：28 个；声明依赖：`application`、`desktop`、`game`、`installer`、`runtime`、`translation`、`pack`、`shared`
+- 文件：30 个；声明依赖：`application`、`desktop`、`game`、`installer`、`runtime`、`translation`、`pack`、`shared`
 - 输入：
   - `--probe-* command-line arguments`
 - 输出：
