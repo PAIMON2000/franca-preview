@@ -20,14 +20,14 @@ internal static class ReleaseUpdateProbe
             string page = "https://github.com/PAIMON2000/franca-preview/releases/tag/v0.2.20261028",
             string asset = "Franca0.2-1028.exe") => JsonSerializer.Serialize(new
             { tag_name = tag, name = "Franca next", draft, prerelease, html_url = page, assets = new[] { new { name = asset } } });
-        var current = new Version(0, 1, 20261104);
+        var current = new Version(0, 1, 20261105);
         AvailableRelease? Parse(string value) => ReleaseUpdateService.ParseRelease(value, current);
         Check("version_metadata", ReleaseUpdateService.CurrentVersion == current
-            && ReleaseUpdateService.DisplayVersion == "Franca0.1-1104");
+            && ReleaseUpdateService.DisplayVersion == "Franca0.1-1105");
         Check("new_release", Parse(Payload())?.Name == "Franca next");
-        Check("equal_release", Parse(Payload("v0.1.20261104")) is null);
+        Check("equal_release", Parse(Payload("v0.1.20261105")) is null);
         Check("older_release", Parse(Payload("v0.1.20261103")) is null);
-        Check("next_day", Parse(Payload("v0.1.20261105")) is not null);
+        Check("next_day", Parse(Payload("v0.1.20261106")) is not null);
         Check("draft", Parse(Payload(draft: true)) is null);
         Check("prerelease", Parse(Payload(prerelease: true)) is null);
         Check("invalid_tag", Parse(Payload("Franca0.1-1104")) is null);
