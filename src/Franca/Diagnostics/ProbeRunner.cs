@@ -34,6 +34,48 @@ internal static partial class ProbeRunner
                 return true;
             }
         }
+        if (args.Length > 0 && args[0] == "--renpy-extract")
+        {
+            // Read-only: scan a Ren'Py game dir, list translatable strings as JSON.
+            // --renpy-extract <gameDir> [--out <txt>] [--json]
+            AttachConsole(-1);
+            Console.OutputEncoding = System.Text.Encoding.UTF8;
+            if (args.Length < 2)
+            {
+                Console.WriteLine("RENPY_ERROR\t--renpy-extract <gameDir> [--out <txt>] [--json]");
+                Environment.ExitCode = 1;
+            }
+            else
+            {
+                try
+                {
+                    var scan = Services.RenPy.RenPyExtractService.Scan(args[1]);
+                    var strings = Services.RenPy.RenPyExtractService.ExtractStrings(scan);
+                    var outArg = Array.Find(args, a => a == "--out");
+                    var outPath = outArg != null && Array.IndexOf(args, outArg) + 1 < args.Length
+                        ? args[Array.IndexOf(args, outArg) + 1] : null;
+                    if (outPath != null)
+                        await File.WriteAllLinesAsync(outPath, strings.Select(s => s.Text));
+                    var payload = new
+                    {
+                        scan.ScriptRoot,
+                        Scripts = scan.Scripts.Count,
+                        Errors = scan.Errors,
+                        Histogram = Services.RenPy.RenPyExtractService.NodeHistogram(scan.Scripts),
+                        Counts = strings.GroupBy(s => s.Kind).ToDictionary(g => g.Key, g => g.Count()),
+                        strings = args.Contains("--json") ? strings : null,
+                    };
+                    Console.WriteLine(JsonSerializer.Serialize(payload));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"RENPY_ERROR\t{ex.GetType().Name}\t{ex.Message}");
+                    Environment.ExitCode = 1;
+                }
+            }
+            app.Shutdown();
+            return true;
+        }
         if (args.Length > 0 && args[0] == "--probe-release-update")
         {
             AttachConsole(-1);
