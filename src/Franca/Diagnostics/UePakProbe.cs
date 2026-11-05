@@ -31,6 +31,7 @@ internal static class UePakProbe
             Check("index_varint_64bit", TestVarintBoundary());
             Check("footer_17byte_prefix", TestFooterPrefix());
             Check("cityhash_known_vector", CityHash64.Hash([]) == 0x9AE16A3B2F90404FUL);
+            Check("oodle_method_routing", TestOodleRouting());
             Check("fnv_empty_offset_basis", Fnv64.HashPath("", 7) == 0xcbf29ce48422232cUL);
             Check("fnv_path_case", Fnv64.HashPath("Game/Boss战.uasset", 42) == Fnv64.HashPath("game/boss战.uasset", 42));
             Check("pak_wire_contract", TestWireContract(root));
@@ -50,6 +51,51 @@ internal static class UePakProbe
 
         Console.WriteLine($"RESULT\tUEPAK\tfailures={failures}");
         if (failures > 0) Environment.ExitCode = 1;
+    }
+
+    // Oodle 路由：把 writer 产物索引中的方法名槽从 "Zlib" 改成 "Oodle"（数据仍是 zlib 流，
+    // 假解压器内部用 ZLibStream 真解压），验证 1) 未提供 oodle 时明确拒绝 2) 提供后按块
+    // 期望大小路由成功 3) 返回值不符时报大小错误。不加载任何真实 Oodle dll。
+    private static bool TestOodleRouting()
+    {
+        var payload = Encoding.UTF8.GetBytes(string.Concat(Enumerable.Repeat("秋风萧瑟天气凉，草木摇落露为霜。", 300)));
+        var pak = PakFileWriter.Write("../../../", 42, new List<PakFileWriter.Item>
+        {
+            new() { Path = "Game/Content/Loc/UI.locres", Data = payload, Compress = true },
+        });
+        var zlibSlot = Encoding.ASCII.GetBytes("Zlib");
+        var at = -1;
+        for (var i = 0; i + 4 <= pak.Length; i++)
+            if (pak[i] == zlibSlot[0] && pak.AsSpan(i, 4).SequenceEqual(zlibSlot)) { at = i; break; }
+        if (at < 0) return false;
+        Encoding.ASCII.GetBytes("Oodle").CopyTo(pak, at);
+
+        try
+        {
+            using var denied = PakFileReader.FromBytes(pak);
+            denied.Extract(denied.Find("Game/Content/Loc/UI.locres")!);
+            return false;
+        }
+        catch (NotSupportedException) { }
+
+        int FakeOodle(byte[] src, byte[] dst)
+        {
+            using var zs = new System.IO.Compression.ZLibStream(new MemoryStream(src), System.IO.Compression.CompressionMode.Decompress);
+            var read = zs.Read(dst, 0, dst.Length);
+            return read == dst.Length ? read : -1;
+        }
+        using (var ok = PakFileReader.FromBytes(pak, FakeOodle))
+            if (!ok.Extract(ok.Find("Game/Content/Loc/UI.locres")!).SequenceEqual(payload)) return false;
+
+        int WrongSize(byte[] src, byte[] dst) => 1;
+        try
+        {
+            using var bad = PakFileReader.FromBytes(pak, WrongSize);
+            bad.Extract(bad.Find("Game/Content/Loc/UI.locres")!);
+            return false;
+        }
+        catch (FormatException) { }
+        return true;
     }
 
     private static bool TestLocResRoundtrip()

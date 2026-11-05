@@ -95,6 +95,55 @@ internal static class UeStaticProbe
             }
             Check("source_pak_unchanged", (await File.ReadAllBytesAsync(pakPath)).SequenceEqual(original));
             Check("game_no_artifacts", Directory.GetFiles(game, "*", SearchOption.AllDirectories).Length == 1);
+
+            // Partial official localization: target slot lacks some source keys (real case:
+            // Homeworld 3 Game.locres ships zh-Hans with ~5% of en keys absent). Prepare must
+            // succeed, append missing entries translated with correct hashes, overwrite matched
+            // entries as usual, and still refuse when a shared key's source hash drifts.
+            var game2 = Path.Combine(root, "game2");
+            Directory.CreateDirectory(game2);
+            var pakPath2 = Path.Combine(game2, "partial.pak");
+            const string sourcePath2 = "Game/Content/Localization/UI/en/UI.locres";
+            const string targetPath2 = "Game/Content/Localization/UI/zh-Hans/UI.locres";
+            var partialSource = LocResFile.FromDictionary(new() { ["UI"] = new() { ["hello"] = "Hello", ["missing-key"] = "New content" } });
+            var partialTarget = LocResFile.Parse(partialSource.Serialize());
+            partialTarget.Namespaces[0].Entries.RemoveAll(e => e.Key == "missing-key");
+            foreach (var e in partialTarget.Namespaces.SelectMany(n => n.Entries)) e.Value = "官方";
+            await File.WriteAllBytesAsync(pakPath2, PakFileWriter.Write("../../../", 42, new List<PakFileWriter.Item>
+            {
+                new() { Path = sourcePath2, Data = partialSource.Serialize(), Compress = true },
+                new() { Path = targetPath2, Data = partialTarget.Serialize(), Compress = true },
+            }));
+            var partialReport = await service.PrepareAsync(game2, pakPath2, 999993, Path.Combine(root, "output2"),
+                new[] { sourcePath2 }, settings, null, CancellationToken.None);
+            Check("partial_target_accepted", !partialReport.Incomplete);
+            using (var prepared2 = PakFileReader.Open(Path.Combine(partialReport.OutputDirectory, "pakchunk99-WindowsNoEditor_P.pak")))
+            {
+                var loc2 = LocResFile.Parse(prepared2.Extract(prepared2.Find(targetPath2)!));
+                var ui2 = loc2.Namespaces.Single(n => n.Name == "UI");
+                var added = ui2.Entries.Single(e => e.Key == "missing-key");
+                Check("missing_key_appended_translated", added.Value == "译:New content"
+                    && ui2.Entries.Single(e => e.Key == "hello").Value == "译:Hello");
+                Check("added_entry_hashes_correct", added.KeyHash == CityHash64.StringHash32("missing-key")
+                    && added.SourceStringHash == partialSource.Namespaces[0].Entries.Single(e => e.Key == "missing-key").SourceStringHash);
+            }
+            partialTarget.Namespaces[0].Entries[0].SourceStringHash++;
+            await File.WriteAllBytesAsync(pakPath2, PakFileWriter.Write("../../../", 42, new List<PakFileWriter.Item>
+            {
+                new() { Path = sourcePath2, Data = partialSource.Serialize(), Compress = true },
+                new() { Path = targetPath2, Data = partialTarget.Serialize(), Compress = true },
+            }));
+            try
+            {
+                await service.PrepareAsync(game2, pakPath2, 999993, Path.Combine(root, "output3"),
+                    new[] { sourcePath2 }, settings, null, CancellationToken.None);
+                Check("hash_drift_still_refused", false);
+            }
+            catch (InvalidDataException)
+            {
+                Check("hash_drift_still_refused", true);
+            }
+
             try
             {
                 await service.PrepareAsync(game, pakPath, 999991, Path.Combine(game, "output"), new[] { sourcePath }, settings, null, CancellationToken.None);

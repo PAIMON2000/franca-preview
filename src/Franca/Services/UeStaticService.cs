@@ -37,6 +37,13 @@ public sealed partial class UeStaticService
                 throw new ArgumentException("Game, output and cache directories cannot traverse a reparse point");
     }
 
+    private static LocResFile.LocResNamespace CreateNamespace(LocResFile file, string name)
+    {
+        var ns = new LocResFile.LocResNamespace { Name = name, Hash = CityHash64.StringHash32(name) };
+        file.Namespaces.Add(ns);
+        return ns;
+    }
+
     public static IReadOnlyList<Resource> Inspect(string pakPath, string sourceCulture = "en", string targetCulture = "zh-Hans")
     {
         using var pak = PakFileReader.Open(pakPath);
@@ -96,12 +103,18 @@ public sealed partial class UeStaticService
             throw new ArgumentException("An explicitly selected resource is absent or has no target slot");
         var documents = selected.Select(r => (Resource: r, Source: LocResFile.Parse(pak.Extract(pak.Find(r.SourcePath)!)),
             Target: LocResFile.Parse(pak.Extract(pak.Find(r.TargetPath)!)))).ToArray();
-        // Match keys and source hashes before any provider requests; refuse changed source revisions.
+        // Match source hashes before any provider requests; refuse changed source revisions.
+        // Partially localized games have target slots missing source keys (official translation
+        // lags content updates): missing keys are appended below; only hash drift on keys
+        // present in both refuses.
         foreach (var (_, source, target) in documents)
         {
-            var targetKeys = target.Namespaces.SelectMany(n => n.Entries.Select(e => (n.Name, e.Key, e.SourceStringHash))).ToHashSet();
-            var sourceKeys = source.Namespaces.SelectMany(n => n.Entries.Select(e => (n.Name, e.Key, e.SourceStringHash))).ToHashSet();
-            if (!sourceKeys.IsSubsetOf(targetKeys)) throw new InvalidDataException("Source keys are missing or source hashes differ in target locres");
+            var targetKeys = target.Namespaces.SelectMany(n => n.Entries.Select(e => (Key: (n.Name, e.Key), e.SourceStringHash)))
+                .ToDictionary(e => e.Key, e => e.SourceStringHash);
+            foreach (var ns in source.Namespaces)
+                foreach (var entry in ns.Entries)
+                    if (targetKeys.TryGetValue((ns.Name, entry.Key), out var hash) && hash != entry.SourceStringHash)
+                        throw new InvalidDataException("Source hash differs in target locres: " + ns.Name + "/" + entry.Key);
         }
         var texts = documents.SelectMany(d => d.Source.Namespaces).SelectMany(n => n.Entries).Select(e => e.Value)
             .Distinct(StringComparer.Ordinal).ToArray();
@@ -118,6 +131,19 @@ public sealed partial class UeStaticService
                         || !sourceEntries.TryGetValue(entry.Key, out var text)) continue; // target-only native entries
                     entry.Value = result.Translations.GetValueOrDefault(text) ?? text;
                 }
+            // Append source keys the target slot lacks (partial official localization).
+            foreach (var ns in source.Namespaces)
+            {
+                var targetNs = target.Namespaces.FirstOrDefault(n => n.Name == ns.Name);
+                foreach (var entry in ns.Entries)
+                {
+                    if (targetNs != null && targetNs.Entries.Any(t => t.Key == entry.Key)) continue;
+                    targetNs ??= CreateNamespace(target, ns.Name);
+                    targetNs.Entries.Add(new LocResFile.LocResEntry { Key = entry.Key,
+                        Value = result.Translations.GetValueOrDefault(entry.Value) ?? entry.Value,
+                        KeyHash = CityHash64.StringHash32(entry.Key), SourceStringHash = entry.SourceStringHash });
+                }
+            }
             // UE 4.26.2 rejected the compressed overlay despite UE5 UnrealPak verification.
             // Localization-only overlays are small; use uncompressed payloads until legacy block decoding is verified.
             items.Add(new PakFileWriter.Item { Path = resource.TargetPath, Data = target.Serialize(), Compress = false });

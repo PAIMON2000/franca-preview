@@ -14,6 +14,26 @@ internal static partial class ProbeRunner
 
     public static async Task<bool> TryRunAsync(App app, string[] args)
     {
+        // 全局选项：--oodle=<本机 oo2core_*.dll 路径>，为 UE CLI 命令提供 Oodle 解压能力。
+        var oodleArg = Array.Find(args, a => a.StartsWith("--oodle=", StringComparison.Ordinal));
+        if (oodleArg != null)
+        {
+            args = args.Where(a => !a.StartsWith("--oodle=", StringComparison.Ordinal)).ToArray();
+            var oodlePath = oodleArg[8..];
+            try
+            {
+                Services.UePak.Oodle.TryLoad(oodlePath);
+            }
+            catch (Exception ex)
+            {
+                AttachConsole(-1);
+                Console.OutputEncoding = System.Text.Encoding.UTF8;
+                Console.WriteLine($"UE_ERROR\t无法加载 Oodle dll：{ex.Message}");
+                app.Shutdown();
+                Environment.ExitCode = 1;
+                return true;
+            }
+        }
         if (args.Length > 0 && args[0] == "--probe-release-update")
         {
             AttachConsole(-1);

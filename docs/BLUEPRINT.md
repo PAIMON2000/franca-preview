@@ -129,7 +129,7 @@ graph LR
 ### `installer`
 
 - 职责：runtime installation；configuration health；repair；journalled installation and interrupted-install recovery；static archive patching for Touhou (ZUN engine) data packages；thcrap runtime translation patching for Touhou (ZUN engine) games；procedural localized menu sprite generation for Touhou th10/th11 (title.anm PNGs)；experimental UE v11 pak, locres and restricted cooked FText DataTable preparation outside game directories
-- 文件：20 个；声明依赖：`game`、`translation`、`runtime`、`pack`、`shared`
+- 文件：21 个；声明依赖：`game`、`translation`、`runtime`、`pack`、`shared`
 - 输入：
   - `explicit relay address`
   - `target game directory`

@@ -1,8 +1,10 @@
 # Franca 开发进度
 
-更新：2026-11-03。本文件是当前状态唯一入口；[路线图](ROADMAP.md) 维护执行顺序，[兼容性矩阵](COMPATIBILITY.md) 维护逐游戏验收边界。详细开发经过保留在内部归档（不随仓库公开）。
+更新：2026-11-05。本文件是当前状态唯一入口；[路线图](ROADMAP.md) 维护执行顺序，[兼容性矩阵](COMPATIBILITY.md) 维护逐游戏验收边界。详细开发经过保留在内部归档（不随仓库公开）。
 
 ## 当前结论
+
+2026-11-05 **UE5/IoStore 判决性实验真机通过**（排队项②闭环）：MECCHA CHAMELEON（UE5，IoStore .ucas/.utoc 容器）+ 家园 3 两款真机走完全链路。结论：**UE5 容器游戏接受 legacy pak 覆盖包**（pakchunk99-Windows_P.pak 放 Paks 目录即生效，MECCHA 菜单"创建服务器/寻找服务器/退出游戏"出现简中译文）——IoStore 写入支持可长期回避，仅当某游戏文本确在容器内时才需评估 utoc/ucas 读取。配套代码落地：①`UePak/Oodle.cs` 新增 Oodle 解压（LoadLibrary 本机 oo2core dll + P/Invoke，**DllImport 必须 CharSet.Unicode**，默认 ANSI 编组致 LoadLibraryW 必败；dll 不随 Franca 分发，CLI 用 `--oodle=<路径>` 注入）；②`PakFileReader` Extract 按索引压缩方法名路由（"Oodle" 前缀），探针加 `oodle_method_routing`（ue-pak 10→11）；③`UeStaticService` 部分官方翻译修复——目标槽缺键不再拒绝、缺失键补入译文（新 `CreateNamespace`），共有键哈希漂移仍拒绝，探针 44→50；④`UePakInstallService` 两处真机 bug：`HashFile` 改流式 SHA256（>2GB 不炸）、基线哈希比较改 OrdinalIgnoreCase。真机插曲：MECCHA 游戏文件在测试期间被 Steam 热更新（appmanifest lastupdated 与文件 mtime 吻合），非安装器写入；卸载已验证（事务回滚、覆盖包移除），家园 3 同样安装→验证→卸载还原。Release 0 错误；ue-pak 11 / ue-static 50 / ue-install 18 / navigation 76 / startup 26 / blueprint 14 / architecture 51 / dictionary 33 全过。引擎页 `engines.note.unreal` ×15 语言同步（UE5 容器已实证可覆盖，加密 pak/IoStore 写入不支持）。未改版本号、不触发更新检查（实验验证非功能变更）。
 
 2026-11-04 引擎识别新增 MapleStory（冒险岛，Nexon/Wizet 自研 2D 引擎）：应用户询问「能否支持冒险岛」调研后结论——经典端游为 Wizet 自研引擎 + 在线 MMO 反作弊环境（GameGuard/HackShield/NGS）+ 国服已有官中，三条现有翻译路线（Unity 注入/东方 thcrap/UE pak 覆盖）均不适用，明确**不支持**。落地为仅识别条目：`GameEngine.MapleStory`、检测签名 `MapleStory*.exe + 限深 2 的 *.wz 数据包`（依据公开客户端布局，暂无本机样本，签名注释已注明待真机复核）、`EngineSupportCatalog` 末尾追加（IsSupported=false 走「仅识别」徽标），新增备注 key `engines.note.online` ×15 语言（用户口径：网络游戏存在被视为外挂的风险，不支持网络游戏）。导航探针 `engine_catalog_covers_engines` 12→13 并加 `engine_maplestory_recognized_online_unsupported`（75→76 项全过）。Release 0 错误。本次不改版本号、不触发更新检查（识别条目非功能变更）。
 

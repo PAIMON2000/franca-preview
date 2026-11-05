@@ -14,6 +14,7 @@ public sealed class PakFileReader : IDisposable
     public const uint SupportedVersion = 11;
 
     private readonly Func<long, long, byte[]> _readAt;
+    private readonly Func<byte[], byte[], int>? _oodle;
     private readonly long _fileSize;
     private readonly FileStream? _file;
     private readonly List<PakEntry> _entries = new();
@@ -29,12 +30,12 @@ public sealed class PakFileReader : IDisposable
     public IReadOnlyList<PakEntry> Entries => _entries;
     public IReadOnlyDictionary<ulong, int> PathHashIndex => _pathHashIndex;
 
-    public static PakFileReader Open(string path)
+    public static PakFileReader Open(string path, Func<byte[], byte[], int>? oodle = null)
     {
         var fs = File.OpenRead(path);
         try
         {
-            return new PakFileReader(fs);
+            return new PakFileReader(fs, oodle);
         }
         catch
         {
@@ -43,31 +44,33 @@ public sealed class PakFileReader : IDisposable
         }
     }
 
-    public static PakFileReader FromBytes(byte[] data) => new(data);
+    public static PakFileReader FromBytes(byte[] data, Func<byte[], byte[], int>? oodle = null) => new(data, oodle);
 
-    private PakFileReader(byte[] data) : this((off, len) =>
+    private PakFileReader(byte[] data, Func<byte[], byte[], int>? oodle) : this((off, len) =>
     {
         var b = new byte[len];
         Buffer.BlockCopy(data, (int)off, b, 0, (int)len);
         return b;
-    }, data.LongLength, null)
+    }, data.LongLength, null, oodle)
     {
     }
 
-    private PakFileReader(FileStream fs) : this((off, len) =>
+    private PakFileReader(FileStream fs, Func<byte[], byte[], int>? oodle) : this((off, len) =>
     {
         var b = new byte[len];
         fs.Position = off;
         fs.ReadExactly(b);
         return b;
-    }, fs.Length, fs)
+    }, fs.Length, fs, oodle)
     {
     }
 
-    private PakFileReader(Func<long, long, byte[]> readAtRaw, long fileSize, FileStream? file)
+    private PakFileReader(Func<long, long, byte[]> readAtRaw, long fileSize, FileStream? file,
+        Func<byte[], byte[], int>? oodle)
     {
         _file = file;
         _fileSize = fileSize;
+        _oodle = oodle ?? Oodle.DefaultDecompressor;
         byte[] ReadAt(long off, long len)
         {
             if (off < 0 || len < 0 || off + len > fileSize)
@@ -227,12 +230,25 @@ public sealed class PakFileReader : IDisposable
             VerifyHash(full, data);
             return data;
         }
+        var oodleMethod = full.CompressionMethod != 0 && full.CompressionMethod <= CompressionMethods.Count
+            && CompressionMethods[(int)full.CompressionMethod - 1].StartsWith("Oodle", StringComparison.OrdinalIgnoreCase);
         using var output = new MemoryStream();
-        foreach (var (start, end) in full.Blocks)
+        for (var bi = 0; bi < full.Blocks.Count; bi++)
         {
+            var (start, end) = full.Blocks[bi];
             var chunk = new byte[(int)(end - start)];
             Buffer.BlockCopy(data, (int)start - p, chunk, 0, chunk.Length);
-            if (chunk.Length > 0 && chunk[0] == 0x78)
+            if (oodleMethod)
+            {
+                if (_oodle == null)
+                    throw new NotSupportedException($"条目 {entry.Path} 使用 Oodle 压缩：请通过 --oodle 指定本机 oo2core_*.dll（游戏自带，不随 Franca 分发）");
+                var expected = (int)Math.Min(full.CompressionBlockSize, full.UncompressedSize - (long)bi * full.CompressionBlockSize);
+                var buffer = new byte[expected];
+                if (_oodle(chunk, buffer) != expected)
+                    throw new FormatException($"条目 {entry.Path} Oodle 解压大小不符（块 {bi}）");
+                output.Write(buffer, 0, expected);
+            }
+            else if (chunk.Length > 0 && chunk[0] == 0x78)
             {
                 using var zs = new ZLibStream(new MemoryStream(chunk), CompressionMode.Decompress);
                 zs.CopyTo(output);

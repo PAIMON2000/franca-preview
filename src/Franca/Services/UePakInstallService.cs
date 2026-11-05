@@ -36,7 +36,12 @@ public sealed class UePakInstallService
     public UePakInstallService(string gameDirectory)
     { _game = Path.GetFullPath(gameDirectory).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar; }
 
-    private static string HashFile(string path) => Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(path)));
+    // 流式哈希：游戏 pak 可超过 2GB，不能 ReadAllBytes
+    private static string HashFile(string path)
+    {
+        using var stream = File.OpenRead(path);
+        return Convert.ToHexString(SHA256.HashData(stream));
+    }
 
     private string Safe(string relative) => InstallationTransaction.SafePath(_game, relative);
 
@@ -106,7 +111,7 @@ public sealed class UePakInstallService
         InstallationTransaction.Recover(_game, log ?? (_ => { }));
         var preparedHash = HashFile(preparedPakPath);
         var original = Safe(originalPakRelative);
-        if (!File.Exists(original) || HashFile(original) != expectedOriginalSha256)
+        if (!File.Exists(original) || !string.Equals(HashFile(original), expectedOriginalSha256, StringComparison.OrdinalIgnoreCase))
             throw new InvalidDataException("Game pak baseline mismatch (updated game or wrong directory); refusing to install.");
         var targetRelative = pakDirectoryRelative.TrimEnd('/', '\\') + "/" + overrideFileName;
         var target = Safe(targetRelative);
@@ -136,7 +141,8 @@ public sealed class UePakInstallService
             var incoming = Path.Combine(record, "incoming");
             File.Copy(preparedPakPath, incoming, true);
             File.Move(incoming, target, true);
-            if (HashFile(target) != preparedHash || HashFile(original) != expectedOriginalSha256)
+            if (!string.Equals(HashFile(target), preparedHash, StringComparison.Ordinal)
+                || !string.Equals(HashFile(original), expectedOriginalSha256, StringComparison.OrdinalIgnoreCase))
                 throw new IOException("UE pak verification failed after write.");
             using (var check = UePak.PakFileReader.Open(target)) { }
             journal.Status = "committed";
