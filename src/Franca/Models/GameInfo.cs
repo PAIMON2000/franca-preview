@@ -43,7 +43,10 @@ public static class GameEngineExtensions
 
     public static bool IsUe(this GameEngine engine) => engine is GameEngine.Unreal;
 
-    // 可安装翻译的引擎：Unity 注入 + 东方自研引擎 thcrap 运行时路线（TouhouThcrapService）
+    public static bool IsRenPy(this GameEngine engine) => engine is GameEngine.RenPy;
+
+    // 可安装翻译的引擎：Unity 注入 + 东方自研引擎 thcrap 运行时路线（TouhouThcrapService）。
+    // UE（pak 覆盖）与 RenPy（tl 目录覆盖）走详情区安装按钮组，见 GameInfo 对应属性块。
     public static bool IsInstallable(this GameEngine engine) =>
         engine.IsUnity() || engine is GameEngine.Touhou;
 }
@@ -86,16 +89,18 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
         RaiseChanged(nameof(InstallError));
         RaiseChanged(nameof(HasInstallError));
     }
-    public bool IsSupported => Engine.IsInstallable() || Engine.IsUe();
-    // 详情区启用开关仅 Unity/Touhou 注入路线；UE 用安装按钮组，不用开关
+    public bool IsSupported => Engine.IsInstallable() || Engine.IsUe() || Engine.IsRenPy();
+    // 详情区启用开关仅 Unity/Touhou 注入路线；UE/RenPy 用安装按钮组，不用开关
     public bool HasToggle => Engine.IsInstallable();
     public string LibraryTitle => string.IsNullOrWhiteSpace(TranslatedName) ? Name : TranslatedName;
     public string LibrarySubtitle => LibraryTitle == Name ? EngineLabel : Name;
     public string EnableTranslationLabel => Services.UiStrings.Get("game.enable");
     public string PrimaryActionLabel => IsToggling ? Services.UiStrings.Get("ui.working")
         : IsUe ? (UeInstalled ? LaunchLabel : UeInstallLabel)
+        : IsRenPy ? (RenPyInstalled ? LaunchLabel : RenPyInstallLabel)
         : IsActive ? LaunchLabel : EnableTranslationLabel;
     public bool CanPrimaryAction => IsUe ? (UeInstalled ? CanLaunch : UeCanInstall)
+        : IsRenPy ? (RenPyInstalled ? CanLaunch : RenPyCanInstall)
         : IsActive ? CanLaunch : CanToggle;
     public string LibraryStatusText => IsToggling ? Services.UiStrings.Get("ui.working")
         : NeedsTranslationRepair ? Services.UiStrings.Get("health.problem")
@@ -103,9 +108,10 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
         : IsActive ? Services.UiStrings.Get("ui.configured")
         : !string.IsNullOrEmpty(AvailableOfficialSupportLabel) ? AvailableOfficialSupportLabel
         : IsUe ? (UeInstalled ? Services.UiStrings.Get("game.ready") : Services.UiStrings.Get("game.notready"))
+        : IsRenPy ? (RenPyInstalled ? Services.UiStrings.Get("game.ready") : Services.UiStrings.Get("game.notready"))
         : !IsSupported ? Services.UiStrings.Get("ui.unsupported") : Services.UiStrings.Get("game.notready");
     public System.Windows.Media.Brush LibraryStatusColor => (System.Windows.Media.Brush)
-        System.Windows.Application.Current.FindResource(NeedsTranslationRepair ? "WarnBrush" : IsActive || UeInstalled ? "OkBrush" : "TextSecondaryBrush");
+        System.Windows.Application.Current.FindResource(NeedsTranslationRepair ? "WarnBrush" : IsActive || UeInstalled || RenPyInstalled ? "OkBrush" : "TextSecondaryBrush");
     public bool CanRepairTranslationConfig => Engine.IsInstallable() && IsReady && !IsToggling;
     public string RepairConfigLabel => Services.UiStrings.Get("health.repair");
     public string RepairConfigHint => Services.UiStrings.Get("health.hint");
@@ -128,6 +134,17 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
     public string UeInstallLabel => Services.UiStrings.Get("game.enable");
     public string UeInstallHint => Services.UiStrings.Get("ue.install.hint");
     public string UeRepairLabel => Services.UiStrings.Get("health.repair");
+
+    // ---- RenPy tl 覆盖路线（实验）：状态读事务日志；安装入口在详情区选择准备产物清单 ----
+    public bool IsRenPy => Engine.IsRenPy();
+    public bool RenPyInstalled => IsRenPy && Services.RenPy.RenPyInstallService.IsInstalled(Path);
+    public bool RenPyNotInstalled => IsRenPy && !RenPyInstalled;
+    public bool RenPyCanInstall => IsRenPy && !RenPyInstalled && !IsToggling;
+    public bool RenPyCanManage => RenPyInstalled && !IsToggling;
+    // 按钮文案与 Unity 行统一用「启用翻译」；hint 说明需要选择准备产物清单
+    public string RenPyInstallLabel => Services.UiStrings.Get("game.enable");
+    public string RenPyInstallHint => Services.UiStrings.Get("renpy.install.hint");
+    public string RenPyUninstallLabel => Services.UiStrings.Get("uninstall.button");
 
     public string TranslatedName { get; set; } = "";
     public string NameSource { get; set; } = ""; // official / machine / failed / en
@@ -166,6 +183,7 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
     // 官方语言标注最优先（有官中的游戏这条信息最有价值）；其次非可安装引擎占位、停用/就绪/未启用
     public string StatusText => !string.IsNullOrEmpty(AvailableOfficialSupportLabel) ? AvailableOfficialSupportLabel
         : IsUe ? Services.UiStrings.Get(UeInstalled ? "game.ready" : "game.notready")
+        : IsRenPy ? Services.UiStrings.Get(RenPyInstalled ? "game.ready" : "game.notready")
         : !Engine.IsInstallable() ? "—"
         : IsDisabledByUser ? Services.UiStrings.Get("game.disabled")
         : Services.UiStrings.Get(IsReady ? "game.ready" : "game.notready");
@@ -189,13 +207,15 @@ public class GameInfo : System.ComponentModel.INotifyPropertyChanged
     // 开关可用性：仅可安装引擎且不在切换过程中
     public bool CanToggle => Engine.IsInstallable() && !IsToggling;
 
-    // 经 Steam 启动：翻译已启用（Unity 激活 / UE 覆盖包已安装）且有 appId 的 Steam 游戏
-    public bool CanLaunch => (IsActive || UeInstalled) && AppId is > 0 && !IsToggling;
+    // 经 Steam 启动：翻译已启用（Unity 激活 / UE 覆盖包已安装 / RenPy tl 已安装）且有 appId 的 Steam 游戏
+    public bool CanLaunch => (IsActive || UeInstalled || RenPyInstalled) && AppId is > 0 && !IsToggling;
     public string LaunchLabel => Services.UiStrings.Get("games.play");
     public string LaunchHint => Services.UiStrings.Get("games.play.hint");
 
     public string ActionText => IsUe
         ? Services.UiStrings.Get(UeInstalled ? "game.ready" : "game.enable")
+        : IsRenPy
+        ? Services.UiStrings.Get(RenPyInstalled ? "game.ready" : "game.enable")
         : !Engine.IsInstallable()
         ? Services.UiStrings.Get("ui.unsupported")
         : Services.UiStrings.Get(IsReady ? "game.ready" : "game.enable");

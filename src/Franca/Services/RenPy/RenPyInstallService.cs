@@ -161,7 +161,16 @@ public sealed class RenPyInstallService
                 if (string.Equals(current, entry.OriginalHash, StringComparison.OrdinalIgnoreCase)) continue;
                 if (!string.Equals(current, entry.InstalledHash, StringComparison.OrdinalIgnoreCase))
                     throw new IOException("Rollback conflict: " + target);
-                if (entry.OriginalHash is null) File.Delete(target);
+                if (entry.OriginalHash is null)
+                {
+                    File.Delete(target);
+                    // Ren'Py compiled the installed .rpy to a sibling .rpyc on
+                    // first launch; that artifact is not in the journal, so
+                    // remove it explicitly or a stale overlay keeps loading.
+                    var compiled = InstallationTransaction.SafePath(_game,
+                        Path.ChangeExtension(entry.Path, ".rpyc"));
+                    if (File.Exists(compiled)) File.Delete(compiled);
+                }
                 else
                 {
                     var backup = InstallationTransaction.SafePath(Path.Combine(record, "backup"), entry.Path);

@@ -131,6 +131,17 @@
                                             IsEnabled="{Binding UeCanManage}"
                                             Click="OnUeUninstallClick" Tag="{Binding}" Padding="12,5"/>
                                 </StackPanel>
+                                <!-- RenPy tl 覆盖路线（实验）：安装入口选择准备产物清单；已安装后提供移除 -->
+                                <StackPanel Orientation="Horizontal" Visibility="{Binding IsRenPy, Converter={StaticResource BoolToVis}}" Margin="0,0,20,0">
+                                    <Button Content="{Binding RenPyInstallLabel}" ToolTip="{Binding RenPyInstallHint}"
+                                            Visibility="{Binding RenPyNotInstalled, Converter={StaticResource BoolToVis}}"
+                                            IsEnabled="{Binding RenPyCanInstall}"
+                                            Click="OnRenPyInstallClick" Tag="{Binding}" Padding="12,5" Margin="0,0,8,0"/>
+                                    <Button Content="{Binding RenPyUninstallLabel}" ToolTip="{Binding UninstallHint}"
+                                            Visibility="{Binding RenPyInstalled, Converter={StaticResource BoolToVis}}"
+                                            IsEnabled="{Binding RenPyCanManage}"
+                                            Click="OnRenPyUninstallClick" Tag="{Binding}" Padding="12,5"/>
+                                </StackPanel>
                             </WrapPanel>
                         </StackPanel>
                     </Border>

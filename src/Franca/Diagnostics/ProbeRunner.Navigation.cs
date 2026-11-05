@@ -145,9 +145,11 @@ internal static partial class ProbeRunner
         Check("engine_touhou_supported", EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.Touhou).IsSupported);
         Check("engine_unreal_supported_experimental", EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.Unreal).IsSupported
             && EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.Unreal).BadgeText == UiStrings.Get("engines.experimental"));
+        Check("engine_renpy_supported_experimental", EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.RenPy).IsSupported
+            && EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.RenPy).BadgeText == UiStrings.Get("engines.experimental")
+            && EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.RenPy).Note == UiStrings.Get("engines.note.renpy"));
         Check("engine_supported_all_experimental_badge", EngineSupportCatalog.All.Where(e => e.IsSupported)
             .All(e => e.BadgeText == UiStrings.Get("engines.experimental")));
-        Check("engine_renpy_recognized_only", !EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.RenPy).IsSupported);
         Check("engine_maplestory_recognized_online_unsupported", !EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.MapleStory).IsSupported
             && EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.MapleStory).BadgeText == UiStrings.Get("engines.recognized")
             && EngineSupportCatalog.All.Single(e => e.Engine == GameEngine.MapleStory).Note == UiStrings.Get("engines.note.online")

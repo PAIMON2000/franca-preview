@@ -338,6 +338,47 @@ public sealed class GameTranslationService
         finally { _operations.Release(); }
     }
 
+    // ---- RenPy tl 覆盖工作流：安装/卸载，全部要求游戏已停止 ----
+
+    public async Task<Services.RenPy.RenPyInstallService.Result> RenPyInstallAsync(GameInfo game,
+        string preparedManifestPath, IProgress<string> progress, CancellationToken ct = default)
+    {
+        await _operations.WaitAsync(ct);
+        try
+        {
+            return await Task.Run(() =>
+            {
+                if (!IsGameStopped(game))
+                    throw new IOException("Game is running; stop it before installing the RenPy tl overlay.");
+                progress.Report(UiStrings.Format("log.renpy.install.start", game.Name));
+                var result = new Services.RenPy.RenPyInstallService(game.Path).Install(
+                    preparedManifestPath, progress.Report, ct);
+                progress.Report(UiStrings.Format("log.renpy.install.done", game.Name, result.State));
+                return result;
+            }, ct);
+        }
+        finally { _operations.Release(); }
+    }
+
+    public async Task<Services.RenPy.RenPyInstallService.Result> RenPyUninstallAsync(GameInfo game,
+        IProgress<string> progress, CancellationToken ct = default)
+    {
+        await _operations.WaitAsync(ct);
+        try
+        {
+            return await Task.Run(() =>
+            {
+                if (!IsGameStopped(game))
+                    throw new IOException("Game is running; stop it before removing the RenPy tl overlay.");
+                var result = new Services.RenPy.RenPyInstallService(game.Path).Uninstall(progress.Report);
+                if (result.State != "not-installed")
+                    progress.Report(UiStrings.Format("log.renpy.uninstall.done", game.Name));
+                return result;
+            }, ct);
+        }
+        finally { _operations.Release(); }
+    }
+
     private async Task<string?> EnsureRelayAsync(GameInfo game, CancellationToken ct)
     {
         try

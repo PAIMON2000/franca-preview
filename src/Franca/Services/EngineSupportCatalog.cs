@@ -6,7 +6,7 @@ namespace Franca.Services;
 public sealed record EngineSupportEntry(GameEngine Engine, string NoteKey)
 {
     public string Name => Engine.Label();
-    public bool IsSupported => Engine.IsInstallable() || Engine.IsUe();
+    public bool IsSupported => Engine.IsInstallable() || Engine.IsUe() || Engine.IsRenPy();
     public string BadgeText => UiStrings.Get(IsSupported ? "engines.experimental" : "engines.recognized");
     public string Note => UiStrings.Get(NoteKey);
 }
@@ -20,7 +20,7 @@ public static class EngineSupportCatalog
         new(GameEngine.UnityMono, "engines.note.mono"),
         new(GameEngine.Touhou, "engines.note.touhou"),
         new(GameEngine.Unreal, "engines.note.unreal"),
-        new(GameEngine.RenPy, "engines.note.recognized"),
+        new(GameEngine.RenPy, "engines.note.renpy"),
         new(GameEngine.RPGMaker, "engines.note.recognized"),
         new(GameEngine.Godot, "engines.note.recognized"),
         new(GameEngine.Clausewitz, "engines.note.recognized"),

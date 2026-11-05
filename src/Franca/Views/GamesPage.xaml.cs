@@ -565,6 +565,73 @@ public partial class GamesPage : UserControl
         }
     }
 
+    // ---- RenPy tl 覆盖路线（实验）：详情区按钮，安装入口选择准备产物清单 ----
+
+    private async void OnRenPyInstallClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement { Tag: GameInfo game }) await InstallRenPyAsync(game);
+    }
+
+    // RenPy 安装主流程：选择准备产物清单 → 事务安装；详情区按钮与主按钮共用
+    private async Task InstallRenPyAsync(GameInfo game)
+    {
+        if (_busy || !game.RenPyCanInstall) return;
+        var dialog = new Microsoft.Win32.OpenFileDialog
+        {
+            Title = game.RenPyInstallHint,
+            Filter = "Franca prepared manifest (manifest.json)|manifest.json",
+        };
+        if (dialog.ShowDialog(Window.GetWindow(this)) != true) return;
+
+        _busy = true;
+        game.IsToggling = true;
+        game.SetInstallError(null);
+        RefreshRow(game);
+        try
+        {
+            await _host.GameTranslation.RenPyInstallAsync(game, dialog.FileName, new Progress<string>(AppLog.Write));
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write(UiStrings.Format("log.enable.fail", ex.Message));
+            game.SetInstallError(ex.Message);
+        }
+        finally
+        {
+            game.IsToggling = false;
+            _busy = false;
+            RefreshRow(game);
+        }
+    }
+
+    private async void OnRenPyUninstallClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not FrameworkElement { Tag: GameInfo game } || _busy || !game.RenPyCanManage)
+            return;
+        var dialog = new UninstallConfirmDialog { Owner = Window.GetWindow(this) };
+        if (dialog.ShowDialog() != true) return;
+
+        _busy = true;
+        game.IsToggling = true;
+        game.SetInstallError(null);
+        RefreshRow(game);
+        try
+        {
+            await _host.GameTranslation.RenPyUninstallAsync(game, new Progress<string>(AppLog.Write));
+        }
+        catch (Exception ex)
+        {
+            AppLog.Write(UiStrings.Format("log.enable.fail", ex.Message));
+            game.SetInstallError(ex.Message);
+        }
+        finally
+        {
+            game.IsToggling = false;
+            _busy = false;
+            RefreshRow(game);
+        }
+    }
+
     private void RefreshTranslationHealth(GameInfo game)
     {
         if (!game.IsReady || !game.Engine.IsUnity())
@@ -636,11 +703,17 @@ public partial class GamesPage : UserControl
     private async void OnGamePrimaryClick(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement { Tag: GameInfo game }) return;
-        // UE：主按钮 = 安装译文（选产物清单）或已安装后启动，与 Unity 行的"启用/启动"同位
+        // UE / RenPy：主按钮 = 安装译文（选产物清单）或已安装后启动，与 Unity 行的"启用/启动"同位
         if (game.IsUe)
         {
             if (game.UeInstalled) OnLaunchClick(sender, e);
             else await InstallUeAsync(game);
+            return;
+        }
+        if (game.IsRenPy)
+        {
+            if (game.RenPyInstalled) OnLaunchClick(sender, e);
+            else await InstallRenPyAsync(game);
             return;
         }
         if (game.IsActive) OnLaunchClick(sender, e);
