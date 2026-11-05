@@ -25,6 +25,14 @@ public sealed class RenPyStaticService
         _translator = new StaticTextTranslationService(new PackStore(packsRoot), provider);
     }
 
+    // Ren'Py engine-builtin UI strings (shipped in renpy/common, not in any game
+    // .rpyc, so the extractor never sees them). Only zh-CN entries for now.
+    private static readonly IReadOnlyDictionary<string, string> EngineBuiltinStringsZh =
+        new Dictionary<string, string>
+        {
+            ["empty slot"] = "空槽位",
+        };
+
     // Ren'Py language identifiers must be valid Python identifiers.
     public static string LanguageDirectory(string targetLanguage) => targetLanguage switch
     {
@@ -87,6 +95,31 @@ public sealed class RenPyStaticService
             translate {language} python:
                 style.default.font = "tl/{language}/NotoSansSC.ttf"
 
+            init 9999 python:
+                # Styles with an EXPLICIT font (game UI fonts, poem fonts) do
+                # not inherit style.default; force our CJK font onto every
+                # registered style AND onto every Text constructor call, so
+                # text rendered through late-created styles or direct font=
+                # arguments (e.g. single-choice menus) still shows CJK.
+                try:
+                    import renpy.style as _franca_style_mod
+                    for _s in list(_franca_style_mod.styles.values()):
+                        try:
+                            _s.font = "tl/{language}/NotoSansSC.ttf"
+                        except Exception:
+                            pass
+                except Exception:
+                    pass
+                try:
+                    import renpy.text.text as _franca_text_mod
+                    _franca_text_orig_init = _franca_text_mod.Text.__init__
+                    def _franca_text_patched_init(self, text, *args, **kwargs):
+                        kwargs["font"] = "tl/{language}/NotoSansSC.ttf"
+                        _franca_text_orig_init(self, text, *args, **kwargs)
+                    _franca_text_mod.Text.__init__ = _franca_text_patched_init
+                except Exception:
+                    pass
+
             """);
 
         var font = fontFile ?? Path.Combine(AppContext.BaseDirectory, "ThirdParty", "thcrap", "fonts", "NotoSansSC.ttf");
@@ -118,6 +151,7 @@ public sealed class RenPyStaticService
         writer.WriteLine("# Franca machine translation. Generated file; reinstall instead of editing.");
         writer.WriteLine($"translate {language} strings:");
         writer.WriteLine();
+        var written = new HashSet<string>(StringComparer.Ordinal);
         foreach (var text in texts)
         {
             if (!translated.TryGetValue(text, out var target) || string.IsNullOrEmpty(target) || target == text)
@@ -125,6 +159,18 @@ public sealed class RenPyStaticService
             writer.WriteLine($"    old {Quote(text)}");
             writer.WriteLine($"    new {Quote(target)}");
             writer.WriteLine();
+            written.Add(text);
+        }
+        if (string.Equals(language.Replace('_', '-'), "zh-CN", StringComparison.OrdinalIgnoreCase))
+        {
+            foreach (var kv in EngineBuiltinStringsZh)
+            {
+                if (!written.Add(kv.Key))
+                    continue; // extractor already emitted its own translation
+                writer.WriteLine($"    old {Quote(kv.Key)}");
+                writer.WriteLine($"    new {Quote(kv.Value)}");
+                writer.WriteLine();
+            }
         }
     }
 

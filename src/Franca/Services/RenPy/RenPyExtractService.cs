@@ -26,8 +26,20 @@ public static class RenPyExtractService
 
         var result = new RenPyScanResult { GameDir = gameDir, ScriptRoot = root };
 
+        // The tl/ overlay (and Ren'Py's cache) must never feed extraction or
+        // the source-strings hash: those files are either ours (installed
+        // translations, compiled to .rpyc next to the .rpy) or compiled
+        // mirrors, and would destabilize update detection.
+        bool Foreign(string path)
+        {
+            var rel = Path.GetRelativePath(root, path).Replace('\\', '/');
+            return rel.StartsWith("tl/", StringComparison.OrdinalIgnoreCase)
+                || rel.StartsWith("cache/", StringComparison.OrdinalIgnoreCase);
+        }
+
         foreach (var rpyc in Directory.GetFiles(root, "*.rpyc", SearchOption.AllDirectories))
         {
+            if (Foreign(rpyc)) continue;
             try
             {
                 result.Scripts.Add((Path.GetFileName(rpyc), RpycFile.LoadStatements(File.ReadAllBytes(rpyc))));
@@ -40,6 +52,7 @@ public static class RenPyExtractService
 
         foreach (var rpaPath in Directory.GetFiles(root, "*.rpa", SearchOption.AllDirectories))
         {
+            if (Foreign(rpaPath)) continue;
             try
             {
                 using var rpa = RpaFile.Open(rpaPath);

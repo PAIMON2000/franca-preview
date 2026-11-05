@@ -24,6 +24,8 @@ internal static class RenPyProbe
             FixtureRoundTrip();
             RpycV2Wrap();
             ExtractionAndEmission();
+            ScreenExtraction();
+            ScanSkipsOverlay();
         }
         catch (Exception ex)
         {
@@ -148,6 +150,79 @@ internal static class RenPyProbe
 
         var v1 = RpycFile.LoadStatements(ZlibWrap(f.Bytes));
         Check("rpyc_v1_blob", v1.Count == 0);
+    }
+
+    // Screen language 2: SLDisplayable nodes carry the displayable GLOBAL ref
+    // and expression-source positionals. Text displayables (Text/_textbutton/
+    // _label) pass positional[0] through renpy.translation.translate_string
+    // at render time — both explicit _() calls and bare literals are
+    // translatable; bare interpolation literals are data and must be skipped.
+    private static void ScreenExtraction()
+    {
+        PyFake Displayable(string fullName, params string[] positional)
+        {
+            var lastDot = fullName.LastIndexOf('.');
+            var d = new PyFake
+            {
+                Module = "renpy.sl2.slast",
+                Name = "SLDisplayable",
+            };
+            d.State["displayable"] = new PyPickle.PyGlobal
+            {
+                Module = fullName[..lastDot],
+                Name = fullName[(lastDot + 1)..],
+            };
+            d.State["positional"] = positional.Cast<object?>().ToList();
+            d.State["children"] = new List<object?>();
+            return d;
+        }
+
+        var stmts = new List<object?>
+        {
+            Displayable("renpy.ui._textbutton", "_('Load Game')"),
+            Displayable("renpy.text.text.Text", "\"empty slot\""),
+            Displayable("renpy.text.text.Text", "'[player]'"),          // bare + interpolation -> data
+            Displayable("renpy.ui._imagebutton", "'gui/mainmenu.png'"), // not a text displayable
+            Displayable("renpy.ui._label", "_(u'History')"),
+        };
+
+        var strings = RenPyStringExtractor.FromStatements([("screens.rpy", stmts)]);
+        var texts = strings.Select(s => s.Text).ToHashSet(StringComparer.Ordinal);
+        Check("screen_call_extracted", texts.Contains("Load Game"));
+        Check("screen_bare_literal_extracted", texts.Contains("empty slot"));
+        Check("screen_label_call_extracted", texts.Contains("History"));
+        Check("screen_interpolation_skipped", !texts.Contains("[player]"));
+        Check("screen_nontext_skipped", !texts.Contains("gui/mainmenu.png"));
+    }
+
+    // The installed tl overlay is compiled by Ren'Py into .rpyc next to the
+    // .rpy; Scan must ignore game/tl/ (and game/cache) so the source-strings
+    // hash stays stable across install state.
+    private static void ScanSkipsOverlay()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "franca-renpy-scan-" + Guid.NewGuid().ToString("N"));
+        var game = Path.Combine(dir, "game");
+        Directory.CreateDirectory(Path.Combine(game, "tl", "zh_cn"));
+        Directory.CreateDirectory(Path.Combine(game, "cache"));
+        var empty = new FixtureBuilder();
+        empty.Proto2();
+        empty.None();
+        empty.EmptyList();
+        empty.Tuple2();
+        empty.Stop();
+        var blob = ZlibWrap(empty.Bytes);
+        File.WriteAllBytes(Path.Combine(game, "a.rpyc"), blob);
+        File.WriteAllBytes(Path.Combine(game, "tl", "zh_cn", "strings.rpyc"), blob);
+        File.WriteAllBytes(Path.Combine(game, "cache", "x.rpyc"), blob);
+        try
+        {
+            var scan = RenPyExtractService.Scan(dir);
+            Check("scan_skips_tl_and_cache", scan.Scripts.Count == 1, $"got {scan.Scripts.Count}");
+        }
+        finally
+        {
+            Directory.Delete(dir, recursive: true);
+        }
     }
 
     private static byte[] ZlibWrap(byte[] payload)

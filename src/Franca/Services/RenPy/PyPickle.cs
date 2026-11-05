@@ -354,10 +354,11 @@ public sealed class PyPickle
         }
     }
 
-    private sealed class PyGlobal
+    public sealed class PyGlobal
     {
         public required string Module { get; init; }
         public required string Name { get; init; }
+        public string FullName => Module.Length == 0 ? Name : Module + "." + Name;
     }
 
     private static string ModuleOf(object? callable) => callable is PyGlobal g ? g.Module : "";

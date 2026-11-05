@@ -116,6 +116,21 @@ public sealed class RenPyInstallService
         journal.Language = language;
         journal.SourceStringsSha256 = expectedHash;
         File.WriteAllText(Manifest(record), JsonSerializer.Serialize(journal, new JsonSerializerOptions { WriteIndented = true }));
+        // Ren'Py compiles installed .rpy files to sibling .rpyc on first launch;
+        // a stale .rpyc from a previous install is loaded alongside the new .rpy
+        // and every `old` string raises "translation already exists". Drop the
+        // compiled artifacts of the files we just installed.
+        foreach (var entry in journal.Files)
+        {
+            if (!entry.Path.EndsWith(".rpy", StringComparison.OrdinalIgnoreCase)) continue;
+            var compiled = InstallationTransaction.SafePath(_game,
+                Path.ChangeExtension(entry.Path, ".rpyc"));
+            if (File.Exists(compiled))
+            {
+                File.Delete(compiled);
+                log($"RenPy 已清除过期编译缓存：{compiled}");
+            }
+        }
         return new Result("installed", record);
     }
 

@@ -63,14 +63,19 @@
 - 事务安装：游戏脚本现场重扫 SourceStringsSha256 与清单比对（防游戏更新漂移）→ State=installed。
 - 真机（窗口化 1280x720）：开场免责声明三页（不适宜儿童/焦虑抑郁警告/13 岁同意）全部中文渲染正常。自动化截图走 PrintWindow(flags=2) 可行，无黑屏。
 - **字体坑**：`translate python: style.default.font` 在 6.99.12 不生效（症状：中文零宽、整段只剩 URL 等 ASCII）；改 `translate <语言> style default:` 块后正常。生成器已修（RenPyStaticService 的 franca.rpy 模板双保险）。
+- **三层字体覆盖**（同日补，真机抓回严重回归后定型）：①`translate <语言> style default:` 块；②`init 9999 python` 遍历 `renpy.style.styles` 全样式强制 font；③**patch `renpy.text.text.Text.__init__` 强制 kwargs["font"]**——单选菜单按钮（"我同意。"）的样式是运行时延迟创建的，②遍历盖不到；字体缺 CJK 时文本零宽 → 按钮热区塌缩 → 整页卡死无法点击/按键推进。三层齐备后主菜单侧栏 5 钮从 tofu（口口口）变正常中文。
+- **屏幕（screen）串提取**（同日落地）：运行时路径查明——screen 文本统一走 `renpy.substitutions.substitute()` → `translate_string()`（引擎源码 `renpy/substitutions.py`，`translate=True` 默认，Input 例外 `substitute=False`），所以 strings 块对 screen 文本天然生效。提取器新增 SLDisplayable 处理：`renpy.text.text.Text`/`renpy.ui._textbutton`/`renpy.ui._label` 取 positional[0] 表达式——显式 `_('...')` 调用和裸字面量都提取，裸字面量含 `[`（插值）跳过。DDLC 实测多收 40 条（History/Skip/Auto/New Game/Load Game/Settings/Return/Yes/No 等）。
+- **引擎内置串补偿**：`empty slot` 等 UI 串编译在 `renpy/common`（随引擎发布，不在任何 game .rpyc），扫描器永远看不到。生成器内嵌固定映射（`EngineBuiltinStringsZh`）在写 strings.rpy 时补 `old/new` 对（当前仅 zh-CN 一条，可随语言扩充；与提取结果去重）。真机 Load 页 9 槽全显"空槽位"。
+- **重装崩溃坑**：RenPy 首启会把 tl/<语言>/*.rpy 编译成同名 .rpyc；下次安装只覆盖 .rpy 时，旧 .rpyc 与新 .rpy 被同时加载 → `A translation for ... already exists` 启动即崩。修复：安装提交后清除所装 .rpy 的过期 .rpyc。
+- **安装根目录坑**：`--renpy-install/--renpy-uninstall` 的 journal 路径以安装根为基（`game/tl/...`），误传内层 `game` 目录会把产物装进 `game/game/tl`；且 Scan 的 `<gameDir>/game` 优先探测会坠入该 stray 目录，之后所有扫描报 "No compiled scripts"。CLI 现归一化（认 `renpy/` sibling 特征，内层 game 自动上溯父级）。
 - **卸载坑**：安装事务日志漏盖 `Engine="renpy"`，RenPyInstallService.ReadJournals 过滤不到自己写的记录 → 卸载恒 not-installed、IsInstalled 同病。修复：安装时补盖章 + 旧记录按 `game/tl/` 路径前缀兼容识别。卸载往返 rolled-back、tl 目录移除验证通过；手改文件被正确判 Rollback conflict。
-- 已知边界：**screen 块内文本未提取**（`_()` 在 screen AST 里而非 PyCode——Load 页 empty slot/Return/侧栏导航按钮保持英文）；主菜单按钮是图片贴图（无文本可译）。screen AST 提取是后续增强项。
-- 合成探针 `--probe-renpy` 9/9 PASS（proto2 手工夹具）。
+- 真机验收（同日第二轮）：免责声明三页中文、"我同意。"按钮中文渲染且可点击（三层字体修复前为空盒+整页卡死）、主菜单侧栏 5 钮全中文、Load 页标题"加载"/侧栏/9 空槽全中文。已知边界：主菜单按钮是图片贴图（无文本可译）；`Page {}` 页码（带插值的引擎内置串）仍英文；RenPy 8 无真机样本。
+- 合成探针 `--probe-renpy` 14/14 PASS（proto2 手工夹具 + 5 项 screen_* + scan_skips_tl_and_cache）。
 - CLI 三命令：`--renpy-prepare <gameDir> <appId> <outputDir> <settings.json> <packsDir> <seconds> [--language=]`、`--renpy-install <gameDir> <preparedDir>`、`--renpy-uninstall <gameDir>`；另有只读 `--renpy-extract`。
 
 ## 待办（后续增强）
 
-1. screen AST 文本提取（`_("...")` 在 screen 语言里，Load/Save/Settings/Help 页导航与空槽文案）。
-2. RenPy 8（py3 pickle 协议 4/5）真机样本验收（解析器已支持，无样本）。
-3. 接正式启用入口（游戏库 GUI），当前仅 CLI。
+1. RenPy 8（py3 pickle 协议 4/5）真机样本验收（解析器已支持，无样本）。
+2. 接正式启用入口（游戏库 GUI），当前仅 CLI。
+3. 引擎内置串扩充（`Page {}` 等带插值串需拆固定部分单独映射）。
 4. 长时间游玩稳定性（ poem 小游戏等动态文本路径）留用户手测。

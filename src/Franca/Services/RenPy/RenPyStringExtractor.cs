@@ -15,6 +15,20 @@ public static partial class RenPyStringExtractor
 {
     [GeneratedRegex(@"_\(\s*u?(['""])((?:\\.|(?!\1).)*)\1\s*\)")]
     private static partial Regex TranslatedCallPattern();
+
+    // Bare string literal as a complete screen positional expression, e.g.
+    // `text "empty slot"` stores the expression source `"empty slot"`.
+    [GeneratedRegex(@"^\s*u?(['""])((?:\\.|(?!\1).)*)\1\s*$")]
+    private static partial Regex BareLiteralPattern();
+
+    // Screen displayables whose positional argument is rendered text that
+    // Ren'Py passes through renpy.translation.translate_string at display
+    // time (renpy/substitutions.py). Everything else (image paths, keys,
+    // timers, ...) is data, not UI text.
+    private static bool IsTextDisplayable(string fullName) => fullName is
+        "renpy.text.text.Text" or
+        "renpy.ui._textbutton" or
+        "renpy.ui._label";
     public static List<RenPyString> FromStatements(IEnumerable<(string Source, List<object?> Stmts)> scripts)
     {
         var seen = new Dictionary<string, RenPyString>(StringComparer.Ordinal);
@@ -50,6 +64,40 @@ public static partial class RenPyStringExtractor
                                 }
                             }
                             // Menu blocks are still walked generically below.
+                            break;
+                        }
+                    case "SLDisplayable":
+                        {
+                            // Screen language 2 node: positional[0] is the
+                            // expression source of the text argument. Both
+                            // explicit `_('...')` calls and bare literals are
+                            // translated at render time by translate_string.
+                            var global = f.Get("displayable");
+                            var fullName = global switch
+                            {
+                                PyPickle.PyGlobal g => g.FullName,
+                                PyFake pf => pf.FullName,
+                                _ => null,
+                            };
+                            if (fullName is not null && IsTextDisplayable(fullName)
+                                && f.Get("positional") is List<object?> { Count: >= 1 } pos
+                                && PyStr(pos[0]) is { } expr)
+                            {
+                                var call = TranslatedCallPattern().Match(expr);
+                                string? raw;
+                                if (call.Success) raw = call.Groups[2].Value;
+                                else
+                                {
+                                    // Bare literal without an explicit _():
+                                    // looked up at render time too, but skip
+                                    // interpolation-only/data-ish literals.
+                                    var bare = BareLiteralPattern().Match(expr);
+                                    if (!bare.Success || bare.Groups[2].Value.Contains('[')) break;
+                                    raw = bare.Groups[2].Value;
+                                }
+                                var s = UnescapePy(raw);
+                                if (s.Length > 0) Add(seen, s, "screen", source);
+                            }
                             break;
                         }
                     case "PyCode":

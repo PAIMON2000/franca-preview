@@ -39,6 +39,22 @@ internal static partial class ProbeRunner
         }
     }
 
+    // Journal paths are relative to the Ren'Py install ROOT (game/tl/...).
+    // Accept the inner script directory too and normalize to the root; a wrong
+    // base doubles the prefix (game/game/tl) and later scans then descend into
+    // the stray directory and miss the real scripts.
+    private static string NormalizeRenPyRoot(string arg)
+    {
+        var full = Path.GetFullPath(arg).TrimEnd(Path.DirectorySeparatorChar);
+        if (Directory.Exists(Path.Combine(full, "renpy"))) return full;
+        var parent = Path.GetDirectoryName(full);
+        if (parent is not null
+            && Path.GetFileName(full).Equals("game", StringComparison.OrdinalIgnoreCase)
+            && Directory.Exists(Path.Combine(parent, "renpy")))
+            return parent;
+        return full;
+    }
+
     private static async Task RunRenPyCommandAsync(string[] args)
     {
         try
@@ -76,12 +92,12 @@ internal static partial class ProbeRunner
             {
                 if (args.Length != 3) throw new ArgumentException("--renpy-install <gameDir> <preparedDir>");
                 var manifest = Path.Combine(Path.GetFullPath(args[2]), "manifest.json");
-                var result = new Services.RenPy.RenPyInstallService(args[1]).Install(manifest, Console.WriteLine);
+                var result = new Services.RenPy.RenPyInstallService(NormalizeRenPyRoot(args[1])).Install(manifest, Console.WriteLine);
                 Console.WriteLine(JsonSerializer.Serialize(result));
                 return;
             }
             if (args.Length != 2) throw new ArgumentException("--renpy-uninstall <gameDir>");
-            var uninstall = new Services.RenPy.RenPyInstallService(args[1]).Uninstall(Console.WriteLine);
+            var uninstall = new Services.RenPy.RenPyInstallService(NormalizeRenPyRoot(args[1])).Uninstall(Console.WriteLine);
             Console.WriteLine(JsonSerializer.Serialize(uninstall));
             if (uninstall.State is "not-installed") Environment.ExitCode = 2;
         }
